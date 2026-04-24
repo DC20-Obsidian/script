@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 
 import json
+import argparse
 
-page = 112
+page = 70
 page_range = range(68, 115)
+
+parser = argparse.ArgumentParser(
+    prog='parse-spells'
+)
+parser.add_argument('page', default=page, nargs='?')
+args = parser.parse_args()
+page = int(args.page)
 
 def extract_spell_name(text_items: dict, i: int):
     i_init = i
