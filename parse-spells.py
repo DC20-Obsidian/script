@@ -4,14 +4,18 @@ import json
 import argparse
 
 page = 70
-page_range = range(68, 115)
+# spell range: 68-114
 
 parser = argparse.ArgumentParser(
     prog='parse-spells'
 )
 parser.add_argument('page', default=page, nargs='?')
+parser.add_argument('last_page', nargs='?')
 args = parser.parse_args()
+
 page = int(args.page)
+last_page = int(args.last_page if args.last_page else page)
+page_range = slice(page - 1, last_page)
 
 def eprint(*args, **kw):
     import sys
@@ -56,61 +60,65 @@ class EncodeJSON(json.JSONEncoder):
 with open('./dc20_0.10beta.json', 'r') as file:
     data = json.load(file)
 
-tags = ["Source", "School", "Tags", "Cost", "Range", "Duration", "Spell Enhancements"]
+# tags = ["Source", "School", "Tags", "Cost", "Range", "Duration", "Spell Enhancements"]
 spells = []
-current_spell = Spell()
-current_item: str = "name"
+text_items = data['pages'][page_range]
 
-text_items = data['pages'][page - 1]['textItems']
-i = 0
-while i < len(text_items):
-    text = text_items[i]['text']
-    push_spell = False
+def process_page(page_text, spells):
+    current_spell = Spell()
+    current_item = 'name'
+    for i, text_item in enumerate(page_text):
+        text = text_item['text']
+        push_spell = False
 
-    match current_item:
-        case 'name':
-            if text == "Source":
-                current_spell.name = extract_spell_name(text_items, i)
-                current_item = 'source'
-        case 'source':
-            if text[0] == ':':
-                current_spell.source = text[2:]
-                current_item = 'school'
-        case 'school':
-            if text[0] == ':':
-                current_spell.school = text[2:]
-                current_item = 'tags'
-        case 'tags':
-            if text[0] == ':':
-                current_spell.tags = text[2:]
-                current_item = 'cost'
-        case 'cost':
-            if text[0] == ':':
-                current_spell.cost = text[2:]
-                current_item = 'range'
-        case 'range':
-            if text[0] == ':':
-                current_spell.range = text[2:]
-                current_item = 'duration'
-        case 'duration':
-            if text[0] == ':':
-                current_spell.duration = text[2:]
-                current_item = 'desc'
-                push_spell = False
-        case 'desc':
-            if text != 'Spell Enhancements':
-                current_spell.description += text
-            else:
-                current_item = 'name'
-                push_spell = True
+        match current_item:
+            case 'name':
+                if text == "Source":
+                    current_spell.name = extract_spell_name(page_text, i)
+                    current_item = 'source'
+            case 'source':
+                if text[0] == ':':
+                    current_spell.source = text[2:]
+                    current_item = 'school'
+            case 'school':
+                if text[0] == ':':
+                    current_spell.school = text[2:]
+                    current_item = 'tags'
+            case 'tags':
+                if text[0] == ':':
+                    current_spell.tags = text[2:]
+                    current_item = 'cost'
+            case 'cost':
+                if text[0] == ':':
+                    current_spell.cost = text[2:]
+                    current_item = 'range'
+            case 'range':
+                if text[0] == ':':
+                    current_spell.range = text[2:]
+                    current_item = 'duration'
+            case 'duration':
+                if text[0] == ':':
+                    current_spell.duration = text[2:]
+                    current_item = 'desc'
+                    push_spell = False
+            case 'desc':
+                if text != 'Spell Enhancements':
+                    current_spell.description += text
+                else:
+                    current_item = 'name'
+                    push_spell = True
+            # TODO add table parsing and fix spaces
 
 
-    if push_spell:
-        spells.append(current_spell)
-        current_spell = Spell()
+        if push_spell:
+            spells.append(current_spell)
+            current_spell = Spell()
 
-    eprint(text)
-    i += 1
+        eprint(text)
+        i += 1
+
+for page in text_items:
+    process_page(page['textItems'], spells)
 
 # for spell in spells:
 #     print(json.dumps(spell.__dict__))
