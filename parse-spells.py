@@ -38,13 +38,12 @@ def extract_spell_name(text_items: dict, i: int):
         name += "-"
     eprint(f"-----name-----> {name}")
     return name
-    
 
 class Spell:
     name: str = "<none>"
-    source: str = "<none>"
+    source: List[str] = []
     school: str = "<none>"
-    tags: str = "<none>"
+    tags: List[str] = []
     cost: str = "<none>"
     range: str = "<none>"
     duration: str = "<none>"
@@ -77,7 +76,7 @@ def process_page(page_text, spells):
                     current_item = 'source'
             case 'source':
                 if text[0] == ':':
-                    current_spell.source = text[2:]
+                    current_spell.source = text[2:].split(', ')
                     current_item = 'school'
             case 'school':
                 if text[0] == ':':
@@ -85,7 +84,7 @@ def process_page(page_text, spells):
                     current_item = 'tags'
             case 'tags':
                 if text[0] == ':':
-                    current_spell.tags = text[2:]
+                    current_spell.tags = text[2:].split(', ')
                     current_item = 'cost'
             case 'cost':
                 if text[0] == ':':
