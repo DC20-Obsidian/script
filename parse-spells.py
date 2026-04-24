@@ -60,7 +60,6 @@ class EncodeJSON(json.JSONEncoder):
 with open('./dc20_0.10beta.json', 'r') as file:
     data = json.load(file)
 
-# tags = ["Source", "School", "Tags", "Cost", "Range", "Duration", "Spell Enhancements"]
 spells = []
 text_items = data['pages'][page_range]
 
@@ -109,13 +108,11 @@ def process_page(page_text, spells):
                     push_spell = True
             # TODO add table parsing and fix spaces
 
-
         if push_spell:
             spells.append(current_spell)
             current_spell = Spell()
 
         eprint(text)
-        i += 1
 
 for page in text_items:
     process_page(page['textItems'], spells)
