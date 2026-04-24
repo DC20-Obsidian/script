@@ -13,6 +13,10 @@ parser.add_argument('page', default=page, nargs='?')
 args = parser.parse_args()
 page = int(args.page)
 
+def eprint(*args, **kw):
+    import sys
+    print(*args, file=sys.stderr, **kw)
+
 def extract_spell_name(text_items: dict, i: int):
     i_init = i
     # Just hit "Source", backtrack to name start
@@ -28,7 +32,7 @@ def extract_spell_name(text_items: dict, i: int):
         name += text
         # if len(text) >= 3:
         name += "-"
-    print(f"-----name-----> {name}")
+    eprint(f"-----name-----> {name}")
     return name
     
 
@@ -41,6 +45,13 @@ class Spell:
     range
     duration
     description
+
+class EncodeJSON(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, (Spell,)):
+            return o.__dict__
+        else:
+            return json.JSONEncoder.default(self, o)
 
 with open('./dc20_0.10beta.json', 'r') as file:
     data = json.load(file)
@@ -58,17 +69,16 @@ while i < len(text_items):
     match curent_item:
         case 'name':
             if text == "Source":
-                print("ffo")
                 name = extract_spell_name(text_items, i)
                 current_spell.name = name
                 current_item = 'source'
                 spells.append(current_spell)
                 current_spell = Spell()
-    # print(text, end="---")
-    # print(text_items[i]['fontName'])
-    print(text)
+
+    eprint(text)
     i += 1
 
-for spell in spells:
-    print(json.dumps(spell.__dict__))
+# for spell in spells:
+#     print(json.dumps(spell.__dict__))
+print(json.dumps(spells, cls=EncodeJSON))
 
