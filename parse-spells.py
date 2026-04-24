@@ -65,14 +65,49 @@ text_items = data['pages'][page - 1]['textItems']
 i = 0
 while i < len(text_items):
     text = text_items[i]['text']
+    push_spell = False
 
     match current_item:
         case 'name':
             if text == "Source":
                 current_spell.name = extract_spell_name(text_items, i)
                 current_item = 'source'
-                spells.append(current_spell)
-                current_spell = Spell()
+        case 'source':
+            if text[0] == ':':
+                current_spell.source = text[2:]
+                current_item = 'school'
+        case 'school':
+            if text[0] == ':':
+                current_spell.school = text[2:]
+                current_item = 'tags'
+        case 'tags':
+            if text[0] == ':':
+                current_spell.tags = text[2:]
+                current_item = 'cost'
+        case 'cost':
+            if text[0] == ':':
+                current_spell.cost = text[2:]
+                current_item = 'range'
+        case 'range':
+            if text[0] == ':':
+                current_spell.range = text[2:]
+                current_item = 'duration'
+        case 'duration':
+            if text[0] == ':':
+                current_spell.duration = text[2:]
+                current_item = 'desc'
+                push_spell = False
+        case 'desc':
+            if text != 'Spell Enhancements':
+                current_spell.description += text
+            else:
+                current_item = 'name'
+                push_spell = True
+
+
+    if push_spell:
+        spells.append(current_spell)
+        current_spell = Spell()
 
     eprint(text)
     i += 1
