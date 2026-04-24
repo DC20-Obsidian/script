@@ -37,14 +37,14 @@ def extract_spell_name(text_items: dict, i: int):
     
 
 class Spell:
-    name
-    source
-    school
-    tags
-    cost
-    range
-    duration
-    description
+    name: str = "<none>"
+    source: str = "<none>"
+    school: str = "<none>"
+    tags: str = "<none>"
+    cost: str = "<none>"
+    range: str = "<none>"
+    duration: str = "<none>"
+    description: str = ""
 
 class EncodeJSON(json.JSONEncoder):
     def default(self, o):
