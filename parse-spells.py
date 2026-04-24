@@ -66,41 +66,46 @@ def process_page(page_text, spells):
     current_spell = Spell()
     current_item = 'name'
     for i, text_item in enumerate(page_text):
-        text = text_item['text']
+        prev_text: str = page_text[i-1]['text'] if i != 0 else " "
+        prev_colon: bool = prev_text[-1:] == ':'
+        text: str = text_item['text']
         push_spell = False
+        debug_line = True
+
+        eprint(f"{current_item=}")
 
         match current_item:
             case 'name':
-                if text == "Source":
+                if text[:6] == "Source" or text[:10] == "Spell List":
                     current_spell.name = extract_spell_name(page_text, i)
                     current_item = 'source'
             case 'source':
-                if text[0] == ':':
-                    current_spell.source = text[2:].split(', ')
+                if text[0] == ':' or prev_colon :
+                    current_spell.source = text.strip(': ').split(', ')
                     current_item = 'school'
             case 'school':
-                if text[0] == ':':
-                    current_spell.school = text[2:]
+                if text[0] == ':' or prev_colon :
+                    current_spell.school = text.strip(': ')
                     current_item = 'tags'
             case 'tags':
-                if text[0] == ':':
-                    current_spell.tags = text[2:].split(', ')
+                if text[0] == ':' or prev_colon :
+                    current_spell.tags = text.strip(': ').split(', ')
                     current_item = 'cost'
             case 'cost':
-                if text[0] == ':':
-                    current_spell.cost = text[2:]
+                if text[0] == ':' or prev_colon :
+                    current_spell.cost = text.strip(': ')
                     current_item = 'range'
             case 'range':
-                if text[0] == ':':
-                    current_spell.range = text[2:]
+                if text[0] == ':' or prev_colon :
+                    current_spell.range = text.strip(': ')
                     current_item = 'duration'
             case 'duration':
-                if text[0] == ':':
-                    current_spell.duration = text[2:]
+                if text[0] == ':' or prev_colon :
+                    current_spell.duration = text.strip(': ')
                     current_item = 'desc'
                     push_spell = False
             case 'desc':
-                if text != 'Spell Enhancements':
+                if text.rstrip('s') != 'Spell Enhancement':
                     current_spell.description += text
                 else:
                     current_item = 'name'
@@ -111,7 +116,10 @@ def process_page(page_text, spells):
             spells.append(current_spell)
             current_spell = Spell()
 
-        eprint(text)
+        if debug_line:
+            eprint(text)
+            # eprint(f"{text}     - {text_item['fontName']}")
+            # eprint(text_item['fontName'])
 
 for page in text_items:
     process_page(page['textItems'], spells)
