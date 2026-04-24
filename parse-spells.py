@@ -34,8 +34,8 @@ def extract_spell_name(text_items: dict, i: int):
     for i in range(i, i_init):
         text = text_items[i]['text']
         name += text
-        # if len(text) >= 3:
-        name += "-"
+    # Semi-fix caseing
+    name = ' '.join([ s.capitalize() for s in name.split(' ') ])
     eprint(f"-----name-----> {name}")
     return name
 
