@@ -40,19 +40,24 @@ def extract_spell_name(text_items: dict, i: int):
     return name
 
 class Spell:
-    name: str = "<none>"
-    source: List[str] = []
-    school: str = "<none>"
-    tags: List[str] = []
-    cost: str = "<none>"
-    range: str = "<none>"
-    duration: str = "<none>"
-    description: str = ""
+    def __init__(self):
+        self.name: str = "<none>"
+        self.source: List[str] = []
+        self.school: str = "<none>"
+        self.tags: List[str] = []
+        self.cost: str = "<none>"
+        self.range: str = "<none>"
+        self.duration: str = "<none>"
+        self.description: str = ""
+        self._current_enhmt = ""
+        self.enhancements: dict[str, str] = {}
 
 class EncodeJSON(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, (Spell,)):
-            return o.__dict__
+            d = o.__dict__
+            d.pop("_current_enhmt")
+            return d
         else:
             return json.JSONEncoder.default(self, o)
 
@@ -67,13 +72,13 @@ def process_page(page_text, spells):
     current_item = 'name'
     for i, text_item in enumerate(page_text):
         prev_text: str = page_text[i-1]['text'] if i != 0 else " "
+        next_text: str = page_text[i+1]['text'] if i + 1 < len(page_text) else " "
         prev_colon: bool = prev_text[-1:] == ':'
         text: str = text_item['text']
         push_spell = False
         debug_line = True
 
-        eprint(f"{current_item=}")
-
+        # eprint(f"{current_item=}")
         match current_item:
             case 'name':
                 if text[:6] == "Source" or text[:10] == "Spell List":
@@ -103,13 +108,25 @@ def process_page(page_text, spells):
                 if text[0] == ':' or prev_colon :
                     current_spell.duration = text.strip(': ')
                     current_item = 'desc'
-                    push_spell = False
             case 'desc':
                 if text.rstrip('s') != 'Spell Enhancement':
                     current_spell.description += text
                 else:
-                    current_item = 'name'
+                    current_item = 'enhancements'
+            case 'enhancements':
+                # Check if line is a page number
+                if text_item['fontName'] == 'g_d0_f3' or 'THE DUNGEON COACH' in text or text.isdigit():
                     push_spell = True
+                    current_item = 'name'
+                else:
+                    text_p = text.rstrip(':').lower()
+                    if (text.endswith(':') or next_text.startswith(':')) and (
+                        not text_p.endswith('success') and not text_p.endswith('failure')):
+                        current_spell._current_enhmt = text.rstrip(':')
+                    enhmt = current_spell._current_enhmt
+                    if enhmt != "":
+                        current_spell.enhancements.setdefault(enhmt, "")
+                        current_spell.enhancements[enhmt] += text.lstrip(': ')
             # TODO add table parsing and fix spaces
 
         if push_spell:
