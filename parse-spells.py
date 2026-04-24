@@ -59,18 +59,17 @@ with open('./dc20_0.10beta.json', 'r') as file:
 tags = ["Source", "School", "Tags", "Cost", "Range", "Duration", "Spell Enhancements"]
 spells = []
 current_spell = Spell()
-curent_item: str = "name"
+current_item: str = "name"
 
 text_items = data['pages'][page - 1]['textItems']
 i = 0
 while i < len(text_items):
     text = text_items[i]['text']
 
-    match curent_item:
+    match current_item:
         case 'name':
             if text == "Source":
-                name = extract_spell_name(text_items, i)
-                current_spell.name = name
+                current_spell.name = extract_spell_name(text_items, i)
                 current_item = 'source'
                 spells.append(current_spell)
                 current_spell = Spell()
