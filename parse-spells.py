@@ -3,23 +3,35 @@
 import json
 import argparse
 
-page = 70
+first_page = 70
 # spell range: 68-114
 
 parser = argparse.ArgumentParser(
     prog='parse-spells'
 )
-parser.add_argument('page', default=page, nargs='?')
+parser.add_argument('page', default=first_page, nargs='?')
 parser.add_argument('last_page', nargs='?')
 args = parser.parse_args()
 
-page = int(args.page)
-last_page = int(args.last_page if args.last_page else page)
-page_range = slice(page - 1, last_page)
+first_page = int(args.page)
+last_page = int(args.last_page if args.last_page else first_page)
+page_range = slice(first_page - 1, last_page)
 
 def eprint(*args, **kw):
     import sys
     print(*args, file=sys.stderr, **kw)
+
+# from blender
+class colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 def extract_spell_name(text_items: dict, i: int):
     i_init = i
@@ -36,15 +48,15 @@ def extract_spell_name(text_items: dict, i: int):
         name += text
     # Semi-fix caseing
     name = ' '.join([ s.capitalize() for s in name.split(' ') ])
-    eprint(f"-----name-----> {name}")
+    eprint(f"{colors.OKGREEN}-----name-----> {name}{colors.ENDC}")
     return name
 
 class Spell:
     def __init__(self):
         self.name: str = "<none>"
-        self.source: List[str] = []
+        self.source: list[str] = []
         self.school: str = "<none>"
-        self.tags: List[str] = []
+        self.tags: list[str] = []
         self.cost: str = "<none>"
         self.range: str = "<none>"
         self.duration: str = "<none>"
@@ -71,12 +83,6 @@ class EncodeJSON(json.JSONEncoder):
             return d
         else:
             return json.JSONEncoder.default(self, o)
-
-with open('./dc20_0.10beta.json', 'r') as file:
-    data = json.load(file)
-
-spells = []
-text_items = data['pages'][page_range]
 
 def process_page(page_text, spells):
     current_spell = Spell()
@@ -153,7 +159,14 @@ def process_page(page_text, spells):
             # eprint(f"{text}     - {text_item['fontName']}")
             # eprint(text_item['fontName'])
 
-for page in text_items:
+with open('./dc20_0.10beta.json', 'r') as file:
+    data = json.load(file)
+
+spells = []
+text_items = data['pages'][page_range]
+
+for i, page in enumerate(text_items):
+    eprint(f"{colors.HEADER}==========> processing page: {i + first_page}{colors.ENDC}")
     process_page(page['textItems'], spells)
 
 # for spell in spells:
