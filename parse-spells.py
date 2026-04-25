@@ -1,24 +1,14 @@
 #!/usr/bin/env python
 
 import json
-import argparse
 
-from utils import colors, eprint
+from utils import colors, eprint, Args
 from dc_types import Spell, Enhancement, EncodeJSON
 
-first_page = 70
 # spell range: 68-114
 
-parser = argparse.ArgumentParser(
-    prog='parse-spells'
-)
-parser.add_argument('page', default=first_page, nargs='?')
-parser.add_argument('last_page', nargs='?')
-args = parser.parse_args()
-
-first_page = int(args.page)
-last_page = int(args.last_page if args.last_page else first_page)
-page_range = slice(first_page - 1, last_page)
+args = Args(default_page=70)
+page_range = args.page_range
 
 def extract_spell_name(text_items: dict, i: int):
     i_init = i
@@ -120,7 +110,7 @@ spells = []
 text_items = data['pages'][page_range]
 
 for i, page in enumerate(text_items):
-    eprint(f"{colors.HEADER}==========> processing page: {i + first_page}{colors.ENDC}")
+    eprint(f"{colors.HEADER}==========> processing page: {i + page_range.start}{colors.ENDC}")
     process_page(page['textItems'], spells)
 
 # for spell in spells:
