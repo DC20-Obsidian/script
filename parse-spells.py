@@ -3,6 +3,9 @@
 import json
 import argparse
 
+from utils import colors, eprint
+from dc_types import Spell, Enhancement, EncodeJSON
+
 first_page = 70
 # spell range: 68-114
 
@@ -16,22 +19,6 @@ args = parser.parse_args()
 first_page = int(args.page)
 last_page = int(args.last_page if args.last_page else first_page)
 page_range = slice(first_page - 1, last_page)
-
-def eprint(*args, **kw):
-    import sys
-    print(*args, file=sys.stderr, **kw)
-
-# from blender
-class colors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 def extract_spell_name(text_items: dict, i: int):
     i_init = i
@@ -50,39 +37,6 @@ def extract_spell_name(text_items: dict, i: int):
     name = ' '.join([ s.capitalize() for s in name.split(' ') ])
     eprint(f"{colors.OKGREEN}-----name-----> {name}{colors.ENDC}")
     return name
-
-class Spell:
-    def __init__(self):
-        self.name: str = "<none>"
-        self.source: list[str] = []
-        self.school: str = "<none>"
-        self.tags: list[str] = []
-        self.cost: str = "<none>"
-        self.range: str = "<none>"
-        self.duration: str = "<none>"
-        self.description: str = ""
-        self.enhancements: dict[str, Enhancement] = {}
-
-class Enhancement:
-    def __init__(self):
-        self.name: str = "<none>"
-        self.cost: str = "<none>"
-        self.description: str = ""
-        # description
-    def finish(self):
-        (prefix, _, self.description) = self.description.partition(')')
-        self.description = self.description.strip()
-        (self.name, _, self.cost) = prefix.partition('(')
-
-class EncodeJSON(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, (Spell, Enhancement)):
-            d = o.__dict__
-            # if isinstance(o, Spell):
-            #     d.pop("_current_enhmt")
-            return d
-        else:
-            return json.JSONEncoder.default(self, o)
 
 def process_page(page_text, spells):
     current_spell = Spell()
