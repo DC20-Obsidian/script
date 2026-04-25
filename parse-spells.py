@@ -49,14 +49,25 @@ class Spell:
         self.range: str = "<none>"
         self.duration: str = "<none>"
         self.description: str = ""
-        self._current_enhmt = ""
-        self.enhancements: dict[str, str] = {}
+        self.enhancements: dict[str, Enhancement] = {}
+
+class Enhancement:
+    def __init__(self):
+        self.name: str = "<none>"
+        self.cost: str = "<none>"
+        self.description: str = ""
+        # description
+    def finish(self):
+        (prefix, _, self.description) = self.description.partition(')')
+        self.description = self.description.strip()
+        (self.name, _, self.cost) = prefix.partition('(')
 
 class EncodeJSON(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, (Spell,)):
+        if isinstance(o, (Spell, Enhancement)):
             d = o.__dict__
-            d.pop("_current_enhmt")
+            # if isinstance(o, Spell):
+            #     d.pop("_current_enhmt")
             return d
         else:
             return json.JSONEncoder.default(self, o)
@@ -70,6 +81,7 @@ text_items = data['pages'][page_range]
 def process_page(page_text, spells):
     current_spell = Spell()
     current_item = 'name'
+    current_enhancement = ""
     for i, text_item in enumerate(page_text):
         prev_text: str = page_text[i-1]['text'] if i != 0 else " "
         next_text: str = page_text[i+1]['text'] if i + 1 < len(page_text) else " "
@@ -122,16 +134,19 @@ def process_page(page_text, spells):
                     text_p = text.rstrip(':').lower()
                     if (text.endswith(':') or next_text.startswith(':')) and (
                         not text_p.endswith('success') and not text_p.endswith('failure')):
-                        current_spell._current_enhmt = text.rstrip(':')
-                    enhmt = current_spell._current_enhmt
-                    if enhmt != "":
-                        current_spell.enhancements.setdefault(enhmt, "")
-                        current_spell.enhancements[enhmt] += text.lstrip(': ')
+                        if current_enhancement != "":
+                            current_spell.enhancements[current_enhancement].finish()
+                        current_enhancement = text.rstrip(':')
+                    if current_enhancement != "":
+                        current_spell.enhancements.setdefault(current_enhancement, Enhancement())
+                        current_spell.enhancements[current_enhancement].description += text.lstrip(': ')
             # TODO add table parsing and fix spaces
 
         if push_spell:
+            current_spell.enhancements[current_enhancement].finish()
             spells.append(current_spell)
             current_spell = Spell()
+            current_enhancement = ""
 
         if debug_line:
             eprint(text)
