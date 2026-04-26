@@ -17,6 +17,7 @@ def fixup(s: str):
 
     def replace(match: re.Match):
         # return f' {colors.RED}{match.group(1)}{colors.ENDC} '
+        # return f' foo{match.group(1)}bar '
         return f' {match.group(1)} '
     def add_space_after(match: re.Match):
         return f'{match.group(1)} '
@@ -26,12 +27,12 @@ def fixup(s: str):
         return match.group(1)
 
     misc_fixes = [
-        (r'ona', 'on a'),
-        (r'ina', 'in a'),
+        (r' ona', ' on a'),
+        (r' ina', ' in a'),
         (r'([,:\.])', add_space_after), # , . :
         (r'([\(])', add_space_before), # (
         (r'[ \u0001]+', ' '), # Remove duplicate spaces
-        (r' ([\.,:])', identity), # Remove spaces in front
+        (r' ([\.,:\)])', identity), # Remove spaces in front
         (r'([\(]) ', identity), # Remove spaces after
         (r'\) :', '):'), # "Save (5) :" -> "Save (5):"
     ]
