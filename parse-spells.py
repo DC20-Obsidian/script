@@ -38,7 +38,6 @@ def process_page(page_text, spells):
         prev_colon: bool = prev_text[-1:] == ':'
         text: str = text_item['text']
         push_spell = False
-        debug_line = True
 
         # eprint(f"{current_item=}")
         match current_item:
@@ -98,10 +97,14 @@ def process_page(page_text, spells):
             current_spell = Spell()
             current_enhancement = ""
 
-        if debug_line:
-            eprint(text)
-            # eprint(f"{text}     - {text_item['fontName']}")
-            # eprint(text_item['fontName'])
+        # if current_item == 'enhancements':
+        #     eprint(f'{current_enhancement=}')
+        highlight_list = ["Spell Enhancements", "Cost", "Duration"]
+        if any(s in text for s in highlight_list):
+            eprint(f"{colors.CYAN}{text}{colors.ENDC}")
+        else:
+            # eprint(text)
+            eprint(f"{text:-<50}      {colors.GREEN}{text_item['fontName']}{colors.ENDC}")
 
 with open('./dc20_0.10beta.json', 'r') as file:
     data = json.load(file)
