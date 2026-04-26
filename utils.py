@@ -1,5 +1,8 @@
 import argparse
 
+from dc_types import TextItem
+from fixup_text import fixup
+
 def eprint(*args, **kw):
     import sys
     print(*args, file=sys.stderr, **kw)
@@ -35,3 +38,23 @@ class Args:
         last_page = int(args.last_page if args.last_page else first_page)
         self.page_range = slice(first_page - 1, last_page)
         self.all: bool = bool(args.all)
+
+def debug_headings(pages: list[dict]):
+    headings = []
+    current_heading = ""
+    for page in pages:
+        page_number = page['page']
+        for text_item in page['textItems']:
+            item = TextItem(text_item, page_number)
+            if item.font == "g_d0_f3":
+                current_heading += item.text
+            else:
+                if current_heading != "":
+                    t = fixup(current_heading).title()
+                    headings.append(t)
+                    current_heading = ""
+
+    for heading in headings:
+        print(heading)
+
+    return headings
