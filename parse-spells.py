@@ -108,7 +108,7 @@ def process_page(page_text, spells):
 
         # if current_item == 'enhancements':
         #     eprint(f'{current_enhancement=}')
-        highlight_list = ["Spell Enhancements", "Cost", "Duration"]
+        highlight_list = ["Spell Enhancements", "Cost", "Duration", "Spell Tags", "School", "Source"]
         if any(s in text for s in highlight_list):
             eprint(f"{colors.CYAN}{text}{colors.ENDC}")
         else:
