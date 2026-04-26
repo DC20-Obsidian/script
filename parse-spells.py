@@ -25,7 +25,7 @@ def extract_spell_name(text_items: dict, i: int):
         name += text
     # Semi-fix caseing
     name = ' '.join([ s.capitalize() for s in name.split(' ') ])
-    eprint(f"{colors.OKGREEN}-----name-----> {name}{colors.ENDC}")
+    eprint(f"{colors.GREEN}-----name-----> {name}{colors.ENDC}")
     return name
 
 def process_page(page_text, spells):
@@ -110,7 +110,7 @@ spells = []
 text_items = data['pages'][page_range]
 
 for i, page in enumerate(text_items):
-    eprint(f"{colors.HEADER}==========> processing page: {i + page_range.start}{colors.ENDC}")
+    eprint(f"{colors.BLUE}==========> processing page: {i + page_range.start}{colors.ENDC}")
     process_page(page['textItems'], spells)
 
 # for spell in spells:
