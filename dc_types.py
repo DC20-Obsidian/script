@@ -13,6 +13,10 @@ class Spell:
         self.description: str = ""
         self.enhancements: dict[str, Enhancement] = {}
 
+    def finish(self):
+        self.name = fixup(self.name).title()
+        self.description = fixup(self.description)
+
 class Enhancement:
     def __init__(self):
         self.name: str = "<none>"

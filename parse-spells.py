@@ -101,6 +101,7 @@ def process_page(page_text, spells):
 
         if push_spell:
             current_spell.enhancements[current_enhancement].finish()
+            current_spell.finish()
             spells.append(current_spell)
             current_spell = Spell()
             current_enhancement = ""
