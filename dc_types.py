@@ -4,6 +4,7 @@ from fixup_text import fixup
 class Spell:
     def __init__(self):
         self.name: str = "<none>"
+        self.page_number: int = -1
         self.source: list[str] = []
         self.school: str = "<none>"
         self.tags: list[str] = []

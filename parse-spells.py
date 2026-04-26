@@ -28,7 +28,7 @@ def extract_spell_name(text_items: dict, i: int):
     eprint(f"{colors.GREEN}-----name-----> {name}{colors.ENDC}")
     return name
 
-def process_page(page_text, spells):
+def process_page(page_text, spells, page_number):
     current_spell = Spell()
     current_item = 'name'
     current_enhancement = ""
@@ -100,6 +100,7 @@ def process_page(page_text, spells):
             # TODO add table parsing and fix spaces
 
         if push_spell:
+            current_spell.page_number = page_number
             current_spell.enhancements[current_enhancement].finish()
             current_spell.finish()
             spells.append(current_spell)
@@ -122,8 +123,9 @@ spells = []
 text_items = data['pages'][page_range]
 
 for i, page in enumerate(text_items):
-    eprint(f"{colors.BLUE}==========> processing page: {i + page_range.start}{colors.ENDC}")
-    process_page(page['textItems'], spells)
+    page_number = i + page_range.start + 1
+    eprint(f"{colors.BLUE}==========> processing page: {page_number}{colors.ENDC}")
+    process_page(page['textItems'], spells, page_number)
 
 # for spell in spells:
 #     print(json.dumps(spell.__dict__))
