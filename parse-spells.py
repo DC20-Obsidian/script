@@ -79,8 +79,8 @@ def process_page(page_text, spells, page_number):
                 else:
                     current_item = 'enhancements'
             case 'enhancements':
-                # Check if line is a page number
-                if font == 'g_d0_f3' or 'THE DUNGEON COACH' in text or (text.isdigit() and font == "g_d0_f2"):
+                # Check if line is a spell name, school heading, footer, or page number
+                if any(f == font for f in ['g_d0_f3', 'g_d0_f4']) or 'THE DUNGEON COACH' in text or (text.isdigit() and font == "g_d0_f2"):
                     push_spell = True
                     current_item = 'name'
                 else:
