@@ -1,4 +1,5 @@
 import json
+from fixup_text import fixup
 
 class Spell:
     def __init__(self):
@@ -20,7 +21,7 @@ class Enhancement:
         # description
     def finish(self):
         (prefix, _, self.description) = self.description.partition(')')
-        self.description = self.description.strip()
+        self.description = fixup(self.description.strip())
         (self.name, _, self.cost) = prefix.partition('(')
 
 class EncodeJSON(json.JSONEncoder):
