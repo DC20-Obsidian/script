@@ -6,7 +6,7 @@ with open('./words.txt', 'r') as file:
         if line.startswith('#') or line == '':
             continue
         words.append(line)
-# words.sort(key=str.__len__, reverse=True)
+words.sort(key=str.__len__, reverse=True)
 
 if __name__ == "__main__":
     print(words)
