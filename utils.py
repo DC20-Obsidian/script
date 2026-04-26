@@ -28,8 +28,10 @@ class Args:
         )
         parser.add_argument('page', default=default_page, nargs='?')
         parser.add_argument('last_page', nargs='?')
+        parser.add_argument('-a', '--all', action='store_true')
         args = parser.parse_args()
 
         first_page = int(args.page)
         last_page = int(args.last_page if args.last_page else first_page)
         self.page_range = slice(first_page - 1, last_page)
+        self.all: bool = bool(args.all)

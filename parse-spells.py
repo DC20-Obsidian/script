@@ -8,7 +8,10 @@ from dc_types import Spell, Enhancement, EncodeJSON
 # spell range: 68-114
 
 args = Args(default_page=70)
-page_range = args.page_range
+if args.all:
+    page_range = slice(68, 114)
+else:
+    page_range = args.page_range
 
 def extract_spell_name(text_items: dict, i: int):
     i_init = i
