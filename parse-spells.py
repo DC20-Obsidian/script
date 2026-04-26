@@ -9,7 +9,7 @@ from dc_types import Spell, Enhancement, EncodeJSON
 
 args = Args(default_page=70)
 if args.all:
-    page_range = slice(68, 114)
+    page_range = slice(71, 145)
 else:
     page_range = args.page_range
 
@@ -90,10 +90,11 @@ def process_page(page_text, spells, page_number):
                     # Foo\n:Bar
                     # Foo\n:\nBar
                     # Watch out for: 'Success:', 'Failure:', 'Hit:', 'Success (5):'
-                    text_p = text.rstrip(':').title().strip()
+                    false_positives = ["check success", "save success", "success", "failure", "save failure", "hit", ")", "dc tip", "example"]
+                    text_p = text.lstrip(':').lower().strip()
                     if ((text.endswith(':') and len(text_p) > 0) or next_text.startswith(':')) and not (
-                        text_p.endswith('Success') or text_p.endswith('Failure') or
-                        text_p.endswith('Hit') or text_p.endswith(')')):
+                        any(text_p.startswith(prefix) for prefix in false_positives)
+                        ):
                         if current_enhancement != "":
                             current_spell.enhancements[current_enhancement].finish()
                         current_enhancement = text.rstrip(':')
@@ -119,7 +120,7 @@ def process_page(page_text, spells, page_number):
             # eprint(text)
             eprint(f"{text:-<50}      {colors.GREEN}{text_item['fontName']}{colors.ENDC}")
 
-with open('./dc20_0.10beta.json', 'r') as file:
+with open('./dc20_0.10.5beta.json', 'r') as file:
     data = json.load(file)
 
 spells = []
