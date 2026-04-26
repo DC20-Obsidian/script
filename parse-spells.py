@@ -37,6 +37,7 @@ def process_page(page_text, spells):
         next_text: str = page_text[i+1]['text'] if i + 1 < len(page_text) else " "
         prev_colon: bool = prev_text[-1:] == ':'
         text: str = text_item['text']
+        font: str = text_item['fontName']
         push_spell = False
 
         # eprint(f"{current_item=}")
@@ -76,13 +77,20 @@ def process_page(page_text, spells):
                     current_item = 'enhancements'
             case 'enhancements':
                 # Check if line is a page number
-                if text_item['fontName'] == 'g_d0_f3' or 'THE DUNGEON COACH' in text or text.isdigit():
+                if font == 'g_d0_f3' or 'THE DUNGEON COACH' in text or (text.isdigit() and font == "g_d0_f2"):
                     push_spell = True
                     current_item = 'name'
                 else:
-                    text_p = text.rstrip(':').lower()
-                    if (text.endswith(':') or next_text.startswith(':')) and (
-                        not text_p.endswith('success') and not text_p.endswith('failure')):
+                    # Find colons that belong to enhancement titles
+                    # examples:
+                    # Foo:
+                    # Foo\n:Bar
+                    # Foo\n:\nBar
+                    # Watch out for: 'Success:', 'Failure:', 'Hit:', 'Success (5):'
+                    text_p = text.rstrip(':').title().strip()
+                    if ((text.endswith(':') and len(text_p) > 0) or next_text.startswith(':')) and not (
+                        text_p.endswith('Success') or text_p.endswith('Failure') or
+                        text_p.endswith('Hit') or text_p.endswith(')')):
                         if current_enhancement != "":
                             current_spell.enhancements[current_enhancement].finish()
                         current_enhancement = text.rstrip(':')
