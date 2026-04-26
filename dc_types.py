@@ -38,3 +38,10 @@ class EncodeJSON(json.JSONEncoder):
             return d
         else:
             return json.JSONEncoder.default(self, o)
+
+class TextItem:
+    def __init__(self, item: dict, page: int):
+        self.page: int = page
+        self.text: str = item['text']
+        self.font: str = item['fontName']
+        self.font_size = item['fontSize']
