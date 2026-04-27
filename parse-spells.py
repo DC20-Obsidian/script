@@ -73,7 +73,7 @@ def parse_spell(proto_spell: DCProtoItem):
     spell.name = proto_spell.name
     items: list[TextItem] = proto_spell.items
 
-    # Pop: 'Source:':f11:1, 'Source':f7:154, 'Spell List':f7:3
+    # Pop: 'Source:':f11:2, 'Source':f7:155, 'Spell List':f7:3
     item = items.pop(0)
     spell.page_number = item.page
     assert_font(item, ["g_d0_f7", "g_d0_f11"])
@@ -85,8 +85,8 @@ def parse_spell(proto_spell: DCProtoItem):
         spell.source.extend(re.findall(r'[a-zA-Z]+', item.text))
         item = items.pop(0)
 
-    # Pop: 'School':f7: 147, 'Spell School':f7:11
-    assert_font(item, ["g_d0_f7"])
+    # Pop: 'School':f7:148, 'School:':f14:1 'Spell School':f7:11
+    assert_font(item, ["g_d0_f7", "g_d0_f14"])
 
     # Spell School
     item: TextItem = items.pop(0)
@@ -95,8 +95,8 @@ def parse_spell(proto_spell: DCProtoItem):
     assert len(school) == 1
     spell.school = school[0].strip()
 
-    # Pop: 'Tags':f21: 157, 'Spell Tags':f21:1
-    assert_font(items.pop(0), ["g_d0_f21"])
+    # Pop: 'Tags':f21: 158, 'Tags:':f11:1 'Spell Tags':f21:1
+    assert_font(items.pop(0), ["g_d0_f21", "g_d0_f11"])
 
     # Spell Tags
     item: TextItem = items.pop(0)
@@ -105,8 +105,8 @@ def parse_spell(proto_spell: DCProtoItem):
         spell.tags.extend(re.findall(r'[a-zA-Z]+', item.text))
         item = items.pop(0)
 
-    # Pop: 'Cost':f7: 158
-    assert_font(item, ["g_d0_f7"])
+    # Pop: 'Cost':f7: 159, 'Cost':f11:1
+    assert_font(item, ["g_d0_f7", "g_d0_f11"])
 
     # Spell Cost
     item: TextItem = items.pop(0)
@@ -115,7 +115,7 @@ def parse_spell(proto_spell: DCProtoItem):
         spell.cost += item.text.lstrip(':').strip()
         item = items.pop(0)
 
-    # Pop: 'Range':f21: 158
+    # Pop: 'Range':f21: 160
     assert_font(item, ["g_d0_f21"])
 
     # Spell Range
