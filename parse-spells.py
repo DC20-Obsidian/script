@@ -9,7 +9,7 @@ def main():
     # Parse args
     args = Args(default_page=71)
     if args.all:
-        page_range = slice(71, 145)
+        page_range = slice(70, 145)
     else:
         page_range = args.page_range
 
