@@ -3,3 +3,4 @@
 !words/**
 *.pdf
 __pycache__
+output

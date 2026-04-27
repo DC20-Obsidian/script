@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+import os
+
+import parse_spells
+from dc_types import Spell
+from utils import eprint
+
+def main():
+    try:
+        os.makedirs('./output/spells/')
+    except FileExistsError:
+        eprint("folder already exists")
+    spells = parse_spells.main()
+
+    for spell in spells:
+        name = spell.name
+        markdown = gen_markdown(spell)
+        save_file(name, markdown)
+
+template = """---
+name: {name}
+source:
+{source}
+school: {school}
+spell_tags:
+{tags}
+ap_cost: {AP}
+mp_cost: {MP}
+cost: {cost}
+range: {range}
+duration: {duration}
+sustained: {sustained}
+page: {page}
+---
+{description}
+"""
+def list_to_array(l: list[str]):
+    a = " - "
+    a += f'\n - '.join(l)
+    return a
+
+def gen_markdown(spell: Spell):
+    args= {
+       "name": spell.name,
+        "source": list_to_array(spell.source),
+        "school": spell.school,
+        "tags": list_to_array(spell.tags),
+        "cost": spell.cost,
+        "range": spell.range,
+        "duration": spell.duration,
+        "AP": spell.ap_cost,
+        "MP": spell.mp_cost,
+        "sustained": spell.sustained,
+        "page": spell.page_number,
+        "description": spell.description
+    }
+    return template.format(**args)
+
+def save_file(name: str, s: str):
+    name = f'./output/spells/{name}.md'
+    with open(name, 'w') as file:
+        file.write(s)
+
+main()

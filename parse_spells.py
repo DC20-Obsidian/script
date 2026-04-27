@@ -147,7 +147,7 @@ def parse_spell(proto_spell: DCProtoItem):
     return spell.fixup()
 
 def parse_description(items: list[TextItem]):
-    end_cap_style = 'ansi'
+    end_cap_style = 'markdown'
     end_caps = {
         "ansi": {
             "bold": (colors.BOLD, colors.ENDC),
