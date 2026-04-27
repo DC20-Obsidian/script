@@ -30,7 +30,7 @@ def main():
         print(json.dumps(spells, cls=DCObjEncoder))
         return spells
 
-def split_spells(pages: list[dict]):
+def split_spells(pages: list[dict]) -> list[DCProtoItem]:
     spells: list[DCProtoItem] = []
     current_spell: DCProtoItem = DCProtoItem()
     false_positives = ["summontraits"]
@@ -62,7 +62,7 @@ def split_spells(pages: list[dict]):
     spells.append(current_spell)
     return spells
 
-def parse_spell(proto_spell: DCProtoItem):
+def parse_spell(proto_spell: DCProtoItem) -> Spell:
     """
         Pop Format: '<string or regex>':<font>:count
         Fonts:
@@ -146,7 +146,7 @@ def parse_spell(proto_spell: DCProtoItem):
     # return spell
     return spell.fixup()
 
-def parse_description(items: list[TextItem]):
+def parse_description(items: list[TextItem]) -> str:
     end_cap_style = 'markdown'
     end_caps = {
         "ansi": {
@@ -177,6 +177,7 @@ def parse_description(items: list[TextItem]):
     item: TextItem = items.pop(0)
     prev_item = item
 
+    # f27: Spell Enhancements
     while item is not None and item.font != 'g_d0_f27':
         match item.font.lstrip('g_d0_'):
             case "f11" | "f14":
@@ -194,9 +195,10 @@ def parse_description(items: list[TextItem]):
         prev_item = item
         item = items.pop(0)
 
+    # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
     return desc.strip()
 
-def parse_spells(spells_raw):
+def parse_spells(spells_raw) -> list[Spell]:
     spells: list[Spell] = []
     for raw_spell in spells_raw:
         page_number = raw_spell.items[0].page

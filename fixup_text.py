@@ -1,6 +1,6 @@
 import re
 
-def load_words(files: list[str]):
+def load_words(files: list[str]) -> list[str]:
     words: list[str] = []
     for file in files:
         with open(file, 'r') as file:
@@ -14,7 +14,7 @@ def load_words(files: list[str]):
 
 names = load_words(['./words/names.txt'])
 
-def fixup(s: str, words: list[str]):
+def fixup(s: str, words: list[str]) -> str:
     def replace(match: re.Match):
         # return f' {colors.RED}{match.group(1)}{colors.ENDC} '
         # return f' foo{match.group(1)}bar '
@@ -45,6 +45,6 @@ def fixup(s: str, words: list[str]):
         s = re.sub(fix[0], fix[1], s)
     return s.strip()
 
-def fixup_name(s: str):
+def fixup_name(s: str) -> str:
     s = fixup(s.lower(), names).title()
     return re.sub("'S", 's', s)

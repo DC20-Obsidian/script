@@ -34,12 +34,13 @@ page: {page}
 ---
 {description}
 """
-def list_to_array(l: list[str]):
+
+def list_to_array(l: list[str]) -> str:
     a = " - "
     a += f'\n - '.join(l)
     return a
 
-def gen_markdown(spell: Spell):
+def gen_markdown(spell: Spell) -> str:
     args= {
        "name": spell.name,
         "source": list_to_array(spell.source),
@@ -61,4 +62,5 @@ def save_file(name: str, s: str):
     with open(name, 'w') as file:
         file.write(s)
 
-main()
+if __name__ == "__main__":
+    main()

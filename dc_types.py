@@ -18,7 +18,7 @@ class Spell:
         self.description: str = ""
         self.enhancements: list[Enhancement] = []
 
-    def fixup(self):
+    def fixup(self) -> Spell:
         ap = re.search('([0-9]+) ?AP', self.cost)
         ap = ap.group(1) if ap else 0
         self.ap_cost = int(ap)
