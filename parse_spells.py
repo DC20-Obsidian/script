@@ -184,7 +184,7 @@ def parse_description(items: list[TextItem]):
             case "f21" | "f7":
                 desc += bold_italic(item.text)
             case _:
-                raise Exception(f"{colors.RED}Unknown font{colors.ENDC}: font: {item.font}, page: {item.page}, text: {item.text}")
+                # raise Exception(f"{colors.RED}Unknown font{colors.ENDC}: font: {item.font}, page: {item.page}, text: {item.text}")
                 desc += normal(item.text)
 
         prev_item = item
