@@ -23,9 +23,11 @@ def main():
 
     if args.raw:
         print(json.dumps(spells_raw, cls=DCObjEncoder))
+        return spells_raw
     else:
         spells: list[Spell] = parse_spells(spells_raw)
         print(json.dumps(spells, cls=DCObjEncoder))
+        return spells
 
 def split_spells(pages: list[dict]):
     spells: list[DCProtoItem] = []
