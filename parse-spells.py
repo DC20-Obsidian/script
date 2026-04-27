@@ -27,8 +27,8 @@ def split_spells(pages: list[dict]):
     spells: list[DCProtoItem] = []
     current_spell: DCProtoItem = DCProtoItem()
     false_positives = ["summontraits"]
-    # f2: page numbers, f9: footer
-    discard_fonts: list[str] = ["g_d0_f2", "g_d0_f9"]
+    # f2: page numbers, f9, f1: footers
+    discard_fonts: list[str] = ["g_d0_f2", "g_d0_f9", "g_d0_f1"]
     spell_has_name: bool = False
 
     for page in pages:
