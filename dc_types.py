@@ -29,9 +29,9 @@ class Enhancement:
         self.description = fixup(self.description.strip())
         (self.name, _, self.cost) = prefix.partition('(')
 
-class EncodeJSON(json.JSONEncoder):
+class DCObjEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, (Spell, Enhancement)):
+        if isinstance(o, (Spell, Enhancement, TextItem, DCProtoItem)):
             d = o.__dict__
             # if isinstance(o, Spell):
             #     d.pop("_current_enhmt")
@@ -45,3 +45,8 @@ class TextItem:
         self.text: str = item['text']
         self.font: str = item['fontName']
         self.font_size = item['fontSize']
+
+class DCProtoItem:
+    def __init__(self):
+        self.name: str = ""
+        self.items: list[TextItem] = []

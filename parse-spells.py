@@ -3,15 +3,56 @@
 import json
 
 from utils import colors, eprint, Args
-from dc_types import Spell, Enhancement, EncodeJSON
+from dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem
 
-# spell range: 68-114
+def main():
+    # Parse args
+    args = Args(default_page=71)
+    if args.all:
+        page_range = slice(71, 145)
+    else:
+        page_range = args.page_range
 
-args = Args(default_page=70)
-if args.all:
-    page_range = slice(71, 145)
-else:
-    page_range = args.page_range
+    # Open file
+    with open('./dc20_0.10.5beta.json', 'r') as file:
+        pages: list[dict] = json.load(file)
+        pages: list[dict] = pages[page_range] # Filter pages
+
+    # Split spells
+    spells: list[DCProtoItem] = split_spells(pages)
+
+    for spell in spells:
+        print(f'-> {spell.name:>20}: {len(spell.items)}')
+
+def split_spells(pages: list[dict]):
+    spells: list[DCProtoItem] = []
+    current_spell: DCProtoItem = DCProtoItem()
+    false_positives = ["summontraits"]
+    # f2: page numbers, f9: footer
+    discard_fonts: list[str] = ["g_d0_f2", "g_d0_f9"]
+    spell_has_name: bool = False
+
+    for page in pages:
+        page_number: int = page['page']
+        for text_item in page['textItems']:
+            item: TextItem = TextItem(text_item, page_number)
+
+            # f3: heading font
+            if item.font == "g_d0_f3":
+                if spell_has_name:
+                    # New Spell; commit and initilise a new one
+                    if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
+                        spells.append(current_spell)
+                    current_spell = DCProtoItem()
+                    spell_has_name = False
+                current_spell.name += item.text
+            else:
+                spell_has_name = True
+                if item.font not in discard_fonts:
+                    current_spell.items.append(item)
+
+    spells.append(current_spell)
+    return spells
 
 def extract_spell_name(text_items: dict, i: int):
     i_init = i
@@ -120,18 +161,8 @@ def process_page(page_text, spells, page_number):
             # eprint(text)
             eprint(f"{text:-<50}      {colors.GREEN}{text_item['fontName']}{colors.ENDC}")
 
-with open('./dc20_0.10.5beta.json', 'r') as file:
-    data = json.load(file)
+if __name__ == "__main__":
+    main()
 
-spells = []
-text_items = data['pages'][page_range]
-
-for i, page in enumerate(text_items):
-    page_number = i + page_range.start + 1
-    eprint(f"{colors.BLUE}==========> processing page: {page_number}{colors.ENDC}")
-    process_page(page['textItems'], spells, page_number)
-
-# for spell in spells:
-#     print(json.dumps(spell.__dict__))
-print(json.dumps(spells, cls=EncodeJSON))
+# print(json.dumps(spells, cls=DCObjEncoder))
 
