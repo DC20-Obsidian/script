@@ -2,7 +2,7 @@
 
 import json
 
-from utils import colors, eprint, Args
+from utils import colors, eprint, Args, assert_font
 from dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem
 
 def main():
@@ -19,9 +19,14 @@ def main():
         pages: list[dict] = pages[page_range] # Filter pages
 
     # Split spells
-    spells: list[DCProtoItem] = split_spells(pages)
+    spells_raw: list[DCProtoItem] = split_spells(pages)
 
-    print(json.dumps(spells, cls=DCObjEncoder))
+    spells: list[Spell] = parse_spells(spells_raw)
+
+    if args.raw:
+        print(json.dumps(spells_raw, cls=DCObjEncoder))
+    else:
+        print(json.dumps(spells, cls=DCObjEncoder))
 
 def split_spells(pages: list[dict]):
     spells: list[DCProtoItem] = []
@@ -53,115 +58,99 @@ def split_spells(pages: list[dict]):
     spells.append(current_spell)
     return spells
 
-def extract_spell_name(text_items: dict, i: int):
-    i_init = i
-    # Just hit "Source", backtrack to name start
-    i -= 1
-    while i > 0 and text_items[i]['fontName'] == 'g_d0_f3':
-        i -= 1
-    if i != 0:
-        i += 1
-    name = ""
-    # TODO fix spaces and cace
-    for i in range(i, i_init):
-        text = text_items[i]['text']
-        name += text
-    # Semi-fix caseing
-    name = ' '.join([ s.capitalize() for s in name.split(' ') ])
-    eprint(f"{colors.GREEN}-----name-----> {name}{colors.ENDC}")
-    return name
+def parse_spell(proto_spell: DCProtoItem):
+    """
+        Pop Format: '<string or regex>':<font>:count
+        Fonts:
+            f5:  normat text
+            f21, f7: bold, italic
+            f11, f14: bold
+            f3: headings
+            f27: subheading
+    """
+    import re
+    spell = Spell()
+    spell.name = proto_spell.name
+    items: list[TextItem] = proto_spell.items
 
-def process_page(page_text, spells, page_number):
-    current_spell = Spell()
-    current_item = 'name'
-    current_enhancement = ""
-    for i, text_item in enumerate(page_text):
-        prev_text: str = page_text[i-1]['text'] if i != 0 else " "
-        next_text: str = page_text[i+1]['text'] if i + 1 < len(page_text) else " "
-        prev_colon: bool = prev_text[-1:] == ':'
-        text: str = text_item['text']
-        font: str = text_item['fontName']
-        push_spell = False
+    # Pop: 'Source:':f11:1, 'Source':f7:154, 'Spell List':f7:3
+    item = items.pop(0)
+    spell.page_number = item.page
+    assert_font(item, ["g_d0_f7", "g_d0_f11"])
 
-        # eprint(f"{current_item=}")
-        match current_item:
-            case 'name':
-                if text[:6] == "Source" or text[:10] == "Spell List":
-                    current_spell.name = extract_spell_name(page_text, i)
-                    current_item = 'source'
-            case 'source':
-                if text[0] == ':' or prev_colon :
-                    current_spell.source = text.strip(': ').split(', ')
-                    current_item = 'school'
-            case 'school':
-                if text[0] == ':' or prev_colon :
-                    current_spell.school = text.strip(': ')
-                    current_item = 'tags'
-            case 'tags':
-                if text[0] == ':' or prev_colon :
-                    current_spell.tags = text.strip(': ').split(', ')
-                    current_item = 'cost'
-            case 'cost':
-                if text[0] == ':' or prev_colon :
-                    current_spell.cost = text.strip(': ')
-                    current_item = 'range'
-            case 'range':
-                if text[0] == ':' or prev_colon :
-                    current_spell.range = text.strip(': ')
-                    current_item = 'duration'
-            case 'duration':
-                if text[0] == ':' or prev_colon :
-                    current_spell.duration = text.strip(': ')
-                    current_item = 'desc'
-            case 'desc':
-                if text.rstrip('s') != 'Spell Enhancement':
-                    current_spell.description += text
-                else:
-                    current_item = 'enhancements'
-            case 'enhancements':
-                # Check if line is a spell name, school heading, footer, or page number
-                if any(f == font for f in ['g_d0_f3', 'g_d0_f4']) or 'THE DUNGEON COACH' in text or (text.isdigit() and font == "g_d0_f2"):
-                    push_spell = True
-                    current_item = 'name'
-                else:
-                    # Find colons that belong to enhancement titles
-                    # examples:
-                    # Foo:
-                    # Foo\n:Bar
-                    # Foo\n:\nBar
-                    # Watch out for: 'Success:', 'Failure:', 'Hit:', 'Success (5):'
-                    false_positives = ["check success", "save success", "success", "failure", "save failure", "hit", ")", "dc tip", "example"]
-                    text_p = text.lstrip(':').lower().strip()
-                    if ((text.endswith(':') and len(text_p) > 0) or next_text.startswith(':')) and not (
-                        any(text_p.startswith(prefix) for prefix in false_positives)
-                        ):
-                        if current_enhancement != "":
-                            current_spell.enhancements[current_enhancement].finish()
-                        current_enhancement = text.rstrip(':')
-                    if current_enhancement != "":
-                        current_spell.enhancements.setdefault(current_enhancement, Enhancement())
-                        current_spell.enhancements[current_enhancement].description += text.lstrip(': ')
-            # TODO add table parsing and fix spaces
+    # Spell Source
+    item: TextItem = items.pop(0)
+    assert_font(item, ["g_d0_f5"])
+    while item.font == "g_d0_f5":
+        spell.source.extend(re.findall(r'[a-zA-Z]+', item.text))
+        item = items.pop(0)
 
-        if push_spell:
-            current_spell.page_number = page_number
-            current_spell.enhancements[current_enhancement].finish()
-            current_spell.finish()
-            spells.append(current_spell)
-            current_spell = Spell()
-            current_enhancement = ""
+    # Pop: 'School':f7: 147, 'Spell School':f7:11
+    assert_font(item, ["g_d0_f7"])
 
-        # if current_item == 'enhancements':
-        #     eprint(f'{current_enhancement=}')
-        highlight_list = ["Spell Enhancements", "Cost", "Duration", "Spell Tags", "School", "Source"]
-        if any(s in text for s in highlight_list):
-            eprint(f"{colors.CYAN}{text}{colors.ENDC}")
-        else:
-            # eprint(text)
-            eprint(f"{text:-<50}      {colors.GREEN}{text_item['fontName']}{colors.ENDC}")
+    # Spell School
+    item: TextItem = items.pop(0)
+    assert_font(item, ["g_d0_f5"])
+    school: list[str] = re.findall(r'^:? ?([a-zA-Z ]+)', item.text)
+    assert len(school) == 1
+    spell.school = school[0].strip()
+
+    # Pop: 'Tags':f21: 157, 'Spell Tags':f21:1
+    assert_font(items.pop(0), ["g_d0_f21"])
+
+    # Spell Tags
+    item: TextItem = items.pop(0)
+    assert_font(item, ["g_d0_f5"])
+    while item.font == "g_d0_f5":
+        spell.tags.extend(re.findall(r'[a-zA-Z]+', item.text))
+        item = items.pop(0)
+
+    # Pop: 'Cost':f7: 158
+    assert_font(item, ["g_d0_f7"])
+
+    # Spell Cost
+    item: TextItem = items.pop(0)
+    assert_font(item, ["g_d0_f5"])
+    while item.font == "g_d0_f5":
+        spell.cost += item.text.lstrip(':').strip()
+        item = items.pop(0)
+
+    # Pop: 'Range':f21: 158
+    assert_font(item, ["g_d0_f21"])
+
+    # Spell Range
+    item: TextItem = items.pop(0)
+    assert_font(item, ["g_d0_f5"])
+    spell.range = item.text.lstrip(':').strip()
+    # No loop here because "Dispel Magic" has no listed duration
+
+    item: TextItem = items.pop(0)
+    if re.match('^Duration', item.text) is not None:
+        # Spell is not "Dispel Magic"
+        assert_font(item, ["g_d0_f21"])
+
+        item: TextItem = items.pop(0)
+        assert_font(item, ["g_d0_f5"])
+        spell.duration = item.text.lstrip(':').strip()
+    else:
+        # Spell is "Dispel Magic". Filling in Duration
+        spell.duration = "Instantaneous"
+        items.insert(0, item)
+
+    return spell
+
+def parse_spells(spells_raw):
+    spells: list[Spell] = []
+    for raw_spell in spells_raw:
+        page_number = raw_spell.items[0].page
+        try:
+            spells.append(parse_spell(raw_spell))
+        except Exception as e:
+            eprint(f"{colors.RED}Error{colors.ENDC} with spell {raw_spell.name}, starts on page: {page_number}")
+            eprint(e)
+            break
+    return spells
 
 if __name__ == "__main__":
     main()
-
-# print(json.dumps(spells, cls=DCObjEncoder))
 

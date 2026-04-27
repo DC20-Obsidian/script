@@ -1,4 +1,5 @@
 import argparse
+import re
 
 from dc_types import TextItem
 from fixup_text import fixup
@@ -32,12 +33,14 @@ class Args:
         parser.add_argument('page', default=default_page, nargs='?')
         parser.add_argument('last_page', nargs='?')
         parser.add_argument('-a', '--all', action='store_true')
+        parser.add_argument('-r', '--raw', action='store_true')
         args = parser.parse_args()
 
         first_page = int(args.page)
         last_page = int(args.last_page if args.last_page else first_page)
         self.page_range = slice(first_page - 1, last_page)
         self.all: bool = bool(args.all)
+        self.raw: bool = bool(args.raw)
 
 def debug_headings(pages: list[dict]):
     headings = []
@@ -58,3 +61,10 @@ def debug_headings(pages: list[dict]):
         print(heading)
 
     return headings
+
+def assert_font(item: TextItem, fonts: list[str]):
+    assert item.font in fonts, f'Invalid font on page: {item.page}. Expected one of: {fonts}, found: {item.font}'
+
+def assert_item(item: TextItem, fonts: list[str], regex: re.Pattern):
+    assert_font(item, fonts)
+    assert regex.match(item.text) != None, f'item does not match regex'
