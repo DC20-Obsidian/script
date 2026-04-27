@@ -4,6 +4,7 @@ import json
 
 from utils import colors, eprint, Args, assert_font
 from dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem
+from fixup_text import fixup_name
 
 def main():
     # Parse args
@@ -47,6 +48,7 @@ def split_spells(pages: list[dict]):
                 if spell_has_name:
                     # New Spell; commit and initilise a new one
                     if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
+                        current_spell.name = fixup_name(current_spell.name.lower()).title()
                         spells.append(current_spell)
                     current_spell = DCProtoItem()
                     spell_has_name = False
@@ -56,6 +58,7 @@ def split_spells(pages: list[dict]):
                 if item.font not in discard_fonts:
                     current_spell.items.append(item)
 
+    current_spell.name = fixup_name(current_spell.name.lower()).title()
     spells.append(current_spell)
     return spells
 

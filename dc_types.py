@@ -1,12 +1,12 @@
 import json
-from fixup_text import fixup
+from fixup_text import fixup_name
 
 class Spell:
     def __init__(self):
         self.name: str = ""
         self.page_number: int = -1
         self.source: list[str] = []
-        self.school: str = "<none>"
+        self.school: str = ""
         self.tags: list[str] = []
         self.cost: str = ""
         self.range: str = ""
@@ -15,8 +15,8 @@ class Spell:
         self.enhancements: dict[str, Enhancement] = {}
 
     def finish(self):
-        self.name = fixup(self.name).title()
-        self.description = fixup(self.description)
+        self.name = fixup_name(self.name).title()
+        # self.description = fixup(self.description)
 
 class Enhancement:
     def __init__(self):
@@ -26,7 +26,7 @@ class Enhancement:
         # description
     def finish(self):
         (prefix, _, self.description) = self.description.partition(')')
-        self.description = fixup(self.description.strip())
+        # self.description = fixup(self.description.strip())
         (self.name, _, self.cost) = prefix.partition('(')
 
 class DCObjEncoder(json.JSONEncoder):

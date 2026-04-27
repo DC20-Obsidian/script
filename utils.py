@@ -2,7 +2,7 @@ import argparse
 import re
 
 from dc_types import TextItem
-from fixup_text import fixup
+from fixup_text import fixup_name
 
 def eprint(*args, **kw):
     import sys
@@ -54,7 +54,7 @@ def debug_headings(pages: list[dict]):
                 current_heading += item.text
             else:
                 if current_heading != "":
-                    t = fixup(current_heading).title()
+                    t = fixup_name(current_heading).title()
                     headings.append(t)
                     current_heading = ""
 
