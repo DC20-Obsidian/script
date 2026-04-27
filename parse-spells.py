@@ -21,8 +21,7 @@ def main():
     # Split spells
     spells: list[DCProtoItem] = split_spells(pages)
 
-    for spell in spells:
-        print(f'-> {spell.name:>20}: {len(spell.items)}')
+    print(json.dumps(spells, cls=DCObjEncoder))
 
 def split_spells(pages: list[dict]):
     spells: list[DCProtoItem] = []
