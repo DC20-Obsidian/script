@@ -9,6 +9,7 @@ def eprint(*args, **kw):
     print(*args, file=sys.stderr, **kw)
 
 class colors:
+    ITALICS = '\033[3m'
     RED = '\033[31m'
     GREEN = '\033[32m'
     YELLOW = '\033[33m'

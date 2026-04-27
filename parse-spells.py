@@ -137,7 +137,59 @@ def parse_spell(proto_spell: DCProtoItem):
         spell.duration = "Instantaneous"
         items.insert(0, item)
 
+    spell.description = parse_description(items)
+
     return spell
+
+def parse_description(items: list[TextItem]):
+    end_cap_style = 'ansi'
+    end_caps = {
+        "ansi": {
+            "bold": (colors.BOLD, colors.ENDC),
+            "em": (f'{colors.BOLD}{colors.ITALICS}', colors.ENDC),
+            "list": lambda s: f'\n {s} ',
+        },
+        "markdown": {
+            "bold": ('**', '**'),
+            "em": ('***', '***'),
+            "list": lambda s: f'\n- {s}'
+        }
+    }
+    def bold_italic(s: str):
+        return f'{end_caps['em'][0]}{s}{end_caps['em'][1]} '
+    def bold(s: str):
+        return f'{end_caps['bold'][0]}{s}{end_caps['bold'][1]} '
+    def normal(s: str):
+        return f'{s} '
+    def list_mark(s: str):
+        if item.text == "•":
+            return end_caps['list'](item.text)
+        else:
+            return f'{item.text} '
+
+    end_caps = end_caps[end_cap_style]
+    desc: str = ""
+    item: TextItem = items.pop(0)
+    prev_item = item
+
+    while item is not None and item.font != 'g_d0_f27':
+        match item.font.lstrip('g_d0_'):
+            case "f11" | "f14":
+                desc += bold(item.text)
+            case "f5":
+                desc += normal(item.text)
+            case "f15":
+                desc += list_mark(item.text)
+            case "f21" | "f7":
+                desc += bold_italic(item.text)
+            case _:
+                raise Exception(f"{colors.RED}Unknown font{colors.ENDC}: font: {item.font}, page: {item.page}, text: {item.text}")
+                desc += normal(item.text)
+
+        prev_item = item
+        item = items.pop(0)
+
+    return desc.strip()
 
 def parse_spells(spells_raw):
     spells: list[Spell] = []
