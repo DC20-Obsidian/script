@@ -21,11 +21,10 @@ def main():
     # Split spells
     spells_raw: list[DCProtoItem] = split_spells(pages)
 
-    spells: list[Spell] = parse_spells(spells_raw)
-
     if args.raw:
         print(json.dumps(spells_raw, cls=DCObjEncoder))
     else:
+        spells: list[Spell] = parse_spells(spells_raw)
         print(json.dumps(spells, cls=DCObjEncoder))
 
 def split_spells(pages: list[dict]):
@@ -200,7 +199,7 @@ def parse_spells(spells_raw):
         except Exception as e:
             eprint(f"{colors.RED}Error{colors.ENDC} with spell {raw_spell.name}, starts on page: {page_number}")
             eprint(e)
-            break
+            continue
     return spells
 
 if __name__ == "__main__":
