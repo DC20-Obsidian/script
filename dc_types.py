@@ -1,4 +1,5 @@
 import json
+import re
 from fixup_text import fixup_name
 
 class Spell:
@@ -9,14 +10,27 @@ class Spell:
         self.school: str = ""
         self.tags: list[str] = []
         self.cost: str = ""
+        self.ap_cost: int = -1
+        self.mp_cost: int = -1
+        self.sustained: bool = False
         self.range: str = ""
         self.duration: str = ""
         self.description: str = ""
-        self.enhancements: dict[str, Enhancement] = {}
+        self.enhancements: list[Enhancement] = []
 
-    def finish(self):
-        self.name = fixup_name(self.name).title()
-        # self.description = fixup(self.description)
+    def fixup(self):
+        ap = re.search('([0-9]+) ?AP', self.cost)
+        ap = ap.group(1) if ap else 0
+        self.ap_cost = int(ap)
+        mp = re.search('([0-9]+) ?MP|minimum of ([0-9]+)', self.cost)
+        mp = mp.groups() if mp else (0, 0)
+        mp = mp[0] if mp[0] else mp[1]
+        self.mp_cost = int(mp)
+        d = self.duration.rpartition('(Sustained')
+        if d[1]:
+            self.sustained = True
+            self.duration = d[0].strip()
+        return self
 
 class Enhancement:
     def __init__(self):

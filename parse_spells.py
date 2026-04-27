@@ -143,7 +143,8 @@ def parse_spell(proto_spell: DCProtoItem):
 
     spell.description = parse_description(items)
 
-    return spell
+    # return spell
+    return spell.fixup()
 
 def parse_description(items: list[TextItem]):
     end_cap_style = 'ansi'
