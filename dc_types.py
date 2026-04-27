@@ -3,14 +3,14 @@ from fixup_text import fixup
 
 class Spell:
     def __init__(self):
-        self.name: str = "<none>"
+        self.name: str = ""
         self.page_number: int = -1
         self.source: list[str] = []
         self.school: str = "<none>"
         self.tags: list[str] = []
-        self.cost: str = "<none>"
-        self.range: str = "<none>"
-        self.duration: str = "<none>"
+        self.cost: str = ""
+        self.range: str = ""
+        self.duration: str = ""
         self.description: str = ""
         self.enhancements: dict[str, Enhancement] = {}
 
@@ -20,8 +20,8 @@ class Spell:
 
 class Enhancement:
     def __init__(self):
-        self.name: str = "<none>"
-        self.cost: str = "<none>"
+        self.name: str = ""
+        self.cost: str = ""
         self.description: str = ""
         # description
     def finish(self):
