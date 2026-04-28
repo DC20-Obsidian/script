@@ -47,9 +47,9 @@ page: {page}
 {description}
 """
 
-def list_to_array(l: list[str]) -> str:
+def list_to_array(li: list[str]) -> str:
     a = " - "
-    a += f'\n - '.join(l)
+    a += f'\n - '.join(map( lambda s: f'"s"', li))
     return a
 
 def gen_markdown(spell: Spell) -> str:
