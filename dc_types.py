@@ -19,17 +19,16 @@ class Spell:
         self.enhancements: list[Enhancement] = []
 
     def fixup(self) -> Spell:
-        ap = re.search('([0-9]+) ?AP', self.cost)
+        ap = re.search(r'([0-9]+) ?AP', self.cost)
         ap = ap.group(1) if ap else 0
         self.ap_cost = int(ap)
-        mp = re.search('([0-9]+) ?MP|minimum of ([0-9]+)', self.cost)
+        mp = re.search(r'([0-9]+) ?MP|minimum of ([0-9]+)', self.cost)
         mp = mp.groups() if mp else (0, 0)
         mp = mp[0] if mp[0] else mp[1]
         self.mp_cost = int(mp)
-        d = self.duration.rpartition('(Sustained')
-        if d[1]:
+        if "Sustained" in self.duration:
             self.sustained = True
-            self.duration = d[0].strip()
+            self.duration = re.sub(r' ?\(?Sustained\)?', '', self.duration)
         return self
 
 class Enhancement:
