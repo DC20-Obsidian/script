@@ -6,9 +6,7 @@ from utils import colors, eprint, Args, assert_font
 from dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem
 from fixup_text import fixup_name
 
-def main():
-    # Parse args
-    args = Args(default_page=71)
+def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     if args.all:
         page_range = slice(70, 145)
     else:
@@ -23,11 +21,12 @@ def main():
     spells_raw: list[DCProtoItem] = split_spells(pages)
 
     if args.raw:
-        print(json.dumps(spells_raw, cls=DCObjEncoder))
+        if args.unprocessed:
+            # Consume all TextItems that can be processed
+            spells: list[Spell] = parse_spells(spells_raw)
         return spells_raw
     else:
         spells: list[Spell] = parse_spells(spells_raw)
-        print(json.dumps(spells, cls=DCObjEncoder))
         return spells
 
 def split_spells(pages: list[dict]) -> list[DCProtoItem]:
@@ -81,6 +80,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     item = items.pop(0)
     spell.page_number = item.page
     assert_font(item, ["g_d0_f7", "g_d0_f11"])
+    # return spell
 
     # Spell Source
     item: TextItem = items.pop(0)
@@ -88,6 +88,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     while item.font == "g_d0_f5":
         spell.source.extend(re.findall(r'[a-zA-Z]+', item.text))
         item = items.pop(0)
+    # return spell
 
     # Pop: 'School':f7:148, 'School:':f14:1 'Spell School':f7:11
     assert_font(item, ["g_d0_f7", "g_d0_f14"])
@@ -98,9 +99,11 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     school: list[str] = re.findall(r'^:? ?([a-zA-Z ]+)', item.text)
     assert len(school) == 1
     spell.school = school[0].strip()
+    # return spell
 
     # Pop: 'Tags':f21: 158, 'Tags:':f11:1 'Spell Tags':f21:1
     assert_font(items.pop(0), ["g_d0_f21", "g_d0_f11"])
+    # return spell
 
     # Spell Tags
     item: TextItem = items.pop(0)
@@ -108,6 +111,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     while item.font == "g_d0_f5":
         spell.tags.extend(re.findall(r'[a-zA-Z]+', item.text))
         item = items.pop(0)
+    # return spell
 
     # Pop: 'Cost':f7: 159, 'Cost':f11:1
     assert_font(item, ["g_d0_f7", "g_d0_f11"])
@@ -118,6 +122,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     while item.font == "g_d0_f5":
         spell.cost += item.text.lstrip(':').strip()
         item = items.pop(0)
+    # return spell
 
     # Pop: 'Range':f21: 160
     assert_font(item, ["g_d0_f21"])
@@ -127,6 +132,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     assert_font(item, ["g_d0_f5"])
     spell.range = item.text.lstrip(':').strip()
     # No loop here because "Dispel Magic" has no listed duration
+    # return spell
 
     item: TextItem = items.pop(0)
     if re.match('^Duration', item.text) is not None:
@@ -140,6 +146,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
         # Spell is "Dispel Magic". Filling in Duration
         spell.duration = "Instantaneous"
         items.insert(0, item)
+    # return spell
 
     spell.description = parse_description(items)
 
@@ -260,11 +267,25 @@ def parse_spells(spells_raw) -> list[Spell]:
         try:
             spells.append(parse_spell(raw_spell))
         except Exception as e:
-            eprint(f"{colors.RED}Error{colors.ENDC} with spell {raw_spell.name}, starts on page: {page_number}")
-            eprint(e)
+            eprint(f"{colors.RED}Error{colors.ENDC} with spell {colors.GREEN}{raw_spell.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}")
+            raise e
+
             continue
     return spells
 
 if __name__ == "__main__":
-    main()
+    args = Args(default_page=71)
+
+    if args.type != "spells" and args.type:
+        raise Exception("Parsing spells, but type is not spells")
+
+    if args.write:
+        raise Exception("args.write is set, but this function dosen't support that. Use a different one.")
+
+    spells: list = main(args)
+
+    if args.print:
+        print(json.dumps(spells, cls=DCObjEncoder))
+    else:
+        eprint(f"{colors.YELLOW}Warning{colors.ENDC}: parse_spells called, but args.print is not set. Skipping")
 

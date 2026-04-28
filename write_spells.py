@@ -1,16 +1,28 @@
 #!/usr/bin/env python
 import os
+import json
 
 import parse_spells
-from dc_types import Spell
-from utils import eprint
+from dc_types import Spell, DCObjEncoder
+from utils import eprint, Args
 
-def main():
+def main(args: Args):
+    spells: list = parse_spells.main(args)
+
+    if args.print:
+        print(json.dumps(spells, cls=DCObjEncoder))
+
+    if args.raw:
+        exit(0)
+
+    if not args.write:
+        eprint(f"{colors.YELLOW}Warning{colors.ENDC}: write_spells called, but args.write is not set. Skipping")
+        exit(0)
+
     try:
         os.makedirs('./output/spells/')
     except FileExistsError:
         eprint("folder already exists")
-    spells = parse_spells.main()
 
     for spell in spells:
         name = spell.name
@@ -63,4 +75,7 @@ def save_file(name: str, s: str):
         file.write(s)
 
 if __name__ == "__main__":
-    main()
+    args = Args(default_page=71)
+    if args.type != "spells" and args.type:
+        raise Exception("Parsing spells, but type is not spells")
+    main(args)

@@ -33,15 +33,23 @@ class Args:
         )
         parser.add_argument('page', default=default_page, nargs='?')
         parser.add_argument('last_page', nargs='?')
-        parser.add_argument('-a', '--all', action='store_true')
-        parser.add_argument('-r', '--raw', action='store_true')
+        parser.add_argument('-a', '--all', action='store_true', help="use all page (configured by type)")
+        parser.add_argument('-r', '--raw', action='store_true', help="output raw data")
+        parser.add_argument('-w', '--write', action='store_true', help="write the output to files")
+        parser.add_argument('-p', '--print', action='store_true', help="print the output to stdout")
+        parser.add_argument('-t', '--type', choices=["spells"], help="the type of item to parse")
+        parser.add_argument('-u', '--unprocessed', action='store_true', help="only output unprocessed textitems (implies --raw)")
         args = parser.parse_args()
 
         first_page = int(args.page)
         last_page = int(args.last_page if args.last_page else first_page)
         self.page_range = slice(first_page - 1, last_page)
         self.all: bool = bool(args.all)
-        self.raw: bool = bool(args.raw)
+        self.unprocessed = bool(args.unprocessed)
+        self.raw: bool = bool(args.raw) or self.unprocessed
+        self.write: bool = bool(args.write)
+        self.print: bool = bool(args.print)
+        self.type: str = args.type
 
 def debug_headings(pages: list[dict]):
     headings = []
