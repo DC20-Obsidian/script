@@ -1,7 +1,6 @@
 import argparse
 import re
 from typing import Optional
-import enum
 
 def eprint(*args, **kw):
     import sys
@@ -51,18 +50,6 @@ class Args:
         self.print: bool = bool(args.print)
         self.file: str = args.file
         self.type: str = args.type
-
-class MarkupStyle(enum.Enum):
-    NONE = 0
-    ANSI = 1
-    MARKDOWN = 2
-
-class FontType(enum.Enum):
-    UNKNOWN = 0
-    NORMAL = 1
-    BOLD = 2
-    BOLD_ITALIC = 3
-    LIST = 4
 
 def get_file_path() -> (str, str):
     return ("./", "./dc-obsidian/")
