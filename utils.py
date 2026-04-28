@@ -1,5 +1,7 @@
 import argparse
 import re
+from typing import Optional
+import enum
 
 from dc_types import TextItem
 from fixup_text import fixup_name
@@ -51,25 +53,79 @@ class Args:
         self.print: bool = bool(args.print)
         self.type: str = args.type
 
-def debug_headings(pages: list[dict]):
-    headings = []
-    current_heading = ""
-    for page in pages:
-        page_number = page['page']
-        for text_item in page['textItems']:
-            item = TextItem(text_item, page_number)
-            if item.font == "g_d0_f3":
-                current_heading += item.text
-            else:
-                if current_heading != "":
-                    t = fixup_name(current_heading).title()
-                    headings.append(t)
-                    current_heading = ""
+class MarkupStyle(enum.Enum):
+    NONE = 0
+    ANSI = 1
+    MARKDOWN = 2
 
-    for heading in headings:
-        print(heading)
+class FontType(enum.Enum):
+    UNKNOWN = 0
+    NORMAL = 1
+    BOLD = 2
+    BOLD_ITALIC = 3
+    LIST = 4
 
-    return headings
+def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: MarkupStyle) -> str:
+    markup: list[dict] = [
+        {
+            "bold": ('', ' '),
+            "em": ('', ' '),
+            "list": lambda s: s
+        }, # NONE
+        {
+            "bold": (f'{colors.BOLD}', f'{colors.ENDC}'),
+            "em": (f'{colors.BOLD}{colors.ITALICS}', f'{colors.ENDC}'),
+            "list": lambda s: f'\n {s} '
+        }, # ANSI
+        {
+            "bold": ('**', '**'),
+            "em": ('***', '***'),
+            "list": (f'\n- ', ''),
+        }, # MARKDOWN
+    ]
+    markup: dict = markup[style.value]
+    # import json
+    # eprint(json.dumps(markup))
+
+    if item is None and prev_item is None:
+        return ""
+    if item is None: #TMP
+        return ""
+
+    def bold_italic(s: str):
+        return f'{markup['em'][0]}{s}{markup['em'][1]} '
+
+    def bold(s: str):
+        return f'{markup['bold'][0]}{s}{markup['bold'][1]} '
+
+    def normal(s: str):
+        return f'{s} '
+
+    def list_mark(s: str):
+        if "•" in s:
+            return f'{markup['list'][0]}{s}{markup['list'][1]}'
+        else:
+            return normal(s)
+
+    # TODO support prev_item
+
+    font = item.font.removeprefix('g_d0_')
+    t = item.text
+    prev_font = (prev_item.font.removeprefix('g_d0_') if prev_item else None)
+
+    match font:
+        case 'f11' | 'f14':
+            return bold(t)
+        case 'f21' | 'f7':
+            return bold_italic(t)
+        case 'f15':
+            return list_mark(t)
+        case 'f5':
+            return normal(t)
+        case _:
+            return normal(t)
+
+    raise Exception("Unknown font")
 
 def assert_font(item: TextItem, fonts: list[str]):
     assert item.font in fonts, f'Invalid font on page: {item.page}. Expected one of: {fonts}, found: {item.font}'
