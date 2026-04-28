@@ -190,10 +190,10 @@ def parse_enhancement(proto: DCProtoItem) -> Enhancement:
         cost += ' ' + proto.items.pop(0).text
     (cost, _, desc) = cost.partition(')')
 
-    enhancement.description = desc + ' ' + parse_description(proto.items)
+    enhancement.description = desc.strip() + ' ' + parse_description(proto.items)
     enhancement.cost = cost.lstrip(': (')
 
-    return enhancement
+    return enhancement.fixup()
 
 def parse_description(items: list[TextItem]) -> str:
     end_cap_style = 'markdown'
