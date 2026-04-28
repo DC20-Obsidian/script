@@ -143,8 +143,57 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
 
     spell.description = parse_description(items)
 
+    enhancements = split_enhancements(items)
+    # spell.enhancements = split_enhancements(items) # Debug
+
+    spell.enhancements = list(map(parse_enhancement, enhancements))
+
     # return spell
     return spell.fixup()
+
+def split_enhancements(items: list[TextItem]) -> list[DCProtoItem]:
+    enhancements: list[DCProtoItem] = []
+    current_enhancement = DCProtoItem()
+    prev_item: TextItem = items[0]
+    has_name = False
+    for item in items:
+        if item.font == "g_d0_f27": # This is for Call Famillar and other spells that hav multiple sections
+            break
+        if item.font in ["g_d0_f21", "g_d0_f7"]:
+            if "•" in prev_item.text: # false positive: skip
+                prev_item = item
+                continue
+
+            if has_name and current_enhancement.name != "":
+                current_enhancement.name = current_enhancement.name.strip()
+                enhancements.append(current_enhancement)
+                current_enhancement = DCProtoItem()
+
+            current_enhancement.name += f'{item.text.strip(':').lstrip()} '
+            has_name = False
+        else:
+            current_enhancement.items.append(item)
+            has_name = True
+
+        prev_item = item
+
+    current_enhancement.name = current_enhancement.name.strip()
+    enhancements.append(current_enhancement)
+    return enhancements
+
+def parse_enhancement(proto: DCProtoItem) -> Enhancement:
+    enhancement = Enhancement()
+    enhancement.name = proto.name
+    cost: str = ""
+
+    while ')' not in cost:
+        cost += ' ' + proto.items.pop(0).text
+    (cost, _, desc) = cost.partition(')')
+
+    enhancement.description = desc + ' ' + parse_description(proto.items)
+    enhancement.cost = cost.lstrip(': (')
+
+    return enhancement
 
 def parse_description(items: list[TextItem]) -> str:
     end_cap_style = 'markdown'
@@ -172,14 +221,17 @@ def parse_description(items: list[TextItem]) -> str:
         else:
             return f'{item.text} '
 
+    if len(items) == 0:
+        return ""
+
     end_caps = end_caps[end_cap_style]
     desc: str = ""
     item: TextItem = items.pop(0)
     prev_item = item
 
     # f27: Spell Enhancements
-    while item is not None and item.font != 'g_d0_f27':
-        match item.font.lstrip('g_d0_'):
+    while item.font != 'g_d0_f27' or not item.text.startswith("Spell Enhancement"):
+        match item.font.removeprefix('g_d0_'):
             case "f11" | "f14":
                 desc += bold(item.text)
             case "f5":
@@ -193,7 +245,10 @@ def parse_description(items: list[TextItem]) -> str:
                 desc += normal(item.text)
 
         prev_item = item
-        item = items.pop(0)
+        if len(items) != 0:
+            item = items.pop(0)
+        else:
+            break
 
     # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
     return desc.strip()
