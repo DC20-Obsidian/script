@@ -4,7 +4,6 @@ from typing import Optional
 import enum
 
 from dc_types import TextItem
-from fixup_text import fixup_name
 
 def eprint(*args, **kw):
     import sys
@@ -128,6 +127,9 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
             return normal(t)
 
     raise Exception("Unknown font")
+
+def get_file_path() -> (str, str):
+    return ("./", "./dc-obsidian/")
 
 def assert_font(item: TextItem, fonts: list[str]):
     assert item.font in fonts, f'Invalid font on page: {item.page}. Expected one of: {fonts}, found: {item.font}'

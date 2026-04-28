@@ -2,7 +2,7 @@
 
 import json
 
-from utils import colors, eprint, Args, assert_font, markup, MarkupStyle
+from utils import colors, eprint, Args, assert_font, markup, MarkupStyle, get_file_path
 from dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem
 from fixup_text import fixup_name
 
@@ -13,7 +13,8 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
         page_range = args.page_range
 
     # Open file
-    file = args.file or './dc-obsidian/json/dc20_0.10.5_pdf_filtered.json'
+    file = get_file_path()[1]
+    file = args.file or f'{file}/json/dc20_0.10.5_pdf_filtered.json'
     with open(file, 'r') as file:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages
