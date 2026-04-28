@@ -20,7 +20,7 @@ def main(args: Args):
         exit(0)
 
     try:
-        os.makedirs('./output/spells/')
+        os.makedirs('./dc-obsidian/spells/')
     except FileExistsError:
         eprint("folder already exists")
 
@@ -36,8 +36,8 @@ source:
 school: {school}
 spell_tags:
 {tags}
-ap_cost: {AP}
-mp_cost: {MP}
+ap: {AP}
+mp: {MP}
 cost: {cost}
 range: {range}
 duration: {duration}
@@ -70,7 +70,7 @@ def gen_markdown(spell: Spell) -> str:
     return template.format(**args)
 
 def save_file(name: str, s: str):
-    name = f'./output/spells/{name}.md'
+    name = f'./dc-obsidian/spells/{name}.md'
     with open(name, 'w') as file:
         file.write(s)
 

@@ -13,7 +13,8 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
         page_range = args.page_range
 
     # Open file
-    with open('./dc20_0.10.5beta.json', 'r') as file:
+    file = args.file or './dc-obsidian/json/dc20_0.10.5_pdf_filtered.json'
+    with open(file, 'r') as file:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages
 

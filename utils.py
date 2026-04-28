@@ -41,16 +41,18 @@ class Args:
         parser.add_argument('-p', '--print', action='store_true', help="print the output to stdout")
         parser.add_argument('-t', '--type', choices=["spells"], help="the type of item to parse")
         parser.add_argument('-u', '--unprocessed', action='store_true', help="only output unprocessed textitems (implies --raw)")
+        parser.add_argument('-f', '--file', help="filtered JSON containing PDF data to use")
         args = parser.parse_args()
 
         first_page = int(args.page)
-        last_page = int(args.last_page if args.last_page else first_page)
+        last_page = int(args.last_page or first_page)
         self.page_range = slice(first_page - 1, last_page)
         self.all: bool = bool(args.all)
         self.unprocessed = bool(args.unprocessed)
         self.raw: bool = bool(args.raw) or self.unprocessed
         self.write: bool = bool(args.write)
         self.print: bool = bool(args.print)
+        self.file: str = args.file
         self.type: str = args.type
 
 class MarkupStyle(enum.Enum):

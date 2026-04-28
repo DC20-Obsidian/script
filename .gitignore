@@ -1,6 +1,5 @@
-*.json
-*.txt
+dc*.json
 !words/**
 *.pdf
 __pycache__
-output
+dc-obsidian
