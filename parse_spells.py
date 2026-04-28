@@ -136,9 +136,10 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     # No loop here because "Dispel Magic" has no listed duration
     # return spell
 
-    item: TextItem = items.pop(0)
+    item: TextItem = items[0]
     if re.match('^Duration', item.text) is not None:
         # Spell is not "Dispel Magic"
+        items.pop(0)
         assert_font(item, ["g_d0_f21"])
 
         item: TextItem = items.pop(0)
@@ -147,7 +148,6 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     else:
         # Spell is "Dispel Magic". Filling in Duration
         spell.duration = "Instantaneous"
-        items.insert(0, item)
     # return spell
 
     spell.description = parse_description(items)

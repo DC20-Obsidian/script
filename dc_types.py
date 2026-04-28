@@ -25,7 +25,7 @@ class Spell:
         self.ap_cost = int(ap)
         mp = re.search(r'([0-9]+) ?MP|minimum of ([0-9]+)', self.cost)
         mp = mp.groups() if mp else (0, 0)
-        mp = mp[0] if mp[0] else mp[1]
+        mp = mp[0] or mp[1]
         self.mp_cost = int(mp)
         if "Sustained" in self.duration:
             self.sustained = True
