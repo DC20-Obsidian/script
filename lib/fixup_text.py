@@ -1,5 +1,5 @@
 import re
-from utils import get_file_path
+from .utils import get_file_path
 
 def load_words(files: list[str]) -> list[str]:
     words: list[str] = []

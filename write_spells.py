@@ -3,8 +3,8 @@ import os
 import json
 
 import parse_spells
-from dc_types import Spell, DCObjEncoder
-from utils import eprint, Args
+from lib.dc_types import Spell, DCObjEncoder
+from lib.utils import eprint, Args
 
 def main(args: Args):
     spells: list = parse_spells.main(args)

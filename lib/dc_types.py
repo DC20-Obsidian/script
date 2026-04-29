@@ -1,8 +1,8 @@
 import json
 import re
 import enum
-from fixup_text import fixup_name
-from utils import colors
+from .fixup_text import fixup_name
+from .utils import colors
 
 class Spell:
     def __init__(self):
