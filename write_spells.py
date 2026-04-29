@@ -75,7 +75,7 @@ def gen_markdown(spell: Spell) -> str:
         "AP": spell.ap_cost,
         "MP": spell.mp_cost,
         "sustained": spell.sustained,
-        "page": spell.page_number,
+        "page": spell.page,
         "description": spell.description,
         "enhancements": enhancements(spell.enhancements)
     }

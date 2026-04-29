@@ -7,7 +7,7 @@ from .utils import colors
 class Spell:
     def __init__(self):
         self.name: str = ""
-        self.page_number: int = -1
+        self.page: int = -1
         self.source: list[str] = []
         self.school: str = ""
         self.tags: list[str] = []

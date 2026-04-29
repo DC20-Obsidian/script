@@ -79,7 +79,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
 
     # Pop: 'Source:':f11:2, 'Source':f7:155, 'Spell List':f7:3
     item = items.pop(0)
-    spell.page_number = item.page
+    spell.page = item.page
     assert_font(item, ["g_d0_f7", "g_d0_f11"])
     # return spell
 
