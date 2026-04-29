@@ -141,6 +141,7 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
 
     def list_mark(s: str):
         if "•" in s:
+            s = re.sub('•', '', s)
             return f'{markup['list'][0]}{s}{markup['list'][1]}'
         else:
             return normal(s)
