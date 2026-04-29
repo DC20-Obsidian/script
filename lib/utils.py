@@ -38,6 +38,7 @@ class Args:
         parser.add_argument('-t', '--type', choices=["spells"], help="the type of item to parse")
         parser.add_argument('-u', '--unprocessed', action='store_true', help="only output unprocessed textitems (implies --raw)")
         parser.add_argument('-f', '--file', help="filtered JSON containing PDF data to use")
+        parser.add_argument('-s', '--saved', action='store_true', help="use saved json data instead of parsing it anew")
         args = parser.parse_args()
 
         first_page = int(args.page)
@@ -50,6 +51,7 @@ class Args:
         self.print: bool = bool(args.print)
         self.file: str = args.file
         self.type: str = args.type
+        self.saved: bool = bool(args.saved)
 
 
 def save_file(path: str, name: str, s: str):

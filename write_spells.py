@@ -3,12 +3,17 @@ import os
 import json
 
 import parse_spells
-from lib.dc_types import Spell, DCObjEncoder, Enhancement
+from lib.dc_types import Spell, DCObjEncoder, Enhancement, dc_obj_decoder
 from lib.utils import eprint, Args, get_file_paths
 
 def main(args: Args):
-    spells: list = parse_spells.main(args)
     out_folder = get_file_paths()['output']
+    if args.saved:
+        in_file = out_folder + 'json/spells_0.10.5.json'
+        with open(in_file, 'r') as file:
+            spells = json.load(file, object_hook=dc_obj_decoder)
+    else:
+        spells: list = parse_spells.main(args)
     out_folder += 'spells/'
 
     if args.raw:

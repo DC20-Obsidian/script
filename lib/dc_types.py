@@ -6,6 +6,7 @@ from .utils import colors
 
 class Spell:
     def __init__(self):
+        self.type = 'spell'
         self.name: str = ""
         self.page: int = -1
         self.source: list[str] = []
@@ -19,6 +20,24 @@ class Spell:
         self.duration: str = ""
         self.description: str = ""
         self.enhancements: list[Enhancement] = []
+
+    @staticmethod
+    def from_json(d: dict) -> Spell:
+        s = Spell()
+        s.name = d['name']
+        s.page = int(d['page'])
+        s.source = d['source']
+        s.school = d['source']
+        s.tags = d['tags']
+        s.cost = d['cost']
+        s.ap_cost = int(d['ap_cost'])
+        s.mp_cost = int(d['mp_cost'])
+        s.sustained = d['sustained']
+        s.range = d['range']
+        s.duration = d['duration']
+        s.description = d['description']
+        s.enhancements = d['enhancements']
+        return s
 
     def fixup(self) -> Spell:
         ap = re.search(r'([0-9]+) ?AP', self.cost)
@@ -36,6 +55,7 @@ class Spell:
 class Enhancement:
     def __init__(self):
         from typing import Optional
+        self.type = 'enhancement'
         self.name: str = ""
         self.cost: str = ""
         self.repeatable: bool = False
@@ -45,6 +65,19 @@ class Enhancement:
         self.ap_cost: str = ""
         self.mp_cost: str = ""
         self.description: str = ""
+
+    @staticmethod
+    def from_json(d: dict) -> Enhancement:
+        e = Enhancement()
+        e.name = d['name']
+        e.cost = d['cost']
+        e.repeatable = d['repeatable']
+        e.sustained = d['sustained']
+        e.dependent_on = d['dependent_on']
+        e.ap_cost = d['ap_cost']
+        e.mp_cost = d['mp_cost']
+        e.description = d['description']
+        return e
 
     def fixup(self):
         if "Repeatable" in self.cost:
@@ -71,10 +104,19 @@ class Enhancement:
 
 class Condition:
     def __init__(self):
+        self.type: str = 'condition'
         self.page: int = -1
         self.name: str = ""
         self.description: str = ""
         self.stacking: bool = False
+
+    @staticmethod
+    def from_json(d: dict):
+        c = Condition()
+        c.page = int(d['page'])
+        c.name = d['name']
+        c.description = d['describution']
+        c.stacking = d['stacking']
 
 class DCObjEncoder(json.JSONEncoder):
     def default(self, o):
@@ -85,6 +127,18 @@ class DCObjEncoder(json.JSONEncoder):
             return d
         else:
             return json.JSONEncoder.default(self, o)
+
+def dc_obj_decoder(d: dict):
+    if 'type' not in d:
+        return d
+    match d['type']:
+        case 'spell':
+            return Spell.from_json(d)
+        case 'enhancement':
+            return Enhancement.from_json(d)
+        case 'condition':
+            return Condition.from_json(d)
+    return d
 
 class TextItem:
     def __init__(self, item: dict, page: int):
