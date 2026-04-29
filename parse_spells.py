@@ -4,7 +4,7 @@ import json
 
 from lib.utils import colors, eprint, Args, get_file_paths
 from lib.dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem, markup, assert_font, MarkupStyle
-from lib.fixup_text import fixup_name
+from lib.fixup_text import fixup_name, fixup_description
 
 def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     if args.all:
@@ -198,7 +198,7 @@ def parse_enhancement(proto: DCProtoItem) -> Enhancement:
         cost += ' ' + proto.items.pop(0).text
     (cost, _, desc) = cost.partition(')')
 
-    enhancement.description = desc.strip() + ' ' + parse_description(proto.items)
+    enhancement.description = fixup_description(desc.strip() + ' ' + parse_description(proto.items))
     enhancement.cost = cost.lstrip(': (')
 
     return enhancement.fixup()
@@ -221,7 +221,7 @@ def parse_description(items: list[TextItem]) -> str:
             break
 
     # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
-    return desc.strip()
+    return fixup_description(desc.strip())
 
 def parse_spells(spells_raw) -> list[Spell]:
     spells: list[Spell] = []

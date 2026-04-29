@@ -37,14 +37,16 @@ def fixup_misc(s: str) -> str:
         return match.group(1)
 
     misc_fixes = [
-        (r'’', "'"),
+        (r'’', r"'"),
         # (r'([,:\.])', add_space_after), # , . :
         (r' \n', '\n'),
         (r'([\(])', add_space_before), # (
-        (r'[ \u0001]+', ' '), # Remove duplicate spaces
+        (r'[ \u0001]+', r' '), # Remove duplicate spaces
         (r' ([\.,:\)])', identity), # Remove spaces in front
         (r'([\(]) ', identity), # Remove spaces after
-        (r'\) :', '):'), # "Save (5) :" -> "Save (5):"
+        (r'([*\)]) :', r'\1:'), # "Save (5) :" -> "Save (5):"
+        (r'\*+ \*+', r' '),
+        (r'P ?a ?s ?s ?i ?v ?e', r'Passive'),
     ]
 
     for fix in misc_fixes:
