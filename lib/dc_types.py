@@ -69,9 +69,16 @@ class Enhancement:
 
         return self
 
+class Condition:
+    def __init__(self):
+        self.page: int = -1
+        self.name: str = ""
+        self.description: str = ""
+        self.stacking: bool = False
+
 class DCObjEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, (Spell, Enhancement, TextItem, DCProtoItem)):
+        if isinstance(o, (Spell, Enhancement, TextItem, DCProtoItem, Condition)):
             d = o.__dict__
             # if isinstance(o, Spell):
             #     d.pop("_current_enhmt")
