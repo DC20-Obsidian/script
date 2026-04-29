@@ -49,4 +49,4 @@ def fixup(s: str, words: list[str]) -> str:
 
 def fixup_name(s: str) -> str:
     s = fixup(s.lower(), names).title()
-    return re.sub("'S", 's', s)
+    return re.sub("'S", "'s", s)

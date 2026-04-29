@@ -47,7 +47,7 @@ page: {page}
 {description}
 """
 
-def list_to_array(li: list[str]) -> str:
+def list_to_yaml(li: list[str]) -> str:
     a = " - "
     a += f'\n - '.join(map( lambda s: f'"s"', li))
     return a
@@ -55,9 +55,9 @@ def list_to_array(li: list[str]) -> str:
 def gen_markdown(spell: Spell) -> str:
     args= {
        "name": spell.name,
-        "source": list_to_array(spell.source),
+        "source": list_to_yaml(spell.source),
         "school": spell.school,
-        "tags": list_to_array(spell.tags),
+        "tags": list_to_yaml(spell.tags),
         "cost": spell.cost,
         "range": spell.range,
         "duration": spell.duration,

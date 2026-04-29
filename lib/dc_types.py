@@ -22,12 +22,12 @@ class Spell:
 
     def fixup(self) -> Spell:
         ap = re.search(r'([0-9]+) ?AP', self.cost)
-        ap = ap.group(1) if ap else 0
-        self.ap_cost = int(ap)
+        self.ap_cost = int(ap.group(1) if ap else 0)
+
         mp = re.search(r'([0-9]+) ?MP|minimum of ([0-9]+)', self.cost)
         mp = mp.groups() if mp else (0, 0)
-        mp = mp[0] or mp[1]
-        self.mp_cost = int(mp)
+        self.mp_cost = int(mp[0] or mp[1])
+
         if "Sustained" in self.duration:
             self.sustained = True
             self.duration = re.sub(r' ?\(?Sustained\)?', '', self.duration)
@@ -108,12 +108,12 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
         {
             "bold": ('', ' '),
             "em": ('', ' '),
-            "list": lambda s: s
+            "list": ('', ' ')
         }, # NONE
         {
             "bold": (f'{colors.BOLD}', f'{colors.ENDC}'),
             "em": (f'{colors.BOLD}{colors.ITALICS}', f'{colors.ENDC}'),
-            "list": lambda s: f'\n {s} '
+            "list": ('\n ', ' ')
         }, # ANSI
         {
             "bold": ('**', '**'),
