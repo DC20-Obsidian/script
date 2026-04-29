@@ -4,10 +4,12 @@ import json
 
 import parse_spells
 from lib.dc_types import Spell, DCObjEncoder, Enhancement
-from lib.utils import eprint, Args
+from lib.utils import eprint, Args, get_file_path
 
 def main(args: Args):
     spells: list = parse_spells.main(args)
+    (_, out_folder) = get_file_path()
+    out_folder += 'spells/'
 
     if args.raw:
         exit(0)
@@ -17,7 +19,7 @@ def main(args: Args):
         exit(0)
 
     try:
-        os.makedirs('./dc-obsidian/spells/')
+        os.makedirs(out_folder)
     except FileExistsError:
         eprint("folder already exists")
 
@@ -27,7 +29,7 @@ def main(args: Args):
         if args.print:
             print(markdown)
         else:
-            save_file(name, markdown)
+            save_file(out_folder, name, markdown)
 
 template = """---
 name: {name}
@@ -97,8 +99,8 @@ def markdown_enhancement(enh: Enhancement) -> str:
     }
     return enhancement_template.format(**args)
 
-def save_file(name: str, s: str):
-    name = f'./dc-obsidian/spells/{name}.md'
+def save_file(path: str, name: str, s: str):
+    name = f'{path}{name}.md'
     with open(name, 'w') as file:
         file.write(s)
 
