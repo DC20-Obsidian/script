@@ -41,7 +41,7 @@ class Enhancement:
         self.repeatable: bool = False
         self.sustained: bool = False
         self.dependent_on: Optional[str] = None
-        # ap/mp_cost is a string becauses "X" is a valid value
+        # ap/mp_cost is a string because "X" is a valid value
         self.ap_cost: str = ""
         self.mp_cost: str = ""
         self.description: str = ""
@@ -55,7 +55,7 @@ class Enhancement:
             self.sustained = True
             self.cost = re.sub(r',? ?Sustained', '', self.cost)
 
-        # dosen't use full "Requires" beacuse of a spelling error in "Luminous Burst" (page 129)
+        # doesn't use full "Requires" because of a spelling error in "Luminous Burst" (page 129)
         if "Requi" in self.cost:
             regex = re.compile(r',? ?Requir?es ([a-zA-Z ]+)')
             self.dependent_on = regex.search(self.cost).group(1)

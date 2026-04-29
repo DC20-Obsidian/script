@@ -47,7 +47,7 @@ def split_spells(pages: list[dict]) -> list[DCProtoItem]:
             # f3: heading font
             if item.font == "g_d0_f3":
                 if spell_has_name:
-                    # New Spell; commit and initilise a new one
+                    # New Spell; commit and initialise a new one
                     if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
                         current_spell.name = fixup_name(current_spell.name.lower()).title()
                         spells.append(current_spell)
@@ -166,7 +166,7 @@ def split_enhancements(items: list[TextItem]) -> list[DCProtoItem]:
     prev_item: TextItem = items[0]
     has_name = False
     for item in items:
-        if item.font == "g_d0_f27": # This is for Call Famillar and other spells that hav multiple sections
+        if item.font == "g_d0_f27": # This is for Call Famillar and other spells that have multiple sections
             break
         if item.font in ["g_d0_f21", "g_d0_f7"]:
             if "•" in prev_item.text: # false positive: skip
@@ -244,7 +244,7 @@ if __name__ == "__main__":
         raise Exception("Parsing spells, but type is not spells")
 
     if args.write:
-        raise Exception("args.write is set, but this function dosen't support that. Use a different one.")
+        raise Exception("args.write is set, but this function doesn't support that. Use a different one.")
 
     spells: list = main(args)
 
