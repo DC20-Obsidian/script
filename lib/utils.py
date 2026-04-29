@@ -51,6 +51,12 @@ class Args:
         self.file: str = args.file
         self.type: str = args.type
 
+
+def save_file(path: str, name: str, s: str):
+    name = f'{path}{name}.md'
+    with open(name, 'w') as file:
+        file.write(s)
+
 def get_file_paths() -> (str, str):
     return {
         "words": "./words/",

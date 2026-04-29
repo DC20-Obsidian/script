@@ -21,6 +21,14 @@ def fixup(s: str, words: list[str]) -> str:
         # return f' {colors.RED}{match.group(1)}{colors.ENDC} '
         # return f' foo{match.group(1)}bar '
         return f' {match.group(1)} '
+
+    pattern = r'(' + '|'.join(re.escape(w) for w in words) +r')'
+    s = re.sub(pattern, replace, s)
+
+    return fixup_misc(s)
+
+
+def fixup_misc(s: str) -> str:
     def add_space_after(match: re.Match):
         return f'{match.group(1)} '
     def add_space_before(match: re.Match):
@@ -29,10 +37,9 @@ def fixup(s: str, words: list[str]) -> str:
         return match.group(1)
 
     misc_fixes = [
-        (r' ona', ' on a'),
-        (r' ina', ' in a'),
         (r'’', "'"),
-        (r'([,:\.])', add_space_after), # , . :
+        # (r'([,:\.])', add_space_after), # , . :
+        (r' \n', '\n'),
         (r'([\(])', add_space_before), # (
         (r'[ \u0001]+', ' '), # Remove duplicate spaces
         (r' ([\.,:\)])', identity), # Remove spaces in front
@@ -40,13 +47,14 @@ def fixup(s: str, words: list[str]) -> str:
         (r'\) :', '):'), # "Save (5) :" -> "Save (5):"
     ]
 
-    pattern = r'(' + '|'.join(re.escape(w) for w in words) +r')'
-    s = re.sub(pattern, replace, s)
-
     for fix in misc_fixes:
         s = re.sub(fix[0], fix[1], s)
     return s.strip()
 
+
 def fixup_name(s: str) -> str:
     s = fixup(s.lower(), names).title()
     return re.sub("'S", "'s", s)
+
+def fixup_description(s: str) -> str:
+    return fixup_misc(s)
