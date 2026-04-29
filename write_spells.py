@@ -9,13 +9,10 @@ from lib.utils import eprint, Args
 def main(args: Args):
     spells: list = parse_spells.main(args)
 
-    if args.print:
-        print(json.dumps(spells, cls=DCObjEncoder))
-
     if args.raw:
         exit(0)
 
-    if not args.write:
+    if not args.write and not args.print:
         eprint(f"{colors.YELLOW}Warning{colors.ENDC}: write_spells called, but args.write is not set. Skipping")
         exit(0)
 
@@ -27,7 +24,10 @@ def main(args: Args):
     for spell in spells:
         name = spell.name
         markdown = gen_markdown(spell)
-        save_file(name, markdown)
+        if args.print:
+            print(markdown)
+        else:
+            save_file(name, markdown)
 
 template = """---
 name: {name}
