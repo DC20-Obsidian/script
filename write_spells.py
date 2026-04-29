@@ -49,7 +49,7 @@ page: {page}
 
 def list_to_yaml(li: list[str]) -> str:
     a = " - "
-    a += f'\n - '.join(map( lambda s: f'"s"', li))
+    a += f'\n - '.join(map( lambda s: f'"{s}"', li))
     return a
 
 def gen_markdown(spell: Spell) -> str:
