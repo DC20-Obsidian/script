@@ -2,7 +2,7 @@
 
 import json
 
-from lib.utils import colors, eprint, Args, get_file_path
+from lib.utils import colors, eprint, Args, get_file_paths
 from lib.dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem, markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name
 
@@ -13,8 +13,7 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
         page_range = args.page_range
 
     # Open file
-    file = get_file_path()[1]
-    file = args.file or f'{file}/json/dc20_0.10.5_pdf_filtered.json'
+    file = args.file or get_file_paths()['input']
     with open(file, 'r') as file:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages

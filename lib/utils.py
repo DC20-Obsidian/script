@@ -51,5 +51,9 @@ class Args:
         self.file: str = args.file
         self.type: str = args.type
 
-def get_file_path() -> (str, str):
-    return ("./", "./dc-obsidian/")
+def get_file_paths() -> (str, str):
+    return {
+        "words": "./words/",
+        "output": "./dc-obsidian/",
+        "input": "./dc-obsidian/json/dc20_0.10.5_pdf_filtered.json",
+    }

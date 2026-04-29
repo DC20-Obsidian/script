@@ -4,11 +4,11 @@ import json
 
 import parse_spells
 from lib.dc_types import Spell, DCObjEncoder, Enhancement
-from lib.utils import eprint, Args, get_file_path
+from lib.utils import eprint, Args, get_file_paths
 
 def main(args: Args):
     spells: list = parse_spells.main(args)
-    (_, out_folder) = get_file_path()
+    out_folder = get_file_paths()['output']
     out_folder += 'spells/'
 
     if args.raw:
