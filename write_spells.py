@@ -3,7 +3,7 @@ import os
 import json
 
 import parse_spells
-from lib.dc_types import Spell, DCObjEncoder
+from lib.dc_types import Spell, DCObjEncoder, Enhancement
 from lib.utils import eprint, Args
 
 def main(args: Args):
@@ -45,12 +45,21 @@ sustained: {sustained}
 page: {page}
 ---
 {description}
+
+## Spell Enhancements
+{enhancements}
 """
 
 def list_to_yaml(li: list[str]) -> str:
     a = " - "
     a += f'\n - '.join(map( lambda s: f'"{s}"', li))
     return a
+
+def enhancements(enhancements: list[Enhancement]) -> str:
+    s: str = ""
+    for enh in enhancements:
+        s += markdown_enhancement(enh)
+    return s
 
 def gen_markdown(spell: Spell) -> str:
     args= {
@@ -65,9 +74,28 @@ def gen_markdown(spell: Spell) -> str:
         "MP": spell.mp_cost,
         "sustained": spell.sustained,
         "page": spell.page_number,
-        "description": spell.description
+        "description": spell.description,
+        "enhancements": enhancements(spell.enhancements)
     }
     return template.format(**args)
+
+enhancement_template = """
+### {name} (**{cost}**{repeatable}{sustained}{dependent_on})
+{description}
+"""
+
+def markdown_enhancement(enh: Enhancement) -> str:
+    args = {
+        "name": enh.name,
+        "cost": enh.cost,
+        "repeatable": ", *Repeatable*" if enh.repeatable else "",
+        "sustained": ", *Sustained*" if enh.sustained else "",
+        "dependent_on": f", Requires: {enh.dependent_on}" if enh.dependent_on else "",
+        "ap_cost": enh.ap_cost,
+        "mp_cost": enh.mp_cost,
+        "description": enh.description,
+    }
+    return enhancement_template.format(**args)
 
 def save_file(name: str, s: str):
     name = f'./dc-obsidian/spells/{name}.md'
