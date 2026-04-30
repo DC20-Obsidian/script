@@ -35,7 +35,7 @@ class Args:
         parser.add_argument('-r', '--raw', action='store_true', help="output raw data")
         parser.add_argument('-w', '--write', action='store_true', help="write the output to files")
         parser.add_argument('-p', '--print', action='store_true', help="print the output to stdout")
-        parser.add_argument('-t', '--type', choices=["spells"], help="the type of item to parse")
+        parser.add_argument('-t', '--type', choices=["spells", "conditions"], help="the type of item to parse")
         parser.add_argument('-u', '--unprocessed', action='store_true', help="only output unprocessed textitems (implies --raw)")
         parser.add_argument('-f', '--file', help="filtered JSON containing PDF data to use")
         parser.add_argument('-s', '--saved', action='store_true', help="use saved json data instead of parsing it anew")
