@@ -3,8 +3,10 @@ import os
 import json
 
 import parse_spells
-from lib.dc_types import Spell, DCObjEncoder, Enhancement, dc_obj_decoder
-from lib.utils import eprint, Args, get_file_paths
+from lib.utils import eprint, Args, get_file_paths, colors
+from dc_types import dc_obj_decoder
+from dc_types.spell import Spell
+from dc_types.enhancement import Enhancement
 
 def main(args: Args):
     out_folder = get_file_paths()['output']

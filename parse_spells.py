@@ -3,8 +3,11 @@
 import json
 
 from lib.utils import colors, eprint, Args, get_file_paths
-from lib.dc_types import Spell, Enhancement, DCObjEncoder, TextItem, DCProtoItem, markup, assert_font, MarkupStyle
+from lib.markup import markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name, fixup_description
+from dc_types import DCObjEncoder, DCProtoItem, TextItem
+from dc_types.spell import Spell
+from dc_types.enhancement import Enhancement
 
 def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     if args.all:

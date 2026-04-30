@@ -2,9 +2,12 @@
 
 import json
 import re
-from lib.dc_types import DCObjEncoder, DCProtoItem, TextItem, assert_font, MarkupStyle, markup, Condition
+from lib.markup import MarkupStyle, markup
 from lib.utils import get_file_paths, Args, colors, eprint, save_file
 from lib.fixup_text import fixup_name, fixup_description
+from dc_types import DCObjEncoder, DCProtoItem, TextItem
+from dc_types.condition import Condition
+from dc_types.spell import Spell
 
 # pages 173-174
 def main(args: Args) -> list[Condition] | list[DCProtoItem]:
