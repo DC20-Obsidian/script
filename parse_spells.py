@@ -35,7 +35,7 @@ def split_spells(pages: list[dict]) -> list[DCProtoItem]:
     current_spell: DCProtoItem = DCProtoItem()
     false_positives = ["summontraits"]
     # f2: page numbers, f9, f1: footers
-    discard_fonts: list[str] = ["g_d0_f2", "g_d0_f9", "g_d0_f1"]
+    discard_fonts: list[str] = ["f2", "f9", "f1"]
     spell_has_name: bool = False
 
     for page in pages:
@@ -44,7 +44,7 @@ def split_spells(pages: list[dict]) -> list[DCProtoItem]:
             item: TextItem = TextItem(text_item, page_number)
 
             # f3: heading font
-            if item.font == "g_d0_f3":
+            if item.font == "f3":
                 if spell_has_name:
                     # New Spell; commit and initialise a new one
                     if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
@@ -80,57 +80,57 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     # Pop: 'Source:':f11:2, 'Source':f7:155, 'Spell List':f7:3
     item = items.pop(0)
     spell.page = item.page
-    assert_font(item, ["g_d0_f7", "g_d0_f11"])
+    assert_font(item, ["f7", "f11"])
     # return spell
 
     # Spell Source
     item: TextItem = items.pop(0)
-    assert_font(item, ["g_d0_f5"])
-    while item.font == "g_d0_f5":
+    assert_font(item, ["f5"])
+    while item.font == "f5":
         spell.source.extend(re.findall(r'[a-zA-Z]+', item.text))
         item = items.pop(0)
     # return spell
 
     # Pop: 'School':f7:148, 'School:':f14:1 'Spell School':f7:11
-    assert_font(item, ["g_d0_f7", "g_d0_f14"])
+    assert_font(item, ["f7", "f14"])
 
     # Spell School
     item: TextItem = items.pop(0)
-    assert_font(item, ["g_d0_f5"])
+    assert_font(item, ["f5"])
     school: list[str] = re.findall(r'^:? ?([a-zA-Z ]+)', item.text)
     assert len(school) == 1
     spell.school = school[0].strip()
     # return spell
 
     # Pop: 'Tags':f21: 158, 'Tags:':f11:1 'Spell Tags':f21:1
-    assert_font(items.pop(0), ["g_d0_f21", "g_d0_f11"])
+    assert_font(items.pop(0), ["f21", "f11"])
     # return spell
 
     # Spell Tags
     item: TextItem = items.pop(0)
-    assert_font(item, ["g_d0_f5"])
-    while item.font == "g_d0_f5":
+    assert_font(item, ["f5"])
+    while item.font == "f5":
         spell.tags.extend(re.findall(r'[a-zA-Z]+', item.text))
         item = items.pop(0)
     # return spell
 
     # Pop: 'Cost':f7: 159, 'Cost':f11:1
-    assert_font(item, ["g_d0_f7", "g_d0_f11"])
+    assert_font(item, ["f7", "f11"])
 
     # Spell Cost
     item: TextItem = items.pop(0)
-    assert_font(item, ["g_d0_f5"])
-    while item.font == "g_d0_f5":
+    assert_font(item, ["f5"])
+    while item.font == "f5":
         spell.cost += item.text.lstrip(':').strip()
         item = items.pop(0)
     # return spell
 
     # Pop: 'Range':f21: 160
-    assert_font(item, ["g_d0_f21"])
+    assert_font(item, ["f21"])
 
     # Spell Range
     item: TextItem = items.pop(0)
-    assert_font(item, ["g_d0_f5"])
+    assert_font(item, ["f5"])
     spell.range = item.text.lstrip(':').strip()
     # No loop here because "Dispel Magic" has no listed duration
     # return spell
@@ -139,10 +139,10 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     if re.match('^Duration', item.text) is not None:
         # Spell is not "Dispel Magic"
         items.pop(0)
-        assert_font(item, ["g_d0_f21"])
+        assert_font(item, ["f21"])
 
         item: TextItem = items.pop(0)
-        assert_font(item, ["g_d0_f5"])
+        assert_font(item, ["f5"])
         spell.duration = item.text.lstrip(':').strip()
     else:
         # Spell is "Dispel Magic". Filling in Duration
@@ -165,9 +165,9 @@ def split_enhancements(items: list[TextItem]) -> list[DCProtoItem]:
     prev_item: TextItem = items[0]
     has_name = False
     for item in items:
-        if item.font == "g_d0_f27": # This is for Call Famillar and other spells that have multiple sections
+        if item.font == "f27": # This is for Call Famillar and other spells that have multiple sections
             break
-        if item.font in ["g_d0_f21", "g_d0_f7"]:
+        if item.font in ["f21", "f7"]:
             if "•" in prev_item.text: # false positive: skip
                 prev_item = item
                 continue
@@ -212,7 +212,7 @@ def parse_description(items: list[TextItem]) -> str:
     prev_item = item
 
     # f27: Spell Enhancements
-    while item.font != 'g_d0_f27' or not item.text.startswith("Spell Enhancement"):
+    while item.font != 'f27' or not item.text.startswith("Spell Enhancement"):
         desc += markup(item, prev_item, MarkupStyle.MARKDOWN)
         prev_item = item
         if len(items) != 0:

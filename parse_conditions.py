@@ -38,7 +38,7 @@ def split_conditions(pages: list[dict]) -> list[DCProtoItem]:
     current_condition: DCProtoItem = DCProtoItem()
     false_positives = []
     # f2: page numbers, f9, f1: footers
-    discard_fonts: list[str] = ["g_d0_f2", "g_d0_f9", "g_d0_f1"]
+    discard_fonts: list[str] = ["f2", "f9", "f1"]
     spell_has_name: bool = False
 
     for page in pages:
@@ -47,7 +47,7 @@ def split_conditions(pages: list[dict]) -> list[DCProtoItem]:
             item: TextItem = TextItem(text_item, page_number)
 
             # f3: heading font
-            if item.font == "g_d0_f3" and item.font_size < 15:
+            if item.font == "f3" and item.font_size < 15:
                 if spell_has_name:
                     # New Spell; commit and initialise a new one
                     if current_condition.name.strip() != "" and not any(fp in current_condition.name.lower() for fp in false_positives):
