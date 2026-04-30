@@ -52,3 +52,21 @@ class Enhancement:
 
         return self
 
+    def markdown(self) -> str:
+        args = {
+            "name": self.name,
+            "cost": self.cost,
+            "repeatable": ", *Repeatable*" if self.repeatable else "",
+            "sustained": ", *Sustained*" if self.sustained else "",
+            "dependent_on": f", Requires: {self.dependent_on}" if self.dependent_on else "",
+            "ap_cost": self.ap_cost,
+            "mp_cost": self.mp_cost,
+            "description": self.description,
+        }
+        return template.format(**args)
+
+
+template = """
+### {name} (**{cost}**{repeatable}{sustained}{dependent_on})
+{description}
+"""

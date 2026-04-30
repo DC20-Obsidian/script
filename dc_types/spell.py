@@ -48,3 +48,53 @@ class Spell:
             self.sustained = True
             self.duration = re.sub(r' ?\(?Sustained\)?', '', self.duration)
         return self
+    
+    def markdown(self) -> str:
+        args= {
+           "name": self.name,
+            "source": list_to_yaml(self.source),
+            "school": self.school,
+            "tags": list_to_yaml(self.tags),
+            "cost": self.cost,
+            "range": self.range,
+            "duration": self.duration,
+            "AP": self.ap_cost,
+            "MP": self.mp_cost,
+            "sustained": self.sustained,
+            "page": self.page,
+            "description": self.description,
+            "enhancements": enhancements(self.enhancements)
+        }
+        return template.format(**args)
+
+template = """---
+name: {name}
+source:
+{source}
+school: {school}
+spell_tags:
+{tags}
+ap: {AP}
+mp: {MP}
+cost: {cost}
+range: {range}
+duration: {duration}
+sustained: {sustained}
+page: {page}
+---
+{description}
+
+## Spell Enhancements
+{enhancements}
+"""
+
+def list_to_yaml(li: list[str]) -> str:
+    a = " - "
+    a += '\n - '.join(map( lambda s: f'"{s}"', li))
+    return a
+
+def enhancements(enhancements: list[Enhancement]) -> str:
+    s: str = ""
+    for enh in enhancements:
+        s += enh.markdown()
+    return s
