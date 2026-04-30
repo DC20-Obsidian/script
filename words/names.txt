@@ -58,3 +58,13 @@ tethered
 impaired
 bleeding
 burning
+
+# Maneuvers
+heroic
+line
+extend
+through
+throw
+step
+piercing
+strike
