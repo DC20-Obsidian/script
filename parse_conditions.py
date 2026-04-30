@@ -2,10 +2,11 @@
 
 import json
 from lib.markup import MarkupStyle, markup
-from lib.utils import get_file_paths, Args, colors, eprint, save_file
+from lib.utils import get_file_paths, Args, colors, eprint, save_file, flatten_pages
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types import DCObjEncoder, DCProtoItem, TextItem
 from dc_types.condition import Condition
+from dc_types.item_list import ItemList
 
 # pages 173-174
 def main(args: Args) -> list[Condition] | list[DCProtoItem]:
@@ -21,7 +22,9 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages
 
-    conditions_raw: list[DCProtoItem] = split_conditions(pages)
+    items: ItemList = flatten_pages(pages)
+
+    conditions_raw: list[DCProtoItem] = split_conditions(items)
 
     if args.raw:
         if args.unprocessed:
@@ -34,7 +37,7 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
         return conditions
 
 
-def split_conditions(pages: list[dict]) -> list[DCProtoItem]:
+def split_conditions(items: ItemList) -> list[DCProtoItem]:
     conditions: list[DCProtoItem] = []
     current_condition: DCProtoItem = DCProtoItem()
     false_positives = []
@@ -42,25 +45,21 @@ def split_conditions(pages: list[dict]) -> list[DCProtoItem]:
     discard_fonts: list[str] = ["f2", "f9", "f1"]
     spell_has_name: bool = False
 
-    for page in pages:
-        page_number: int = page['page']
-        for text_item in page['textItems']:
-            item: TextItem = TextItem(text_item, page_number)
-
-            # f3: heading font
-            if item.font == "f3" and item.font_size < 15:
-                if spell_has_name:
-                    # New Spell; commit and initialise a new one
-                    if current_condition.name.strip() != "" and not any(fp in current_condition.name.lower() for fp in false_positives):
-                        current_condition.name = fixup_name(current_condition.name.lower()).title()
-                        conditions.append(current_condition)
-                    current_condition = DCProtoItem()
-                    spell_has_name = False
-                current_condition.name += item.text
-            else:
-                spell_has_name = True
-                if item.font not in discard_fonts:
-                    current_condition.items.append(item)
+    for item in items:
+        # f3: heading font
+        if item.font == "f3" and item.font_size < 15:
+            if spell_has_name:
+                # New Spell; commit and initialise a new one
+                if current_condition.name.strip() != "" and not any(fp in current_condition.name.lower() for fp in false_positives):
+                    current_condition.name = fixup_name(current_condition.name.lower()).title()
+                    conditions.append(current_condition)
+                current_condition = DCProtoItem()
+                spell_has_name = False
+            current_condition.name += item.text
+        else:
+            spell_has_name = True
+            if item.font not in discard_fonts:
+                current_condition.items.append(item)
 
     current_condition.name = fixup_name(current_condition.name.lower()).title()
     conditions.append(current_condition)

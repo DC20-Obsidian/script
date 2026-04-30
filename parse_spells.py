@@ -2,12 +2,13 @@
 
 import json
 
-from lib.utils import colors, eprint, Args, get_file_paths
+from lib.utils import colors, eprint, Args, get_file_paths, flatten_pages
 from lib.markup import markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types import DCObjEncoder, DCProtoItem, TextItem
 from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
+from dc_types.item_list import ItemList
 
 def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     if args.all:
@@ -21,8 +22,9 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages
 
+    items: ItemList = flatten_pages(pages)
     # Split spells
-    spells_raw: list[DCProtoItem] = split_spells(pages)
+    spells_raw: list[DCProtoItem] = split_spells(items)
 
     if args.raw:
         if args.unprocessed:
@@ -33,7 +35,7 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
         spells: list[Spell] = parse_spells(spells_raw)
         return spells
 
-def split_spells(pages: list[dict]) -> list[DCProtoItem]:
+def split_spells(items: ItemList) -> list[DCProtoItem]:
     spells: list[DCProtoItem] = []
     current_spell: DCProtoItem = DCProtoItem()
     false_positives = ["summontraits"]
@@ -41,25 +43,21 @@ def split_spells(pages: list[dict]) -> list[DCProtoItem]:
     discard_fonts: list[str] = ["f2", "f9", "f1"]
     spell_has_name: bool = False
 
-    for page in pages:
-        page_number: int = page['page']
-        for text_item in page['textItems']:
-            item: TextItem = TextItem(text_item, page_number)
-
-            # f3: heading font
-            if item.font == "f3":
-                if spell_has_name:
-                    # New Spell; commit and initialise a new one
-                    if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
-                        current_spell.name = fixup_name(current_spell.name.lower()).title()
-                        spells.append(current_spell)
-                    current_spell = DCProtoItem()
-                    spell_has_name = False
-                current_spell.name += item.text
-            else:
-                spell_has_name = True
-                if item.font not in discard_fonts:
-                    current_spell.items.append(item)
+    for item in items:
+        # f3: heading font
+        if item.font == "f3":
+            if spell_has_name:
+                # New Spell; commit and initialise a new one
+                if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
+                    current_spell.name = fixup_name(current_spell.name.lower()).title()
+                    spells.append(current_spell)
+                current_spell = DCProtoItem()
+                spell_has_name = False
+            current_spell.name += item.text
+        else:
+            spell_has_name = True
+            if item.font not in discard_fonts:
+                current_spell.items.append(item)
 
     current_spell.name = fixup_name(current_spell.name.lower()).title()
     spells.append(current_spell)

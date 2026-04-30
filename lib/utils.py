@@ -1,3 +1,5 @@
+from dc_types import TextItem
+from dc_types.item_list import ItemList
 import argparse
 
 def eprint(*args, **kw):
@@ -51,6 +53,14 @@ class Args:
         self.type: str = args.type
         self.saved: bool = bool(args.saved)
 
+def flatten_pages(pages: list[dict]) -> ItemList:
+    items: ItemList = ItemList()
+    for page in pages:
+        page_number: int = page['page']
+        for text_item in page['textItems']:
+            item: TextItem = TextItem(text_item, page_number)
+            items.append(item)
+    return items
 
 def save_file(path: str, name: str, s: str):
     name = f'{path}{name}.md'
