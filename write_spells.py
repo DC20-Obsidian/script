@@ -31,6 +31,7 @@ def main(args: Args):
         eprint("folder already exists")
 
     for spell in spells:
+        assert isinstance(spell, Spell)
         name = spell.name
         markdown = gen_markdown(spell)
         if args.print:
@@ -61,7 +62,7 @@ page: {page}
 
 def list_to_yaml(li: list[str]) -> str:
     a = " - "
-    a += f'\n - '.join(map( lambda s: f'"{s}"', li))
+    a += '\n - '.join(map( lambda s: f'"{s}"', li))
     return a
 
 def enhancements(enhancements: list[Enhancement]) -> str:

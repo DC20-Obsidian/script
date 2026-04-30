@@ -27,7 +27,7 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     if args.raw:
         if args.unprocessed:
             # Consume all TextItems that can be processed
-            spells: list[Spell] = parse_spells(spells_raw)
+            parse_spells(spells_raw)
         return spells_raw
     else:
         spells: list[Spell] = parse_spells(spells_raw)

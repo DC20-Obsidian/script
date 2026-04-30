@@ -1,6 +1,4 @@
 import argparse
-import re
-from typing import Optional
 
 def eprint(*args, **kw):
     import sys
@@ -59,7 +57,7 @@ def save_file(path: str, name: str, s: str):
     with open(name, 'w') as file:
         file.write(s)
 
-def get_file_paths() -> (str, str):
+def get_file_paths() -> dict[str, str]:
     return {
         "words": "./words/",
         "output": "./dc-obsidian/",

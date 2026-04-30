@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
 import json
-import re
 from lib.markup import MarkupStyle, markup
 from lib.utils import get_file_paths, Args, colors, eprint, save_file
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types import DCObjEncoder, DCProtoItem, TextItem
 from dc_types.condition import Condition
-from dc_types.spell import Spell
 
 # pages 173-174
 def main(args: Args) -> list[Condition] | list[DCProtoItem]:
@@ -28,7 +26,7 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
     if args.raw:
         if args.unprocessed:
             # Consume all TextItems that can be processed
-            conditions: list[Condition] = parse_conditions(conditions_raw)
+            parse_conditions(conditions_raw)
             pass
         return conditions_raw
     else:
@@ -86,8 +84,8 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
     cond.description = fixup_description(desc)
     return cond
 
-def parse_conditions(conds_raw: list[DCProtoItem]) -> list[Spell]:
-    conds: list[Spell] = []
+def parse_conditions(conds_raw: list[DCProtoItem]) -> list[Condition]:
+    conds: list[Condition] = []
     for raw_cond in conds_raw:
         page_number = raw_cond.items[0].page
         try:
@@ -138,6 +136,7 @@ if __name__ == "__main__":
             eprint(f"{colors.YELLOW}folder already exists{colors.ENDC}")
 
         for cond in conditions:
+            assert isinstance(cond, Condition)
             name = cond.name
             markdown = gen_markdown(cond)
             if args.print:

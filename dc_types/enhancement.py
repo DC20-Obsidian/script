@@ -15,7 +15,7 @@ class Enhancement:
         self.description: str = ""
 
     @staticmethod
-    def from_json(d: dict) -> Enhancement:
+    def from_json(d: dict) -> 'Enhancement':
         e = Enhancement()
         e.name = d['name']
         e.cost = d['cost']
@@ -39,7 +39,9 @@ class Enhancement:
         # doesn't use full "Requires" because of a spelling error in "Luminous Burst" (page 129)
         if "Requi" in self.cost:
             regex = re.compile(r',? ?Requir?es ([a-zA-Z ]+)')
-            self.dependent_on = regex.search(self.cost).group(1)
+            m = regex.search(self.cost)
+            assert m is not None
+            self.dependent_on = m.group(1)
             self.cost = regex.sub('', self.cost)
 
         ap = re.search(r'([0-9X]+) ?AP', self.cost)

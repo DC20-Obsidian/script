@@ -31,7 +31,7 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
         {
             "bold": ('**', '**'),
             "em": ('***', '***'),
-            "list": (f'\n- ', ''),
+            "list": ('\n- ', ''),
         }, # MARKDOWN
     ]
     markup: dict = markup[style.value]
@@ -63,7 +63,7 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
 
     font = item.font
     t = item.text
-    prev_font = (prev_item.font if prev_item else None)
+    # prev_font = (prev_item.font if prev_item else None)
 
     match font:
         case 'f11' | 'f14':
@@ -84,4 +84,4 @@ def assert_font(item: TextItem, fonts: list[str]):
 
 def assert_item(item: TextItem, fonts: list[str], regex: re.Pattern):
     assert_font(item, fonts)
-    assert regex.match(item.text) != None, f'item does not match regex'
+    assert regex.match(item.text) is not None, 'item does not match regex'

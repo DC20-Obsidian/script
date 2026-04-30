@@ -19,7 +19,7 @@ class Spell:
         self.enhancements: list[Enhancement] = []
 
     @staticmethod
-    def from_json(d: dict) -> Spell:
+    def from_json(d: dict) -> 'Spell':
         s = Spell()
         s.name = d['name']
         s.page = int(d['page'])
@@ -36,7 +36,7 @@ class Spell:
         s.enhancements = d['enhancements']
         return s
 
-    def fixup(self) -> Spell:
+    def fixup(self) -> 'Spell':
         ap = re.search(r'([0-9]+) ?AP', self.cost)
         self.ap_cost = int(ap.group(1) if ap else 0)
 
