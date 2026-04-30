@@ -6,9 +6,9 @@ from lib.utils import get_file_paths, Args, colors, eprint, save_file, flatten_p
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types import DCObjEncoder
 from dc_types.proto_item import DCProtoItem
-from dc_types.text_item import TextItem
+from dc_types.text_frag import TextFrag
 from dc_types.condition import Condition
-from dc_types.item_list import ItemList
+from dc_types.frag_list import FragList
 
 # pages 173-174
 def main(args: Args) -> list[Condition] | list[DCProtoItem]:
@@ -24,13 +24,13 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages
 
-    items: ItemList = flatten_pages(pages)
+    frags: FragList = flatten_pages(pages)
 
-    conditions_raw: list[DCProtoItem] = split_conditions(items)
+    conditions_raw: list[DCProtoItem] = split_conditions(frags)
 
     if args.raw:
         if args.unprocessed:
-            # Consume all TextItems that can be processed
+            # Consume all TextFrags that can be processed
             parse_conditions(conditions_raw)
             pass
         return conditions_raw
@@ -39,7 +39,7 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
         return conditions
 
 
-def split_conditions(items: ItemList) -> list[DCProtoItem]:
+def split_conditions(frags: FragList) -> list[DCProtoItem]:
     conditions: list[DCProtoItem] = []
     current_condition: DCProtoItem = DCProtoItem()
     false_positives = []
@@ -47,9 +47,9 @@ def split_conditions(items: ItemList) -> list[DCProtoItem]:
     discard_fonts: list[str] = ["f2", "f9", "f1"]
     spell_has_name: bool = False
 
-    for item in items:
+    for frag in frags:
         # f3: heading font
-        if item.font == "f3" and item.font_size < 15:
+        if frag.font == "f3" and frag.font_size < 15:
             if spell_has_name:
                 # New Spell; commit and initialise a new one
                 if current_condition.name.strip() != "" and not any(fp in current_condition.name.lower() for fp in false_positives):
@@ -57,11 +57,11 @@ def split_conditions(items: ItemList) -> list[DCProtoItem]:
                     conditions.append(current_condition)
                 current_condition = DCProtoItem()
                 spell_has_name = False
-            current_condition.name += item.text
+            current_condition.name += frag.text
         else:
             spell_has_name = True
-            if item.font not in discard_fonts:
-                current_condition.items.append(item)
+            if frag.font not in discard_fonts:
+                current_condition.frags.append(frag)
 
     current_condition.name = fixup_name(current_condition.name.lower()).title()
     conditions.append(current_condition)
@@ -73,14 +73,14 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
     if cond.name.endswith('X'):
         cond.stacking = True
         cond.name = cond.name.rstrip(' X')
-    cond.page = proto_cond.items[0].page
-    items: list[TextItem] = proto_cond.items
+    cond.page = proto_cond.frags[0].page
+    frags: list[TextFrag] = proto_cond.frags
     desc = ""
-    prev_item = None
+    prev_frag = None
 
-    for item in items:
-        desc += markup(item, prev_item, MarkupStyle.MARKDOWN)
-        prev_item = item
+    for frag in frags:
+        desc += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
+        prev_frag = frag
 
     cond.description = fixup_description(desc)
     return cond
@@ -88,7 +88,7 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
 def parse_conditions(conds_raw: list[DCProtoItem]) -> list[Condition]:
     conds: list[Condition] = []
     for raw_cond in conds_raw:
-        page_number = raw_cond.items[0].page
+        page_number = raw_cond.frags[0].page
         try:
             conds.append(parse_condition(raw_cond))
         except Exception as e:

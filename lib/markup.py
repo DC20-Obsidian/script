@@ -1,7 +1,7 @@
 import re
 import enum
 from typing import Optional
-from dc_types.text_item import TextItem
+from dc_types.text_frag import TextFrag
 from .utils import colors
 
 class MarkupStyle(enum.Enum):
@@ -16,7 +16,7 @@ class FontType(enum.Enum):
     BOLD_ITALIC = 3
     LIST = 4
 
-def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: MarkupStyle) -> str:
+def markup(frag: Optional[TextFrag], prev_frag: Optional[TextFrag], style: MarkupStyle) -> str:
     markup: list[dict] = [
         {
             "bold": ('', ' '),
@@ -38,9 +38,9 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
     # import json
     # eprint(json.dumps(markup))
 
-    if item is None and prev_item is None:
+    if frag is None and prev_frag is None:
         return ""
-    if item is None: #TMP
+    if frag is None: #TMP
         return ""
 
     def bold_italic(s: str):
@@ -61,8 +61,8 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
 
     # TODO support prev_item
 
-    font = item.font
-    t = item.text
+    font = frag.font
+    t = frag.text
     # prev_font = (prev_item.font if prev_item else None)
 
     match font:
@@ -79,9 +79,9 @@ def markup(item: Optional[TextItem], prev_item: Optional[TextItem], style: Marku
 
     raise Exception("Unknown font")
 
-def assert_font(item: TextItem, fonts: list[str]):
-    assert item.font in fonts, f'Invalid font on page: {item.page}. Expected one of: {fonts}, found: {item.font}'
+def assert_font(frag: TextFrag, fonts: list[str]):
+    assert frag.font in fonts, f'Invalid font on page: {frag.page}. Expected one of: {fonts}, found: {frag.font}'
 
-def assert_item(item: TextItem, fonts: list[str], regex: re.Pattern):
-    assert_font(item, fonts)
-    assert regex.match(item.text) is not None, 'item does not match regex'
+def assert_item(frag: TextFrag, fonts: list[str], regex: re.Pattern):
+    assert_font(frag, fonts)
+    assert regex.match(frag.text) is not None, 'frag does not match regex'

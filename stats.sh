@@ -31,7 +31,7 @@ w "Count unique durations"
 spells | jq 'map(.tags) | flatten | reduce .[] as $tag ({}; .[$tag] += 1)'
 w "Count tags"
 
-spells -r | jq 'map(select(.items | any(.font == "f22")) | .name)'
+spells -r | jq 'map(select(.frags | any(.font == "f22")) | .name)'
 w "List all spells that have a table in them"
 
 # Restores the original buffer

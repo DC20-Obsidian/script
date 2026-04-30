@@ -5,10 +5,10 @@ import json
 from lib.markup import MarkupStyle, markup
 from lib.utils import get_file_paths, Args, colors, eprint, save_file, flatten_pages
 from lib.fixup_text import fixup_name, fixup_description
-from dc_types.item_list import ItemList
+from dc_types.frag_list import FragList
 from dc_types import DCObjEncoder
 from dc_types.proto_item import DCProtoItem
-from dc_types.text_item import TextItem
+from dc_types.text_frag import TextFrag
 from dc_types.maneuver import Maneuver
 
 # pages 173-174
@@ -25,12 +25,12 @@ def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages
 
-    items: ItemList = flatten_pages(pages)
-    maneuvers_raw: list[DCProtoItem] = split_maneuvers(items)
+    frags: FragList = flatten_pages(pages)
+    maneuvers_raw: list[DCProtoItem] = split_maneuvers(frags)
 
     if args.raw:
         if args.unprocessed:
-            # Consume all TextItems that can be processed
+            # Consume all TextFrags that can be processed
             parse_maneuvers(maneuvers_raw)
             pass
         return maneuvers_raw
@@ -39,7 +39,7 @@ def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
         return maneuvers
 
 
-def split_maneuvers(items: ItemList) -> list[DCProtoItem]:
+def split_maneuvers(frags: FragList) -> list[DCProtoItem]:
     sections: list[str] = ["attack", "defense", "grapple", "utility"]
     # section: str = sections.pop(0)
     section: str = "<NONE>"
@@ -52,13 +52,13 @@ def split_maneuvers(items: ItemList) -> list[DCProtoItem]:
     spell_has_name: bool = False
     prev_font: str = ""
 
-    for item in items:
-        if prev_font == "f4" and item.font != "f4":
+    for frag in frags:
+        if prev_font == "f4" and frag.font != "f4":
             # End of section header
             section = sections.pop(0)
-            prev_font = item.font
+            prev_font = frag.font
             continue
-        if item.font == "f4":
+        if frag.font == "f4":
             # Section header
             # commit and initilise a new maneuver
             if current_maneuver.name.strip() != "" and not any(fp in current_maneuver.name.lower() for fp in false_positives):
@@ -69,8 +69,8 @@ def split_maneuvers(items: ItemList) -> list[DCProtoItem]:
             spell_has_name = False
 
         # f3: heading font
-        if item.font == "f3" and item.font_size < 15:
-            # eprint(f"{item.text}, {item.font_size}")
+        if frag.font == "f3" and frag.font_size < 15:
+            # eprint(f"{frag.text}, {frag.font_size}")
             if spell_has_name:
                 # New Maneuver; commit and initialise a new one
                 if current_maneuver.name.strip() != "" and not any(fp in current_maneuver.name.lower() for fp in false_positives):
@@ -79,12 +79,12 @@ def split_maneuvers(items: ItemList) -> list[DCProtoItem]:
                 current_maneuver = DCProtoItem()
                 current_maneuver.section = section
                 spell_has_name = False
-            current_maneuver.name += item.text
+            current_maneuver.name += frag.text
         else:
             spell_has_name = True
-            if item.font not in discard_fonts:
-                current_maneuver.items.append(item)
-        prev_font = item.font
+            if frag.font not in discard_fonts:
+                current_maneuver.frags.append(frag)
+        prev_font = frag.font
 
     current_maneuver.name = fixup_name(current_maneuver.name.lower()).title()
     maneuvers.append(current_maneuver)
@@ -93,33 +93,33 @@ def split_maneuvers(items: ItemList) -> list[DCProtoItem]:
 def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
     maneuver: Maneuver = Maneuver()
     maneuver.name = proto_maneuver.name
-    maneuver.page = proto_maneuver.items[0].page
+    maneuver.page = proto_maneuver.frags[0].page
     maneuver.kind = proto_maneuver.section
-    items: list[TextItem] = proto_maneuver.items
+    frags: list[TextFrag] = proto_maneuver.frags
     desc: str = ""
-    prev_item: Optional[TextItem] = None
-    item: TextItem = items.pop(0)
+    prev_frag: Optional[TextFrag] = None
+    frag: TextFrag = frags.pop(0)
 
-    while item.font == "f5":
-        maneuver.summary += markup(item, prev_item, MarkupStyle.MARKDOWN)
-        prev_item = item
-        item = items.pop(0)
+    while frag.font == "f5":
+        maneuver.summary += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
+        prev_frag = frag
+        frag = frags.pop(0)
     maneuver.summary = maneuver.summary.strip()
 
-    while item.font != "f5":
-        prev_item = item
-        item = items.pop(0)
+    while frag.font != "f5":
+        prev_frag = frag
+        frag = frags.pop(0)
 
-    while item.font == "f5":
-        maneuver.cost += item.text
-        prev_item = item
-        item = items.pop(0)
+    while frag.font == "f5":
+        maneuver.cost += frag.text
+        prev_frag = frag
+        frag = frags.pop(0)
 
-    while item.font != "f21":
-        item = items.pop(0)
-    # for item in items:
-    #     desc += markup(item, prev_item, MarkupStyle.MARKDOWN)
-    #     prev_item = item
+    while frag.font != "f21":
+        frag = frags.pop(0)
+    # for frag in frags:
+    #     desc += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
+    #     prev_frag = frag
 
     maneuver.description = fixup_description(desc)
     return maneuver
@@ -128,7 +128,7 @@ def parse_maneuvers(conds_raw: list[DCProtoItem]) -> list[Maneuver]:
     conds: list[Maneuver] = []
     for raw_cond in conds_raw:
         try:
-            page_number = raw_cond.items[0].page
+            page_number = raw_cond.frags[0].page
         except:
             eprint(raw_cond.__dict__)
             raise

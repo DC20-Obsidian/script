@@ -7,10 +7,10 @@ from lib.markup import markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types import DCObjEncoder
 from dc_types.proto_item import DCProtoItem
-from dc_types.text_item import TextItem
+from dc_types.text_frag import TextFrag
 from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
-from dc_types.item_list import ItemList
+from dc_types.frag_list import FragList
 
 def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     if args.all:
@@ -24,20 +24,20 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range] # Filter pages
 
-    items: ItemList = flatten_pages(pages)
+    frags: FragList = flatten_pages(pages)
     # Split spells
-    spells_raw: list[DCProtoItem] = split_spells(items)
+    spells_raw: list[DCProtoItem] = split_spells(frags)
 
     if args.raw:
         if args.unprocessed:
-            # Consume all TextItems that can be processed
+            # Consume all TextFrags that can be processed
             parse_spells(spells_raw)
         return spells_raw
     else:
         spells: list[Spell] = parse_spells(spells_raw)
         return spells
 
-def split_spells(items: ItemList) -> list[DCProtoItem]:
+def split_spells(frags: FragList) -> list[DCProtoItem]:
     spells: list[DCProtoItem] = []
     current_spell: DCProtoItem = DCProtoItem()
     false_positives = ["summontraits"]
@@ -45,9 +45,9 @@ def split_spells(items: ItemList) -> list[DCProtoItem]:
     discard_fonts: list[str] = ["f2", "f9", "f1"]
     spell_has_name: bool = False
 
-    for item in items:
+    for frag in frags:
         # f3: heading font
-        if item.font == "f3":
+        if frag.font == "f3":
             if spell_has_name:
                 # New Spell; commit and initialise a new one
                 if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
@@ -55,11 +55,11 @@ def split_spells(items: ItemList) -> list[DCProtoItem]:
                     spells.append(current_spell)
                 current_spell = DCProtoItem()
                 spell_has_name = False
-            current_spell.name += item.text
+            current_spell.name += frag.text
         else:
             spell_has_name = True
-            if item.font not in discard_fonts:
-                current_spell.items.append(item)
+            if frag.font not in discard_fonts:
+                current_spell.frags.append(frag)
 
     current_spell.name = fixup_name(current_spell.name.lower()).title()
     spells.append(current_spell)
@@ -78,101 +78,101 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     import re
     spell = Spell()
     spell.name = proto_spell.name
-    items: list[TextItem] = proto_spell.items
+    frags: list[TextFrag] = proto_spell.frags
 
     # Pop: 'Source:':f11:2, 'Source':f7:155, 'Spell List':f7:3
-    item = items.pop(0)
-    spell.page = item.page
-    assert_font(item, ["f7", "f11"])
+    frag = frags.pop(0)
+    spell.page = frag.page
+    assert_font(frag, ["f7", "f11"])
     # return spell
 
     # Spell Source
-    item: TextItem = items.pop(0)
-    assert_font(item, ["f5"])
-    while item.font == "f5":
-        spell.source.extend(re.findall(r'[a-zA-Z]+', item.text))
-        item = items.pop(0)
+    frag: TextFrag = frags.pop(0)
+    assert_font(frag, ["f5"])
+    while frag.font == "f5":
+        spell.source.extend(re.findall(r'[a-zA-Z]+', frag.text))
+        frag = frags.pop(0)
     # return spell
 
     # Pop: 'School':f7:148, 'School:':f14:1 'Spell School':f7:11
-    assert_font(item, ["f7", "f14"])
+    assert_font(frag, ["f7", "f14"])
 
     # Spell School
-    item: TextItem = items.pop(0)
-    assert_font(item, ["f5"])
-    school: list[str] = re.findall(r'^:? ?([a-zA-Z ]+)', item.text)
+    frag: TextFrag = frags.pop(0)
+    assert_font(frag, ["f5"])
+    school: list[str] = re.findall(r'^:? ?([a-zA-Z ]+)', frag.text)
     assert len(school) == 1
     spell.school = school[0].strip()
     # return spell
 
     # Pop: 'Tags':f21: 158, 'Tags:':f11:1 'Spell Tags':f21:1
-    assert_font(items.pop(0), ["f21", "f11"])
+    assert_font(frags.pop(0), ["f21", "f11"])
     # return spell
 
     # Spell Tags
-    item: TextItem = items.pop(0)
-    assert_font(item, ["f5"])
-    while item.font == "f5":
-        spell.tags.extend(re.findall(r'[a-zA-Z]+', item.text))
-        item = items.pop(0)
+    frag: TextFrag = frags.pop(0)
+    assert_font(frag, ["f5"])
+    while frag.font == "f5":
+        spell.tags.extend(re.findall(r'[a-zA-Z]+', frag.text))
+        frag = frags.pop(0)
     # return spell
 
     # Pop: 'Cost':f7: 159, 'Cost':f11:1
-    assert_font(item, ["f7", "f11"])
+    assert_font(frag, ["f7", "f11"])
 
     # Spell Cost
-    item: TextItem = items.pop(0)
-    assert_font(item, ["f5"])
-    while item.font == "f5":
-        spell.cost += item.text.lstrip(':').strip()
-        item = items.pop(0)
+    frag: TextFrag = frags.pop(0)
+    assert_font(frag, ["f5"])
+    while frag.font == "f5":
+        spell.cost += frag.text.lstrip(':').strip()
+        frag = frags.pop(0)
     # return spell
 
     # Pop: 'Range':f21: 160
-    assert_font(item, ["f21"])
+    assert_font(frag, ["f21"])
 
     # Spell Range
-    item: TextItem = items.pop(0)
-    assert_font(item, ["f5"])
-    spell.range = item.text.lstrip(':').strip()
+    frag: TextFrag = frags.pop(0)
+    assert_font(frag, ["f5"])
+    spell.range = frag.text.lstrip(':').strip()
     # No loop here because "Dispel Magic" has no listed duration
     # return spell
 
-    item: TextItem = items[0]
-    if re.match('^Duration', item.text) is not None:
+    frag: TextFrag = frags[0]
+    if re.match('^Duration', frag.text) is not None:
         # Spell is not "Dispel Magic"
-        items.pop(0)
-        assert_font(item, ["f21"])
+        frags.pop(0)
+        assert_font(frag, ["f21"])
 
-        item: TextItem = items.pop(0)
-        assert_font(item, ["f5"])
-        spell.duration = item.text.lstrip(':').strip()
+        frag: TextFrag = frags.pop(0)
+        assert_font(frag, ["f5"])
+        spell.duration = frag.text.lstrip(':').strip()
     else:
         # Spell is "Dispel Magic". Filling in Duration
         spell.duration = "Instantaneous"
     # return spell
 
-    spell.description = parse_description(items)
+    spell.description = parse_description(frags)
 
-    enhancements = split_enhancements(items)
-    # spell.enhancements = split_enhancements(items) # Debug
+    enhancements = split_enhancements(frags)
+    # spell.enhancements = split_enhancements(frags) # Debug
 
     spell.enhancements = list(map(parse_enhancement, enhancements))
 
     # return spell
     return spell.fixup()
 
-def split_enhancements(items: list[TextItem]) -> list[DCProtoItem]:
+def split_enhancements(frags: list[TextFrag]) -> list[DCProtoItem]:
     enhancements: list[DCProtoItem] = []
     current_enhancement = DCProtoItem()
-    prev_item: TextItem = items[0]
+    prev_frag: TextFrag = frags[0]
     has_name = False
-    for item in items:
-        if item.font == "f27": # This is for Call Famillar and other spells that have multiple sections
+    for frag in frags:
+        if frag.font == "f27": # This is for Call Famillar and other spells that have multiple sections
             break
-        if item.font in ["f21", "f7"]:
-            if "•" in prev_item.text: # false positive: skip
-                prev_item = item
+        if frag.font in ["f21", "f7"]:
+            if "•" in prev_frag.text: # false positive: skip
+                prev_frag = frag
                 continue
 
             if has_name and current_enhancement.name != "":
@@ -180,13 +180,13 @@ def split_enhancements(items: list[TextItem]) -> list[DCProtoItem]:
                 enhancements.append(current_enhancement)
                 current_enhancement = DCProtoItem()
 
-            current_enhancement.name += f'{item.text.strip(':').lstrip()} '
+            current_enhancement.name += f'{frag.text.strip(':').lstrip()} '
             has_name = False
         else:
-            current_enhancement.items.append(item)
+            current_enhancement.frags.append(frag)
             has_name = True
 
-        prev_item = item
+        prev_frag = frag
 
     current_enhancement.name = current_enhancement.name.strip()
     enhancements.append(current_enhancement)
@@ -198,38 +198,38 @@ def parse_enhancement(proto: DCProtoItem) -> Enhancement:
     cost: str = ""
 
     while ')' not in cost:
-        cost += ' ' + proto.items.pop(0).text
+        cost += ' ' + proto.frags.pop(0).text
     (cost, _, desc) = cost.partition(')')
 
-    enhancement.description = fixup_description(desc.strip() + ' ' + parse_description(proto.items))
+    enhancement.description = fixup_description(desc.strip() + ' ' + parse_description(proto.frags))
     enhancement.cost = cost.lstrip(': (')
 
     return enhancement.fixup()
 
-def parse_description(items: list[TextItem]) -> str:
-    if len(items) == 0:
+def parse_description(frags: list[TextFrag]) -> str:
+    if len(frags) == 0:
         return ""
 
     desc: str = ""
-    item: TextItem = items.pop(0)
-    prev_item = item
+    frag: TextFrag = frags.pop(0)
+    prev_frag = frag
 
     # f27: Spell Enhancements
-    while item.font != 'f27' or not item.text.startswith("Spell Enhancement"):
-        desc += markup(item, prev_item, MarkupStyle.MARKDOWN)
-        prev_item = item
-        if len(items) != 0:
-            item = items.pop(0)
+    while frag.font != 'f27' or not frag.text.startswith("Spell Enhancement"):
+        desc += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
+        prev_frag = frag
+        if len(frags) != 0:
+            frag = frags.pop(0)
         else:
             break
 
     # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
     return fixup_description(desc.strip())
 
-def parse_spells(spells_raw) -> list[Spell]:
+def parse_spells(spells_raw: list[DCProtoItem]) -> list[Spell]:
     spells: list[Spell] = []
     for raw_spell in spells_raw:
-        page_number = raw_spell.items[0].page
+        page_number = raw_spell.frags[0].page
         try:
             spells.append(parse_spell(raw_spell))
         except Exception as e:

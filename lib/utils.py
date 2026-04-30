@@ -1,5 +1,5 @@
-from dc_types.text_item import TextItem
-from dc_types.item_list import ItemList
+from dc_types.text_frag import TextFrag
+from dc_types.frag_list import FragList
 import argparse
 
 def eprint(*args, **kw):
@@ -36,7 +36,7 @@ class Args:
         parser.add_argument('-w', '--write', action='store_true', help="write the output to files")
         parser.add_argument('-p', '--print', action='store_true', help="print the output to stdout")
         parser.add_argument('-t', '--type', choices=["spells", "conditions"], help="the type of item to parse")
-        parser.add_argument('-u', '--unprocessed', action='store_true', help="only output unprocessed textitems (implies --raw)")
+        parser.add_argument('-u', '--unprocessed', action='store_true', help="only output unprocessed text fragments (implies --raw)")
         parser.add_argument('-f', '--file', help="filtered JSON containing PDF data to use")
         parser.add_argument('-s', '--saved', action='store_true', help="use saved json data instead of parsing it anew")
         args = parser.parse_args()
@@ -53,14 +53,14 @@ class Args:
         self.type: str = args.type
         self.saved: bool = bool(args.saved)
 
-def flatten_pages(pages: list[dict]) -> ItemList:
-    items: ItemList = ItemList()
+def flatten_pages(pages: list[dict]) -> FragList:
+    frags: FragList = FragList()
     for page in pages:
         page_number: int = page['page']
-        for text_item in page['textItems']:
-            item: TextItem = TextItem(text_item, page_number)
-            items.append(item)
-    return items
+        for text_frag in page['textItems']:
+            frag: TextFrag = TextFrag(text_frag, page_number)
+            frags.append(frag)
+    return frags
 
 def save_file(path: str, name: str, s: str):
     name = f'{path}{name}.md'

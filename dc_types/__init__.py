@@ -3,13 +3,13 @@ from .spell import Spell
 from .enhancement import Enhancement
 from .condition import Condition
 from .maneuver import Maneuver
-from .text_item import TextItem
+from .text_frag import TextFrag
 from .proto_item import DCProtoItem
 
 
 class DCObjEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, (Spell, Enhancement, TextItem, DCProtoItem, Condition, Maneuver)):
+        if isinstance(o, (Spell, Enhancement, TextFrag, DCProtoItem, Condition, Maneuver)):
             d = o.__dict__
             # if isinstance(o, Spell):
             #     d.pop("_current_enhmt")

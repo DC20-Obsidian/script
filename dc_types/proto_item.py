@@ -1,10 +1,10 @@
 
-from .text_item import TextItem
+from .text_frag import TextFrag
 
 class DCProtoItem:
     def __init__(self):
         self.name: str = ""
         self.page: int = -1
-        # self.items: ItemList = ItemList()
-        self.items: list[TextItem] = []
+        # self.frags: FragList = FragList()
+        self.frags: list[TextFrag] = []
         self.section: str = ""
