@@ -3,19 +3,9 @@ from .spell import Spell
 from .enhancement import Enhancement
 from .condition import Condition
 from .maneuver import Maneuver
+from .text_item import TextItem
+from .proto_item import DCProtoItem
 
-class TextItem:
-    def __init__(self, item: dict, page: int):
-        self.page: int = page
-        self.text: str = str(item['text'])
-        self.font: str = str(item['fontName']).removeprefix('g_d0_')
-        self.font_size = int(item['fontSize'])
-
-class DCProtoItem:
-    def __init__(self):
-        self.name: str = ""
-        self.items: list[TextItem] = []
-        self.section: str = ""
 
 class DCObjEncoder(json.JSONEncoder):
     def default(self, o):

@@ -5,7 +5,9 @@ import json
 from lib.utils import colors, eprint, Args, get_file_paths, flatten_pages
 from lib.markup import markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name, fixup_description
-from dc_types import DCObjEncoder, DCProtoItem, TextItem
+from dc_types import DCObjEncoder
+from dc_types.proto_item import DCProtoItem
+from dc_types.text_item import TextItem
 from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
 from dc_types.item_list import ItemList

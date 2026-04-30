@@ -1,4 +1,4 @@
-from dc_types import TextItem
+from dc_types.text_item import TextItem
 from dc_types.item_list import ItemList
 import argparse
 

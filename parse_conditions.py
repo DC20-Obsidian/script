@@ -4,7 +4,9 @@ import json
 from lib.markup import MarkupStyle, markup
 from lib.utils import get_file_paths, Args, colors, eprint, save_file, flatten_pages
 from lib.fixup_text import fixup_name, fixup_description
-from dc_types import DCObjEncoder, DCProtoItem, TextItem
+from dc_types import DCObjEncoder
+from dc_types.proto_item import DCProtoItem
+from dc_types.text_item import TextItem
 from dc_types.condition import Condition
 from dc_types.item_list import ItemList
 

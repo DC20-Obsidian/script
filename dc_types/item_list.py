@@ -1,5 +1,5 @@
 from typing import Self
-from dc_types import TextItem
+from .text_item import TextItem
 
 class ItemList:
     def __init__(self):

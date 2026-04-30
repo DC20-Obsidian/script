@@ -1,7 +1,7 @@
 import re
 import enum
 from typing import Optional
-from dc_types import TextItem
+from dc_types.text_item import TextItem
 from .utils import colors
 
 class MarkupStyle(enum.Enum):
