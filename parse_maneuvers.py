@@ -10,7 +10,7 @@ from utils.split import split_items_default
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types.frag_list import FragList
 from dc_types.serde import DCObjEncoder
-from dc_types.proto_item import DCProtoItem
+from dc_types.proto_item import DCProtoItem, parse_proto_items
 from dc_types.text_frag import TextFrag
 from dc_types.maneuver import Maneuver
 
@@ -35,11 +35,11 @@ def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
     if args.raw:
         if args.unprocessed:
             # Consume all TextFrags that can be processed
-            parse_maneuvers(maneuvers_raw)
+            parse_proto_items(maneuvers_raw, parse_maneuver)
             pass
         return maneuvers_raw
     else:
-        maneuvers: list[Maneuver] = parse_maneuvers(maneuvers_raw)
+        maneuvers: list[Maneuver] = parse_proto_items(maneuvers_raw, parse_maneuver)
         return maneuvers
 
 
@@ -77,26 +77,6 @@ def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
 
     maneuver.description = fixup_description(desc)
     return maneuver
-
-
-def parse_maneuvers(conds_raw: list[DCProtoItem]) -> list[Maneuver]:
-    conds: list[Maneuver] = []
-    for raw_cond in conds_raw:
-        try:
-            page_number = raw_cond.frags.next_get_page()
-        except:
-            eprint(raw_cond.__dict__)
-            raise
-        try:
-            conds.append(parse_maneuver(raw_cond))
-        except Exception as e:
-            eprint(
-                f"{colors.RED}Error{colors.ENDC} with condition {colors.GREEN}{raw_cond.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}"
-            )
-            raise e
-
-            continue
-    return conds
 
 
 if __name__ == "__main__":

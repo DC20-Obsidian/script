@@ -9,7 +9,7 @@ from utils.args import Args
 from lib.markup import markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types.serde import DCObjEncoder
-from dc_types.proto_item import DCProtoItem
+from dc_types.proto_item import DCProtoItem, parse_proto_items
 from dc_types.text_frag import TextFrag
 from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
@@ -35,10 +35,10 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     if args.raw:
         if args.unprocessed:
             # Consume all TextFrags that can be processed
-            parse_spells(spells_raw)
+            parse_proto_items(spells_raw, parse_spell)
         return spells_raw
     else:
-        spells: list[Spell] = parse_spells(spells_raw)
+        spells: list[Spell] = parse_proto_items(spells_raw, parse_spell)
         return spells
 
 
@@ -182,22 +182,6 @@ def parse_description(frags: FragList) -> str:
     )
     # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
     return fixup_description(desc.strip())
-
-
-def parse_spells(spells_raw: list[DCProtoItem]) -> list[Spell]:
-    spells: list[Spell] = []
-    for raw_spell in spells_raw:
-        page_number = raw_spell.frags.next_get_page()
-        try:
-            spells.append(parse_spell(raw_spell))
-        except Exception as e:
-            eprint(
-                f"{colors.RED}Error{colors.ENDC} with spell {colors.GREEN}{raw_spell.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}"
-            )
-            raise e
-
-            continue
-    return spells
 
 
 if __name__ == "__main__":

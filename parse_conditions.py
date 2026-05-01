@@ -8,7 +8,7 @@ from utils.args import Args
 from utils.split import split_items_default
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types.serde import DCObjEncoder
-from dc_types.proto_item import DCProtoItem
+from dc_types.proto_item import DCProtoItem, parse_proto_items
 from dc_types.text_frag import TextFrag
 from dc_types.condition import Condition
 from dc_types.frag_list import FragList
@@ -35,11 +35,11 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
     if args.raw:
         if args.unprocessed:
             # Consume all TextFrags that can be processed
-            parse_conditions(conditions_raw)
+            parse_proto_items(conditions_raw, parse_condition)
             pass
         return conditions_raw
     else:
-        conditions: list[Condition] = parse_conditions(conditions_raw)
+        conditions: list[Condition] = parse_proto_items(conditions_raw, parse_condition)
         return conditions
 
 
@@ -60,22 +60,6 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
 
     cond.description = fixup_description(desc)
     return cond
-
-
-def parse_conditions(conds_raw: list[DCProtoItem]) -> list[Condition]:
-    conds: list[Condition] = []
-    for raw_cond in conds_raw:
-        page_number = raw_cond.frags.next_get_page()
-        try:
-            conds.append(parse_condition(raw_cond))
-        except Exception as e:
-            eprint(
-                f"{colors.RED}Error{colors.ENDC} with condition {colors.GREEN}{raw_cond.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}"
-            )
-            raise e
-
-            continue
-    return conds
 
 
 cond_template = """---
