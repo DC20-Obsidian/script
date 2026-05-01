@@ -1,6 +1,6 @@
-
 from .text_frag import TextFrag
 from .frag_list import FragList
+
 
 class DCProtoItem:
     def __init__(self):

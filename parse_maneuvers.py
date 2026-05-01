@@ -14,6 +14,7 @@ from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from dc_types.maneuver import Maneuver
 
+
 # pages 173-174
 def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
     if args.all:
@@ -23,10 +24,10 @@ def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
         page_range = args.page_range
 
     # Open file
-    file = args.file or get_file_paths()['input']
-    with open(file, 'r') as file:
+    file = args.file or get_file_paths()["input"]
+    with open(file, "r") as file:
         pages: list[dict] = json.load(file)
-        pages: list[dict] = pages[page_range] # Filter pages
+        pages: list[dict] = pages[page_range]  # Filter pages
 
     frags: FragList = flatten_pages(pages)
     maneuvers_raw: list[DCProtoItem] = split_items_default(frags)
@@ -40,6 +41,7 @@ def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
     else:
         maneuvers: list[Maneuver] = parse_maneuvers(maneuvers_raw)
         return maneuvers
+
 
 def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
     sections: list[str] = ["attack", "defense", "grapple", "utility"]
@@ -76,6 +78,7 @@ def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
     maneuver.description = fixup_description(desc)
     return maneuver
 
+
 def parse_maneuvers(conds_raw: list[DCProtoItem]) -> list[Maneuver]:
     conds: list[Maneuver] = []
     for raw_cond in conds_raw:
@@ -87,14 +90,18 @@ def parse_maneuvers(conds_raw: list[DCProtoItem]) -> list[Maneuver]:
         try:
             conds.append(parse_maneuver(raw_cond))
         except Exception as e:
-            eprint(f"{colors.RED}Error{colors.ENDC} with condition {colors.GREEN}{raw_cond.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}")
+            eprint(
+                f"{colors.RED}Error{colors.ENDC} with condition {colors.GREEN}{raw_cond.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}"
+            )
             raise e
 
             continue
     return conds
 
+
 if __name__ == "__main__":
     import os
+
     args = Args(default_page=173)
 
     if args.type != "conditions" and args.type:
@@ -106,8 +113,8 @@ if __name__ == "__main__":
         print(json.dumps(maneuvers, cls=DCObjEncoder))
 
     if args.write and not args.raw:
-        out_folder = get_file_paths()['output']
-        out_folder += 'conditions/'
+        out_folder = get_file_paths()["output"]
+        out_folder += "conditions/"
 
         try:
             os.makedirs(out_folder)

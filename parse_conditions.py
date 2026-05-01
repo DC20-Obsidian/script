@@ -13,6 +13,7 @@ from dc_types.text_frag import TextFrag
 from dc_types.condition import Condition
 from dc_types.frag_list import FragList
 
+
 # pages 173-174
 def main(args: Args) -> list[Condition] | list[DCProtoItem]:
     if args.all:
@@ -22,10 +23,10 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
         page_range = args.page_range
 
     # Open file
-    file = args.file or get_file_paths()['input']
-    with open(file, 'r') as file:
+    file = args.file or get_file_paths()["input"]
+    with open(file, "r") as file:
         pages: list[dict] = json.load(file)
-        pages: list[dict] = pages[page_range] # Filter pages
+        pages: list[dict] = pages[page_range]  # Filter pages
 
     frags: FragList = flatten_pages(pages)
 
@@ -41,12 +42,13 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
         conditions: list[Condition] = parse_conditions(conditions_raw)
         return conditions
 
+
 def parse_condition(proto_cond: DCProtoItem) -> Condition:
     cond = Condition()
-    cond.name = fixup_name(proto_cond.name.replace(' ', ''))
-    if cond.name.endswith('X'):
+    cond.name = fixup_name(proto_cond.name.replace(" ", ""))
+    if cond.name.endswith("X"):
         cond.stacking = True
-        cond.name = cond.name.rstrip(' X')
+        cond.name = cond.name.rstrip(" X")
     cond.page = proto_cond.frags.next_get_page()
     frags: FragList = proto_cond.frags
     desc = ""
@@ -59,6 +61,7 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
     cond.description = fixup_description(desc)
     return cond
 
+
 def parse_conditions(conds_raw: list[DCProtoItem]) -> list[Condition]:
     conds: list[Condition] = []
     for raw_cond in conds_raw:
@@ -66,11 +69,14 @@ def parse_conditions(conds_raw: list[DCProtoItem]) -> list[Condition]:
         try:
             conds.append(parse_condition(raw_cond))
         except Exception as e:
-            eprint(f"{colors.RED}Error{colors.ENDC} with condition {colors.GREEN}{raw_cond.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}")
+            eprint(
+                f"{colors.RED}Error{colors.ENDC} with condition {colors.GREEN}{raw_cond.name}{colors.ENDC}, starts on page: {colors.BLUE}{page_number}{colors.ENDC}"
+            )
             raise e
 
             continue
     return conds
+
 
 cond_template = """---
 name: {name}
@@ -78,6 +84,7 @@ stacking: {stacking}
 ---
 {desc}
 """
+
 
 def gen_markdown(cond: Condition) -> str:
     args = {
@@ -91,6 +98,7 @@ def gen_markdown(cond: Condition) -> str:
 
 if __name__ == "__main__":
     import os
+
     args = Args(default_page=173)
 
     if args.type != "conditions" and args.type:
@@ -102,8 +110,8 @@ if __name__ == "__main__":
         print(json.dumps(conditions, cls=DCObjEncoder))
 
     if args.write and not args.raw:
-        out_folder = get_file_paths()['output']
-        out_folder += 'conditions/'
+        out_folder = get_file_paths()["output"]
+        out_folder += "conditions/"
 
         try:
             os.makedirs(out_folder)

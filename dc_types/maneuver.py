@@ -1,8 +1,9 @@
 from .enhancement import Enhancement
 
+
 class Maneuver:
     def __init__(self):
-        self.type: str = 'maneuver'
+        self.type: str = "maneuver"
         self.page: int = -1
         self.name: str = ""
         self.summary: str = ""
@@ -16,15 +17,15 @@ class Maneuver:
     @staticmethod
     def from_json(d: dict):
         m = Maneuver()
-        m.page = int(d['page'])
-        m.name = d['name']
-        m.summary = d['summary']
-        m.kind = d['kind']
-        m.cost = d['cost']
-        m.ap_cost = int(d['ap_cost'])
-        m.sp_cost = int(d['sp_cost'])
-        m.description = d['describution']
-        m.enhancements = d['enhancements']
+        m.page = int(d["page"])
+        m.name = d["name"]
+        m.summary = d["summary"]
+        m.kind = d["kind"]
+        m.cost = d["cost"]
+        m.ap_cost = int(d["ap_cost"])
+        m.sp_cost = int(d["sp_cost"])
+        m.description = d["describution"]
+        m.enhancements = d["enhancements"]
 
     def markdown(self) -> str:
         args = {
@@ -40,7 +41,8 @@ class Maneuver:
         }
 
         return template.format(**args)
-    
+
+
 template = """---
 name: {name}
 stacking: {stacking}
@@ -57,10 +59,12 @@ kind: {kind}
 {enhancements}
 """
 
+
 def list_to_yaml(li: list[str]) -> str:
     a = " - "
-    a += '\n - '.join(map( lambda s: f'"{s}"', li))
+    a += "\n - ".join(map(lambda s: f'"{s}"', li))
     return a
+
 
 def enhancements(enhancements: list[Enhancement]) -> str:
     s: str = ""

@@ -1,9 +1,10 @@
 import re
 from .enhancement import Enhancement
 
+
 class Spell:
     def __init__(self):
-        self.type = 'spell'
+        self.type = "spell"
         self.name: str = ""
         self.page: int = -1
         self.source: list[str] = []
@@ -19,39 +20,39 @@ class Spell:
         self.enhancements: list[Enhancement] = []
 
     @staticmethod
-    def from_json(d: dict) -> 'Spell':
+    def from_json(d: dict) -> "Spell":
         s = Spell()
-        s.name = d['name']
-        s.page = int(d['page'])
-        s.source = d['source']
-        s.school = d['source']
-        s.tags = d['tags']
-        s.cost = d['cost']
-        s.ap_cost = int(d['ap_cost'])
-        s.mp_cost = int(d['mp_cost'])
-        s.sustained = d['sustained']
-        s.range = d['range']
-        s.duration = d['duration']
-        s.description = d['description']
-        s.enhancements = d['enhancements']
+        s.name = d["name"]
+        s.page = int(d["page"])
+        s.source = d["source"]
+        s.school = d["source"]
+        s.tags = d["tags"]
+        s.cost = d["cost"]
+        s.ap_cost = int(d["ap_cost"])
+        s.mp_cost = int(d["mp_cost"])
+        s.sustained = d["sustained"]
+        s.range = d["range"]
+        s.duration = d["duration"]
+        s.description = d["description"]
+        s.enhancements = d["enhancements"]
         return s
 
-    def fixup(self) -> 'Spell':
-        ap = re.search(r'([0-9]+) ?AP', self.cost)
+    def fixup(self) -> "Spell":
+        ap = re.search(r"([0-9]+) ?AP", self.cost)
         self.ap_cost = int(ap.group(1) if ap else 0)
 
-        mp = re.search(r'([0-9]+) ?MP|minimum of ([0-9]+)', self.cost)
+        mp = re.search(r"([0-9]+) ?MP|minimum of ([0-9]+)", self.cost)
         mp = mp.groups() if mp else (0, 0)
         self.mp_cost = int(mp[0] or mp[1])
 
         if "Sustained" in self.duration:
             self.sustained = True
-            self.duration = re.sub(r' ?\(?Sustained\)?', '', self.duration)
+            self.duration = re.sub(r" ?\(?Sustained\)?", "", self.duration)
         return self
-    
+
     def markdown(self) -> str:
-        args= {
-           "name": self.name,
+        args = {
+            "name": self.name,
             "source": list_to_yaml(self.source),
             "school": self.school,
             "tags": list_to_yaml(self.tags),
@@ -63,9 +64,10 @@ class Spell:
             "sustained": self.sustained,
             "page": self.page,
             "description": self.description,
-            "enhancements": enhancements(self.enhancements)
+            "enhancements": enhancements(self.enhancements),
         }
         return template.format(**args)
+
 
 template = """---
 name: {name}
@@ -88,10 +90,12 @@ page: {page}
 {enhancements}
 """
 
+
 def list_to_yaml(li: list[str]) -> str:
     a = " - "
-    a += '\n - '.join(map( lambda s: f'"{s}"', li))
+    a += "\n - ".join(map(lambda s: f'"{s}"', li))
     return a
+
 
 def enhancements(enhancements: list[Enhancement]) -> str:
     s: str = ""

@@ -4,6 +4,7 @@ from typing import Self, Optional, Union
 from collections.abc import Callable
 from .text_frag import TextFrag
 
+
 class FragList:
     def __init__(self):
         self._frags: list[TextFrag] = []
@@ -34,7 +35,9 @@ class FragList:
     def match_next(self, regex: str) -> bool:
         return re.match(regex, self._frags[0].text) is not None
 
-    def find_multi_while(self, predicate: Callable[[TextFrag], bool], multi_filter: str) -> list[str]:
+    def find_multi_while(
+        self, predicate: Callable[[TextFrag], bool], multi_filter: str
+    ) -> list[str]:
         li: list[str] = []
         frag: TextFrag = self.next()
 
@@ -49,9 +52,13 @@ class FragList:
         return li
 
     def find_words_while_font(self, fonts: list[str]) -> list[str]:
-        return self.find_multi_while(lambda i: i.font in fonts, r'[a-zA-Z]+')
+        return self.find_multi_while(lambda i: i.font in fonts, r"[a-zA-Z]+")
 
-    def cat_while(self, predicate: Callable[[TextFrag, str], bool], transform: Callable[[str], str] = lambda s: s) -> str:
+    def cat_while(
+        self,
+        predicate: Callable[[TextFrag, str], bool],
+        transform: Callable[[str], str] = lambda s: s,
+    ) -> str:
         s: str = ""
         frag: TextFrag = self.next()
 
@@ -94,4 +101,6 @@ class FragList:
 
     def discard_with_font(self, fonts: list[str]):
         frag: TextFrag = self.next()
-        assert frag.font in fonts, f'Invalid font on page: {frag.page}. Expected one of: {fonts}, found: {frag.font}'
+        assert frag.font in fonts, (
+            f"Invalid font on page: {frag.page}. Expected one of: {fonts}, found: {frag.font}"
+        )

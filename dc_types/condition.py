@@ -1,7 +1,6 @@
-
 class Condition:
     def __init__(self):
-        self.type: str = 'condition'
+        self.type: str = "condition"
         self.page: int = -1
         self.name: str = ""
         self.description: str = ""
@@ -10,8 +9,7 @@ class Condition:
     @staticmethod
     def from_json(d: dict):
         c = Condition()
-        c.page = int(d['page'])
-        c.name = d['name']
-        c.description = d['describution']
-        c.stacking = d['stacking']
-
+        c.page = int(d["page"])
+        c.name = d["name"]
+        c.description = d["describution"]
+        c.stacking = d["stacking"]

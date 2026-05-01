@@ -22,7 +22,9 @@ def split_items(
         # Discard
         lambda frag: frag.font in discard_fonts,
         # Header
-        lambda frag: frag.font in header_fonts and frag.font_size <= max_header_font_size,
+        lambda frag: (
+            frag.font in header_fonts and frag.font_size <= max_header_font_size
+        ),
         lambda frag: frag.font in section_fonts,
         # Name
         lambda name: not any(fp in name.lower() for fp in name_false_positives),
