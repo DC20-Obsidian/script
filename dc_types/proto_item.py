@@ -8,4 +8,4 @@ class DCProtoItem:
         self.page: int = -1
         self.frags: FragList = FragList()
         # self.frags: list[TextFrag] = []
-        self.section: str = ""
+        self.section: int = -1
