@@ -8,7 +8,7 @@ from utils.colors import colors
 from utils.args import Args
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types.frag_list import FragList
-from dc_types import DCObjEncoder
+from dc_types.serde import DCObjEncoder
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from dc_types.maneuver import Maneuver

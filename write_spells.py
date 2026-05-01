@@ -6,7 +6,7 @@ import parse_spells
 from lib.utils import eprint, get_file_paths
 from utils.colors import colors
 from utils.args import Args
-from dc_types import dc_obj_decoder
+from dc_types.serde import dc_obj_decoder
 from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
 
