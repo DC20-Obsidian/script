@@ -4,6 +4,7 @@ import json
 
 from lib.utils import eprint, get_file_paths, flatten_pages
 from utils.colors import colors
+from utils.split import split_items_default
 from utils.args import Args
 from lib.markup import markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name, fixup_description
@@ -28,7 +29,7 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
 
     frags: FragList = flatten_pages(pages)
     # Split spells
-    spells_raw: list[DCProtoItem] = split_spells(frags)
+    spells_raw: list[DCProtoItem] = split_items_default(frags)
 
     if args.raw:
         if args.unprocessed:
@@ -38,34 +39,6 @@ def main(args: Args) -> list[Spell] | list[DCProtoItem]:
     else:
         spells: list[Spell] = parse_spells(spells_raw)
         return spells
-
-def split_spells(frags: FragList) -> list[DCProtoItem]:
-    spells: list[DCProtoItem] = []
-    current_spell: DCProtoItem = DCProtoItem()
-    false_positives = ["summontraits"]
-    # f2: page numbers, f9, f1: footers
-    discard_fonts: list[str] = ["f2", "f9", "f1"]
-    spell_has_name: bool = False
-
-    for frag in frags:
-        # f3: heading font
-        if frag.font == "f3":
-            if spell_has_name:
-                # New Spell; commit and initialise a new one
-                if current_spell.name.strip() != "" and not any(fp in current_spell.name.lower() for fp in false_positives):
-                    current_spell.name = fixup_name(current_spell.name.lower()).title()
-                    spells.append(current_spell)
-                current_spell = DCProtoItem()
-                spell_has_name = False
-            current_spell.name += frag.text
-        else:
-            spell_has_name = True
-            if frag.font not in discard_fonts:
-                current_spell.frags.append(frag)
-
-    current_spell.name = fixup_name(current_spell.name.lower()).title()
-    spells.append(current_spell)
-    return spells
 
 def parse_spell(proto_spell: DCProtoItem) -> Spell:
     """
