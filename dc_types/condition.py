@@ -13,3 +13,19 @@ class Condition:
         c.name = d["name"]
         c.description = d["describution"]
         c.stacking = d["stacking"]
+
+    def markdown(self) -> str:
+        args = {
+            "name": self.name,
+            "desc": self.description,
+            "stacking": self.stacking,
+        }
+
+        return template.format(**args)
+
+template = """---
+name: {name}
+stacking: {stacking}
+---
+{desc}
+"""

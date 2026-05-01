@@ -62,24 +62,6 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
     return cond
 
 
-cond_template = """---
-name: {name}
-stacking: {stacking}
----
-{desc}
-"""
-
-
-def gen_markdown(cond: Condition) -> str:
-    args = {
-        "name": cond.name,
-        "desc": cond.description,
-        "stacking": cond.stacking,
-    }
-
-    return cond_template.format(**args)
-
-
 if __name__ == "__main__":
     import os
 
@@ -105,7 +87,7 @@ if __name__ == "__main__":
         for cond in conditions:
             assert isinstance(cond, Condition)
             name = cond.name
-            markdown = gen_markdown(cond)
+            markdown = cond.markdown()
             if args.print:
                 eprint(f"{out_folder}{name}.md")
                 print(markdown)
