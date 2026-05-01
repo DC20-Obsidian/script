@@ -1,4 +1,7 @@
-from typing import Self
+from lib.markup import markup, MarkupStyle
+import re
+from typing import Self, Optional, Union
+from collections.abc import Callable
 from .text_frag import TextFrag
 
 class FragList:
@@ -18,3 +21,77 @@ class FragList:
     def append(self, frag: TextFrag) -> Self:
         self._frags.append(frag)
         return self
+
+    def is_empty(self) -> bool:
+        return len(self._frags) == 0
+
+    def next(self) -> TextFrag:
+        return self._frags.pop(0)
+
+    def next_get_page(self) -> int:
+        return self._frags[0].page
+
+    def match_next(self, regex: str) -> bool:
+        return re.match(regex, self._frags[0].text) is not None
+
+    def find_multi_while(self, predicate: Callable[[TextFrag], bool], multi_filter: str) -> list[str]:
+        li: list[str] = []
+        frag: TextFrag = self.next()
+
+        assert predicate(frag), "predicate is false on the first fragment"
+
+        while predicate(frag):
+            li.extend(re.findall(multi_filter, frag.text))
+            frag = self.next()
+
+        # predicate() returned false, reinsert fragment
+        self._frags.insert(0, frag)
+        return li
+
+    def find_words_while_font(self, fonts: list[str]) -> list[str]:
+        return self.find_multi_while(lambda i: i.font in fonts, r'[a-zA-Z]+')
+
+    def cat_while(self, predicate: Callable[[TextFrag, str], bool], transform: Callable[[str], str] = lambda s: s) -> str:
+        s: str = ""
+        frag: TextFrag = self.next()
+
+        assert predicate(frag, s), "predicate is false on the first fragment"
+
+        while predicate(frag, s):
+            s += transform(frag.text)
+            if not self.is_empty():
+                frag = self.next()
+            else:
+                return s
+
+        self._frags.insert(0, frag)
+        return s
+
+    def markup_while(self, predicate: Callable[[TextFrag], bool]) -> str:
+        if self.is_empty():
+            return ""
+        s: str = ""
+        frag: Optional[TextFrag] = self.next()
+        prev_frag: Optional[TextFrag] = frag
+        assert predicate(frag), "predicate is false on the first fragment"
+        while predicate(frag):
+            s += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
+            prev_frag = frag
+            if self.is_empty():
+                break
+            else:
+                frag = self.next()
+        s += markup(None, prev_frag, MarkupStyle.MARKDOWN)
+        return s
+
+    def assert_frag(self, f: Callable[[TextFrag], bool], msg: Optional[str] = None):
+        frag = self.next()
+        if not f(frag):
+            raise Exception(msg or "TextFrag Assertion Failed")
+
+    def discard_next(self):
+        self.next()
+
+    def discard_with_font(self, fonts: list[str]):
+        frag: TextFrag = self.next()
+        assert frag.font in fonts, f'Invalid font on page: {frag.page}. Expected one of: {fonts}, found: {frag.font}'

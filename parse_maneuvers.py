@@ -95,30 +95,30 @@ def split_maneuvers(frags: FragList) -> list[DCProtoItem]:
 def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
     maneuver: Maneuver = Maneuver()
     maneuver.name = proto_maneuver.name
-    maneuver.page = proto_maneuver.frags[0].page
+    maneuver.page = proto_maneuver.frags.next_get_page()
     maneuver.kind = proto_maneuver.section
-    frags: list[TextFrag] = proto_maneuver.frags
+    frags: FragList = proto_maneuver.frags
     desc: str = ""
     prev_frag: Optional[TextFrag] = None
-    frag: TextFrag = frags.pop(0)
+    frag: TextFrag = frags.next()
 
     while frag.font == "f5":
         maneuver.summary += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
         prev_frag = frag
-        frag = frags.pop(0)
+        frag = frags.next()
     maneuver.summary = maneuver.summary.strip()
 
     while frag.font != "f5":
         prev_frag = frag
-        frag = frags.pop(0)
+        frag = frags.next()
 
     while frag.font == "f5":
         maneuver.cost += frag.text
         prev_frag = frag
-        frag = frags.pop(0)
+        frag = frags.next()
 
-    while frag.font != "f21":
-        frag = frags.pop(0)
+    while frag.font != "f21" and not frags.is_empty():
+        frag = frags.next()
     # for frag in frags:
     #     desc += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
     #     prev_frag = frag
@@ -130,7 +130,7 @@ def parse_maneuvers(conds_raw: list[DCProtoItem]) -> list[Maneuver]:
     conds: list[Maneuver] = []
     for raw_cond in conds_raw:
         try:
-            page_number = raw_cond.frags[0].page
+            page_number = raw_cond.frags.next_get_page()
         except:
             eprint(raw_cond.__dict__)
             raise

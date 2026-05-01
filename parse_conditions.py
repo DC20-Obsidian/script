@@ -75,8 +75,8 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
     if cond.name.endswith('X'):
         cond.stacking = True
         cond.name = cond.name.rstrip(' X')
-    cond.page = proto_cond.frags[0].page
-    frags: list[TextFrag] = proto_cond.frags
+    cond.page = proto_cond.frags.next_get_page()
+    frags: FragList = proto_cond.frags
     desc = ""
     prev_frag = None
 
@@ -90,7 +90,7 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
 def parse_conditions(conds_raw: list[DCProtoItem]) -> list[Condition]:
     conds: list[Condition] = []
     for raw_cond in conds_raw:
-        page_number = raw_cond.frags[0].page
+        page_number = raw_cond.frags.next_get_page()
         try:
             conds.append(parse_condition(raw_cond))
         except Exception as e:
