@@ -3,7 +3,9 @@
 from typing import Optional
 import json
 from lib.markup import MarkupStyle, markup
-from lib.utils import get_file_paths, Args, colors, eprint, save_file, flatten_pages
+from lib.utils import get_file_paths, eprint, save_file, flatten_pages
+from utils.colors import colors
+from utils.args import Args
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types.frag_list import FragList
 from dc_types import DCObjEncoder

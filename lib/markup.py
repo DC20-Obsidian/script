@@ -2,7 +2,7 @@ import re
 import enum
 from typing import Optional
 from dc_types.text_frag import TextFrag
-from .utils import colors
+from utils.colors import colors
 
 class MarkupStyle(enum.Enum):
     NONE = 0

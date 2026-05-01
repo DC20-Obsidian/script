@@ -2,7 +2,9 @@
 
 import json
 
-from lib.utils import colors, eprint, Args, get_file_paths, flatten_pages
+from lib.utils import eprint, get_file_paths, flatten_pages
+from utils.colors import colors
+from utils.args import Args
 from lib.markup import markup, assert_font, MarkupStyle
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types import DCObjEncoder
