@@ -6,20 +6,23 @@ from collections.abc import Callable
 
 
 def split_items_default(frags: FragList) -> list[DCProtoItem]:
-    return split_items(frags, ["f3"], ["f2", "f9", "f1"], ["summontraits"])
+    return split_items(frags, ["f3"], 15, ["f2", "f9", "f1"], ["summontraits"])
 
 
 def split_items(
     frags: FragList,
     header_fonts: list[str],
+    max_header_font_size: float,
     discard_fonts: list[str],
     name_false_positives: list[str],
 ) -> list[DCProtoItem]:
     return split_items_full(
         frags,
-        # Header
-        lambda frag: frag.font in header_fonts,
+        # Discard
         lambda frag: frag.font in discard_fonts,
+        # Header
+        lambda frag: frag.font in header_fonts and frag.font_size <= max_header_font_size,
+        # Name
         lambda name: not any(fp in name.lower() for fp in name_false_positives),
         lambda name: fixup_name(name.lower()).title(),
     )
@@ -27,8 +30,8 @@ def split_items(
 
 def split_items_full(
     frags: FragList,
-    header_predicate: Callable[[TextFrag], bool],
     discard_predicate: Callable[[TextFrag], bool],
+    header_predicate: Callable[[TextFrag], bool],
     name_predicate: Callable[[str], bool],
     fixup_transform: Callable[[str], str] = lambda s: s,
 ) -> list[DCProtoItem]:

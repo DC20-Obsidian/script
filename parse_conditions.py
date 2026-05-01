@@ -5,6 +5,7 @@ from lib.markup import MarkupStyle, markup
 from lib.utils import get_file_paths, eprint, save_file, flatten_pages
 from utils.colors import colors
 from utils.args import Args
+from utils.split import split_items_default
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types.serde import DCObjEncoder
 from dc_types.proto_item import DCProtoItem
@@ -28,7 +29,7 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
 
     frags: FragList = flatten_pages(pages)
 
-    conditions_raw: list[DCProtoItem] = split_conditions(frags)
+    conditions_raw: list[DCProtoItem] = split_items_default(frags)
 
     if args.raw:
         if args.unprocessed:
@@ -39,35 +40,6 @@ def main(args: Args) -> list[Condition] | list[DCProtoItem]:
     else:
         conditions: list[Condition] = parse_conditions(conditions_raw)
         return conditions
-
-
-def split_conditions(frags: FragList) -> list[DCProtoItem]:
-    conditions: list[DCProtoItem] = []
-    current_condition: DCProtoItem = DCProtoItem()
-    false_positives = []
-    # f2: page numbers, f9, f1: footers
-    discard_fonts: list[str] = ["f2", "f9", "f1"]
-    spell_has_name: bool = False
-
-    for frag in frags:
-        # f3: heading font
-        if frag.font == "f3" and frag.font_size < 15:
-            if spell_has_name:
-                # New Spell; commit and initialise a new one
-                if current_condition.name.strip() != "" and not any(fp in current_condition.name.lower() for fp in false_positives):
-                    current_condition.name = fixup_name(current_condition.name.lower()).title()
-                    conditions.append(current_condition)
-                current_condition = DCProtoItem()
-                spell_has_name = False
-            current_condition.name += frag.text
-        else:
-            spell_has_name = True
-            if frag.font not in discard_fonts:
-                current_condition.frags.append(frag)
-
-    current_condition.name = fixup_name(current_condition.name.lower()).title()
-    conditions.append(current_condition)
-    return conditions
 
 def parse_condition(proto_cond: DCProtoItem) -> Condition:
     cond = Condition()
