@@ -68,3 +68,5 @@ throw
 step
 piercing
 strike
+vulnerability
+targets

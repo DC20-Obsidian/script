@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+from dc_types.enhancement import Enhancement
 from typing import Optional
 import json
-from lib.markup import MarkupStyle, markup
+from lib.markup import MarkupStyle, markup, assert_font
 from lib.utils import get_file_paths, eprint, save_file, flatten_pages
 from utils.colors import colors
 from utils.args import Args
-from utils.split import split_items_default
+from utils.split import split_items_default, split_items
 from lib.fixup_text import fixup_name, fixup_description
 from dc_types.frag_list import FragList
 from dc_types.serde import DCObjEncoder
@@ -44,39 +45,63 @@ def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
 
 
 def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
+    two_line_ranges: list[str] = [
+        "Piercing Shot",
+        "Parry",
+    ]  # .range extends over two lines
     sections: list[str] = ["attack", "defense", "grapple", "utility"]
     maneuver: Maneuver = Maneuver()
     maneuver.name = proto_maneuver.name
     maneuver.page = proto_maneuver.frags.next_get_page()
     maneuver.kind = sections[proto_maneuver.section]
     frags: FragList = proto_maneuver.frags
-    desc: str = ""
-    prev_frag: Optional[TextFrag] = None
-    frag: TextFrag = frags.next()
 
-    while frag.font == "f5":
-        maneuver.summary += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
-        prev_frag = frag
-        frag = frags.next()
-    maneuver.summary = maneuver.summary.strip()
+    def plain_text(frag: TextFrag) -> bool:
+        return frag.font == "f5"
 
-    while frag.font != "f5":
-        prev_frag = frag
-        frag = frags.next()
+    if (
+        maneuver.name != "Heroic Pass Through"
+    ):  # "Heroic Pass Through" does not have a cost or range listed
+        if frags.match_next(lambda frag: frag.font == "f5"):
+            maneuver.summary = frags.markup_while(plain_text).strip()
 
-    while frag.font == "f5":
-        maneuver.cost += frag.text
-        prev_frag = frag
-        frag = frags.next()
+        frags.discard_until(plain_text)
 
-    while frag.font != "f21" and not frags.is_empty():
-        frag = frags.next()
-    # for frag in frags:
-    #     desc += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
-    #     prev_frag = frag
+        maneuver.cost = frags.cat_while(lambda frag, _: frag.font == "f5")
 
-    maneuver.description = fixup_description(desc)
-    return maneuver
+        frags.discard_until(plain_text)
+
+        range: TextFrag = frags.next()
+        assert_font(range, ["f5"])
+        maneuver.range = range.text
+        if maneuver.name in two_line_ranges:
+            range: TextFrag = frags.next()
+            assert_font(range, ["f5"])
+            maneuver.range += f" {range.text}"
+    else:
+        maneuver.cost = "Pass Through Action (1 AP)"
+        maneuver.range = "Self"
+
+    maneuver.description = frags.markup_while(lambda frag: frag.font != "f27").strip()
+    frags.discard_with_font(["f27"])
+
+    enhancements: list[DCProtoItem] = split_items(frags, ["f21", "f7"], [], 15, [], [])
+
+    maneuver.enhancements = list(map(parse_enhancement, enhancements))
+
+    return maneuver.fixup()
+
+
+def parse_enhancement(proto_enhancement: DCProtoItem) -> Enhancement:
+    enhancement: Enhancement = Enhancement()
+    enhancement.name = proto_enhancement.name
+    frags: FragList = proto_enhancement.frags
+
+    (cost, _, desc) = frags.cat_while(lambda _, s: ")" not in s).partition(")")
+    enhancement.cost = cost.lstrip(": (")
+    enhancement.description = f"{desc} {frags.markup_while(lambda _: True)}".strip()
+
+    return enhancement.fixup()
 
 
 if __name__ == "__main__":

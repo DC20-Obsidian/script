@@ -105,7 +105,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     # No loop here because "Dispel Magic" has no listed duration
     # return spell
 
-    if frags.match_next("^Duration"):
+    if frags.match_next_regex("^Duration"):
         # Spell is not "Dispel Magic"
         frags.discard_with_font(["f21"])
 
@@ -128,7 +128,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     return spell.fixup()
 
 
-def split_enhancements(frags: FragList) -> list[DCProtoItem]:
+def split_enhancements(frags: FragList) -> list[DCProtoItem]: # TODO use split_items()
     enhancements: list[DCProtoItem] = []
     current_enhancement = DCProtoItem()
     prev_frag: TextFrag = frags._frags[0]
@@ -181,7 +181,7 @@ def parse_description(frags: FragList) -> str:
         lambda frag: frag.font != "f27" or not frag.text.startswith("Spell Enhancement")
     )
     # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
-    return fixup_description(desc.strip())
+    return desc.strip()
 
 
 if __name__ == "__main__":

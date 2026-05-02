@@ -1,3 +1,4 @@
+from dc_types.frag_list import FragList
 import json
 from .spell import Spell
 from .enhancement import Enhancement
@@ -9,6 +10,8 @@ from .proto_item import DCProtoItem
 
 class DCObjEncoder(json.JSONEncoder):
     def default(self, o):
+        if isinstance(o, FragList):
+            return o._frags
         if isinstance(
             o, (Spell, Enhancement, TextFrag, DCProtoItem, Condition, Maneuver)
         ):

@@ -32,7 +32,10 @@ class FragList:
     def next_get_page(self) -> int:
         return self._frags[0].page
 
-    def match_next(self, regex: str) -> bool:
+    def match_next(self, predicate: Callable[[TextFrag], bool]):
+        return predicate(self._frags[0])
+
+    def match_next_regex(self, regex: str) -> bool:
         return re.match(regex, self._frags[0].text) is not None
 
     def find_multi_while(
@@ -88,6 +91,8 @@ class FragList:
                 break
             else:
                 frag = self.next()
+        else:
+            self._frags.insert(0, frag)
         s += markup(None, prev_frag, MarkupStyle.MARKDOWN)
         return s
 
@@ -104,3 +109,14 @@ class FragList:
         assert frag.font in fonts, (
             f"Invalid font on page: {frag.page}. Expected one of: {fonts}, found: {frag.font}"
         )
+
+    def discard_until(self, predicate: Callable[[TextFrag], bool]) -> int:
+        frag = self.next()
+        count = 0
+
+        while not predicate(frag):
+            count += 1
+            frag = self.next()
+
+        self._frags.insert(0, frag)
+        return count

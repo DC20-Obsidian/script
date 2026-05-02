@@ -14,6 +14,7 @@ class Enhancement:
         # ap/mp_cost is a string because "X" is a valid value
         self.ap_cost: str = ""
         self.mp_cost: str = ""
+        self.sp_cost: str = ""
         self.description: str = ""
 
     @staticmethod
@@ -26,6 +27,7 @@ class Enhancement:
         e.dependent_on = d["dependent_on"]
         e.ap_cost = d["ap_cost"]
         e.mp_cost = d["mp_cost"]
+        e.sp_cost = d["sp_cost"]
         e.description = d["description"]
         return e
 
@@ -46,11 +48,20 @@ class Enhancement:
             self.dependent_on = m.group(1)
             self.cost = regex.sub("", self.cost)
 
-        ap = re.search(r"([0-9X]+) ?AP", self.cost)
+        ap_regex: str = r"([0-9X]+) ?AP"
+        ap = re.search(ap_regex, self.cost)
         self.ap_cost = ap.group(1) if ap else "0"
+        self.cost = re.sub(ap_regex, r"\1 AP", self.cost)
 
-        mp = re.search(r"([0-9X]+) ?MP", self.cost)
+        mp_regex: str = r"([0-9X]+) ?MP"
+        mp = re.search(mp_regex, self.cost)
         self.mp_cost = mp.group(1) if mp else "0"
+        self.cost = re.sub(mp_regex, r"\1 MP", self.cost)
+
+        sp_regex: str = r"([0-9X]+) ?SP"
+        sp = re.search(sp_regex, self.cost)
+        self.sp_cost = sp.group(1) if sp else "0"
+        self.cost = re.sub(sp_regex, r"\1 SP", self.cost)
 
         return self
 
@@ -65,6 +76,7 @@ class Enhancement:
             else "",
             "ap_cost": self.ap_cost,
             "mp_cost": self.mp_cost,
+            "sp_cost": self.sp_cost,
             "description": self.description,
         }
         return template.format(**args)
