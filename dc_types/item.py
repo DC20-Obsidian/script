@@ -11,13 +11,13 @@ class Item(ABC):
     @classmethod
     @abstractmethod
     def get_default_page_range(cls) -> slice[int, int]:
-        raise
+        raise Exception("Abstract method")
 
     @classmethod
     @abstractmethod
     def get_save_file(cls, data_folder: str, version: str) -> str:
         (_, _) = (data_folder, version)
-        raise
+        raise Exception("Abstract method")
 
     @classmethod
     def split(cls, frags: FragList) -> list[DCProtoItem]:
@@ -27,14 +27,14 @@ class Item(ABC):
     @abstractmethod
     def from_json(cls, d: dict) -> Self:
         _ = d
-        raise
+        raise Exception("Abstract method")
 
     @abstractmethod
     def markdown(self) -> str:
-        raise
+        raise Exception("Abstract method")
 
     @abstractmethod
     def markdown_path(self, prefix: str) -> str:
         _ = prefix
-        raise
+        raise Exception("Abstract method")
 

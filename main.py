@@ -110,7 +110,7 @@ def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
         case "maneuvers":
             return (Maneuver, parse_maneuver)
         case _:
-            raise
+            raise Exception(f"type {s} not supported")
 
 
 if __name__ == "__main__":

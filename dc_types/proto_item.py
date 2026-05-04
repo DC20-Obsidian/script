@@ -2,7 +2,6 @@ from typing import TypeVar
 from collections.abc import Callable
 from lib.utils import eprint
 from utils.colors import colors
-from .text_frag import TextFrag
 from .frag_list import FragList
 
 
@@ -25,9 +24,9 @@ def parse_proto_items(
     for proto_item in proto_items:
         try:
             page_number = proto_item.frags.next_get_page()
-        except:
+        except Exception as e:
             eprint(proto_item.__dict__)
-            raise
+            raise e
         try:
             items.append(transform(proto_item))
         except Exception as e:
