@@ -2,6 +2,7 @@
 from parsers.spells import parse_spell
 import os
 from parsers.maneuvers import parse_maneuver
+from parsers.conditions import parse_condition
 from dc_types.proto_item import DCProtoItem, parse_proto_items
 from lib.utils import flatten_pages, eprint
 from dc_types.frag_list import FragList
@@ -104,8 +105,8 @@ def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
     match s:
         case "spells":
             return (Spell, parse_spell)
-        # case "conditions":
-        #     return Condition
+        case "conditions":
+            return (Condition, parse_condition)
         case "maneuvers":
             return (Maneuver, parse_maneuver)
         case _:
