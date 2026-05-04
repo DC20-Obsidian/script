@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from parse_maneuvers import parse_maneuver
+import os
+from parsers.maneuvers import parse_maneuver
 from dc_types.proto_item import DCProtoItem, parse_proto_items
 from lib.utils import flatten_pages, eprint
 from dc_types.frag_list import FragList
@@ -27,7 +28,7 @@ def main(args: Args):
         args.page_range = page_range
 
     if args.raw:
-        items_raw = load_raw(args, item_type)
+        items_raw: list[DCProtoItem] = load_raw(args, item_type)
         if args.unprocessed:
             # Consume all TextFrags that can be processed
             parse_proto_items(items_raw, parser)
@@ -35,18 +36,31 @@ def main(args: Args):
         return
 
     items: list[Item] = load_parsed(args, item_type, parser)
+    save_file: str = item_type.get_save_file(rf"{prefix}/json", dc20_version)
 
     if args.print:
-        if args.markdown:
+        if not args.markdown:
+            print(json.dumps(items, cls=DCObjEncoder))
+            eprint(save_file)
+        else:
             for item in items:
                 (path, _, name) = item.markdown_path(prefix).rpartition("/")
                 print(f"{colors.BLUE}{path}{colors.ENDC}/{colors.GREEN}{name}{colors.ENDC}")
                 print(item.markdown())
-        else:
-            print(json.dumps(items, cls=DCObjEncoder))
 
     if args.write:
-        pass
+        if not args.markdown:
+            with open(save_file, "w") as file:
+                file.write(json.dumps(items, cls=DCObjEncoder))
+        else:
+            for item in items:
+                markdown: str = item.markdown()
+                path: str = item.markdown_path(prefix)
+                (dir, _, name) = path.rpartition("/")
+                os.makedirs(dir, exist_ok=True)
+                with open(path, "w") as file:
+                    file.write(markdown)
+
 
 
 def load_parsed(args: Args, item_type: Type[Item], parser: Callable[[DCProtoItem], Item]) -> list[Item]:
