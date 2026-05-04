@@ -71,7 +71,7 @@ class Args:
             bail("--markdown is not supported with --raw")
         if self.type not in choices:
             bail(f"Invalid selection of --type. Must be one of {choices}")
-        if (self.page_range.start < 0 or self.page_range.start < self.page_range.stop) and not self.all:
+        if (self.page_range.start < 0 or self.page_range.stop < self.page_range.start) and not self.all:
             bail("Invalid or missing page range")
 
 def bail(msg: str):
