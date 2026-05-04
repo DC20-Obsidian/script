@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-
-from lib.utils import eprint
-from utils.colors import colors
+# from lib.utils import eprint
+# from utils.colors import colors
 from lib.markup import assert_font
-from lib.fixup_text import fixup_name, fixup_description
+from lib.fixup_text import fixup_description
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from dc_types.spell import Spell

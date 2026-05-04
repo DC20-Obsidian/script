@@ -30,10 +30,6 @@ class Item(ABC):
         raise
 
     @abstractmethod
-    def fixup(self) -> Self:
-        raise
-
-    @abstractmethod
     def markdown(self) -> str:
         raise
 

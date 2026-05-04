@@ -1,14 +1,11 @@
 from dc_types.enhancement import Enhancement
-import json
 from lib.markup import assert_font
-from lib.utils import get_file_paths, eprint, save_file, flatten_pages
-from utils.colors import colors
-from utils.args import Args
-from utils.split import split_items_default, split_items
-from lib.fixup_text import fixup_name, fixup_description
+# from lib.utils import eprint
+# from utils.colors import colors
+from utils.split import split_items
+from lib.fixup_text import fixup_description
 from dc_types.frag_list import FragList
-from dc_types.serde import DCObjEncoder
-from dc_types.proto_item import DCProtoItem, parse_proto_items
+from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from dc_types.maneuver import Maneuver
 

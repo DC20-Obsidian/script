@@ -1,6 +1,4 @@
 import re
-from .utils import get_file_paths
-
 
 def load_words(files: list[str]) -> list[str]:
     words: list[str] = []
@@ -15,8 +13,7 @@ def load_words(files: list[str]) -> list[str]:
     return words
 
 
-dir = get_file_paths()["words"]
-names = load_words([f"{dir}names.txt"])
+names = load_words(["./words/names.txt"])
 
 
 def fixup(s: str, words: list[str]) -> str:
