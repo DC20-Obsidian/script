@@ -1,45 +1,14 @@
 #!/usr/bin/env python
 
-import json
-
-from lib.utils import eprint, get_file_paths, flatten_pages
+from lib.utils import eprint
 from utils.colors import colors
-from utils.split import split_items_default
-from utils.args import Args
-from lib.markup import markup, assert_font, MarkupStyle
+from lib.markup import assert_font
 from lib.fixup_text import fixup_name, fixup_description
-from dc_types.serde import DCObjEncoder
-from dc_types.proto_item import DCProtoItem, parse_proto_items
+from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
 from dc_types.frag_list import FragList
-
-
-def main(args: Args) -> list[Spell] | list[DCProtoItem]:
-    if args.all:
-        page_range = slice(70, 145)
-    else:
-        page_range = args.page_range
-
-    # Open file
-    file = args.file or get_file_paths()["input"]
-    with open(file, "r") as file:
-        pages: list[dict] = json.load(file)
-        pages: list[dict] = pages[page_range]  # Filter pages
-
-    frags: FragList = flatten_pages(pages)
-    # Split spells
-    spells_raw: list[DCProtoItem] = split_items_default(frags)
-
-    if args.raw:
-        if args.unprocessed:
-            # Consume all TextFrags that can be processed
-            parse_proto_items(spells_raw, parse_spell)
-        return spells_raw
-    else:
-        spells: list[Spell] = parse_proto_items(spells_raw, parse_spell)
-        return spells
 
 
 def parse_spell(proto_spell: DCProtoItem) -> Spell:
@@ -117,10 +86,12 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
         spell.duration = "Instantaneous"
     # return spell
 
-    spell.description = parse_description(frags)
+    spell.description = fixup_description(parse_description(frags))
+    frags.discard_with_font(["f27"])
 
     enhancements = split_enhancements(frags)
     # spell.enhancements = split_enhancements(frags) # Debug
+    # return spell
 
     spell.enhancements = list(map(parse_enhancement, enhancements))
 
@@ -183,23 +154,3 @@ def parse_description(frags: FragList) -> str:
     # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
     return desc.strip()
 
-
-if __name__ == "__main__":
-    args = Args(default_page=71)
-
-    if args.type != "spells" and args.type:
-        raise Exception("Parsing spells, but type is not spells")
-
-    if args.write:
-        raise Exception(
-            "args.write is set, but this function doesn't support that. Use a different one."
-        )
-
-    spells: list = main(args)
-
-    if args.print:
-        print(json.dumps(spells, cls=DCObjEncoder))
-    else:
-        eprint(
-            f"{colors.YELLOW}Warning{colors.ENDC}: parse_spells called, but args.print is not set. Skipping"
-        )

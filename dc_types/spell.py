@@ -1,8 +1,10 @@
+from typing import Self
+from dc_types.item import Item
 import re
 from .enhancement import Enhancement
 
 
-class Spell:
+class Spell(Item):
     def __init__(self):
         self.type = "spell"
         self.name: str = ""
@@ -19,9 +21,9 @@ class Spell:
         self.description: str = ""
         self.enhancements: list[Enhancement] = []
 
-    @staticmethod
-    def from_json(d: dict) -> "Spell":
-        s = Spell()
+    @classmethod
+    def from_json(cls, d: dict) -> Self:
+        s = cls()
         s.name = d["name"]
         s.page = int(d["page"])
         s.source = d["source"]
@@ -37,7 +39,7 @@ class Spell:
         s.enhancements = d["enhancements"]
         return s
 
-    def fixup(self) -> "Spell":
+    def fixup(self) -> Self:
         ap = re.search(r"([0-9]+) ?AP", self.cost)
         self.ap_cost = int(ap.group(1) if ap else 0)
 
@@ -67,6 +69,17 @@ class Spell:
             "enhancements": enhancements(self.enhancements),
         }
         return template.format(**args)
+
+    @classmethod
+    def get_default_page_range(cls) -> slice[int, int]:
+        return slice(71 - 1, 145)
+
+    @classmethod
+    def get_save_file(cls, data_folder: str, version: str) -> str:
+        return rf"{data_folder}/spells_{version}.json"
+
+    def markdown_path(self, prefix: str) -> str:
+        return rf"{prefix}/spells/{self.name}.md"
 
 
 template = """---

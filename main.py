@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from parsers.spells import parse_spell
 import os
 from parsers.maneuvers import parse_maneuver
 from dc_types.proto_item import DCProtoItem, parse_proto_items
@@ -97,8 +98,8 @@ def load_raw(args: Args, item_type: Type[Item]) -> list[DCProtoItem]:
 
 def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
     match s:
-        # case "spells":
-        #     return Spell
+        case "spells":
+            return (Spell, parse_spell)
         # case "conditions":
         #     return Condition
         case "maneuvers":
