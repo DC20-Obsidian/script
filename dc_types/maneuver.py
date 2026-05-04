@@ -1,4 +1,3 @@
-from dc_types.proto_item import DCProtoItem
 from dc_types.item import Item
 from typing import Self
 import re
@@ -49,7 +48,7 @@ class Maneuver(Item):
             "summary": self.summary,
             "AP": self.ap_cost,
             "SP": self.sp_cost,
-            "enhancemnets": enhancements(self.enhancements),
+            "enhancements": enhancements(self.enhancements),
             "cost": self.cost,
             "range": self.range,
             "kind": self.kind,
@@ -73,7 +72,6 @@ class Maneuver(Item):
 
 template = """---
 name: {name}
-stacking: {stacking}
 cost: {cost}
 ap: {AP}
 sp: {SP}
