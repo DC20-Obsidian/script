@@ -1,9 +1,11 @@
+from dc_types.proto_item import DCProtoItem
+from dc_types.item import Item
 from typing import Self
 import re
 from .enhancement import Enhancement
 
 
-class Maneuver:
+class Maneuver(Item):
     def __init__(self):
         self.type: str = "maneuver"
         self.page: int = -1
@@ -17,9 +19,9 @@ class Maneuver:
         self.description: str = ""
         self.enhancements: list[Enhancement] = []
 
-    @staticmethod
-    def from_json(d: dict):
-        m = Maneuver()
+    @classmethod
+    def from_json(cls, d: dict) -> Self:
+        m = cls()
         m.page = int(d["page"])
         m.name = d["name"]
         m.summary = d["summary"]
@@ -30,6 +32,7 @@ class Maneuver:
         m.range = d["range"]
         m.description = d["describution"]
         m.enhancements = d["enhancements"]
+        return m
 
     def fixup(self) -> Self:
         ap = re.search(r"([0-9]+) ?AP", self.cost)
@@ -55,6 +58,17 @@ class Maneuver:
         }
 
         return template.format(**args)
+
+    @classmethod
+    def get_default_page_range(cls) -> slice[int, int]:
+        return slice(52 - 1, 59)
+
+    @classmethod
+    def get_save_file(cls, data_folder: str, version: str) -> str:
+        return rf"{data_folder}/maneuvers_{version}.json"
+
+    def markdown_path(self, prefix) -> str:
+        return rf"{prefix}/maneuvers/{self.name}.md"
 
 
 template = """---

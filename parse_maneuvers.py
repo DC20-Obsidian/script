@@ -37,7 +37,6 @@ def main(args: Args) -> list[Maneuver] | list[DCProtoItem]:
         if args.unprocessed:
             # Consume all TextFrags that can be processed
             parse_proto_items(maneuvers_raw, parse_maneuver)
-            pass
         return maneuvers_raw
     else:
         maneuvers: list[Maneuver] = parse_proto_items(maneuvers_raw, parse_maneuver)
@@ -109,7 +108,7 @@ if __name__ == "__main__":
 
     args = Args(default_page=173)
 
-    if args.type != "conditions" and args.type:
+    if args.type != "maneuvers" and args.type:
         raise Exception("Parsing conditions, but type is not conditions")
 
     maneuvers: list = main(args)
