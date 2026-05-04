@@ -6,7 +6,9 @@ from collections.abc import Callable
 
 
 def split_items_default(frags: FragList) -> list[DCProtoItem]:
-    return split_items(frags, ["f3"], ["f4"], 15, ["f2", "f9", "f1"], ["f4"], ["summontraits"])
+    return split_items(
+        frags, ["f3"], ["f4"], 15, ["f2", "f9", "f1"], ["f4"], ["summontraits"]
+    )
 
 
 def split_items(

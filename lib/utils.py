@@ -16,4 +16,3 @@ def flatten_pages(pages: list[dict]) -> FragList:
             frag: TextFrag = TextFrag(text_frag, page_number)
             frags.append(frag)
     return frags
-

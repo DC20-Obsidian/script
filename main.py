@@ -47,7 +47,9 @@ def main(args: Args):
         else:
             for item in items:
                 (path, _, name) = item.markdown_path(prefix).rpartition("/")
-                print(f"{colors.BLUE}{path}{colors.ENDC}/{colors.GREEN}{name}{colors.ENDC}")
+                print(
+                    f"{colors.BLUE}{path}{colors.ENDC}/{colors.GREEN}{name}{colors.ENDC}"
+                )
                 print(item.markdown())
 
     if args.write:
@@ -64,8 +66,9 @@ def main(args: Args):
                     file.write(markdown)
 
 
-
-def load_parsed(args: Args, item_type: Type[Item], parser: Callable[[DCProtoItem], Item]) -> list[Item]:
+def load_parsed(
+    args: Args, item_type: Type[Item], parser: Callable[[DCProtoItem], Item]
+) -> list[Item]:
     if args.saved:
         return load_saved(args, item_type)
     else:
@@ -74,9 +77,7 @@ def load_parsed(args: Args, item_type: Type[Item], parser: Callable[[DCProtoItem
 
 
 def load_saved(args: Args, item_type: Type[Item]) -> list[Item]:
-    saved_file = args.file or item_type.get_save_file(
-        rf"{prefix}/json", dc20_version
-    )
+    saved_file = args.file or item_type.get_save_file(rf"{prefix}/json", dc20_version)
     eprint(f"Loading saved data from {colors.BLUE}{saved_file}{colors.ENDC}")
     with open(saved_file, "r") as file:
         return json.load(file, object_hook=dc_obj_decoder)

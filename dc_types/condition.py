@@ -1,6 +1,7 @@
 from typing import Self
 from dc_types.item import Item
 
+
 class Condition(Item):
     def __init__(self):
         self.type: str = "condition"
@@ -37,6 +38,7 @@ class Condition(Item):
 
     def markdown_path(self, prefix) -> str:
         return rf"{prefix}/conditions/{self.name}.md"
+
 
 template = """---
 name: {name}

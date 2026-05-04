@@ -1,5 +1,6 @@
 from dc_types.enhancement import Enhancement
 from lib.markup import assert_font
+
 # from lib.utils import eprint
 # from utils.colors import colors
 from utils.split import split_items
@@ -8,6 +9,7 @@ from dc_types.frag_list import FragList
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from dc_types.maneuver import Maneuver
+
 
 def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
     two_line_ranges: list[str] = [
@@ -47,10 +49,14 @@ def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
         maneuver.cost = "Pass Through Action (1 AP)"
         maneuver.range = "Self"
 
-    maneuver.description = fixup_description(frags.markup_while(lambda frag: frag.font != "f27").strip())
+    maneuver.description = fixup_description(
+        frags.markup_while(lambda frag: frag.font != "f27").strip()
+    )
     frags.discard_with_font(["f27"])
 
-    enhancements: list[DCProtoItem] = split_items(frags, ["f21", "f7"], [], 15, [], [], [])
+    enhancements: list[DCProtoItem] = split_items(
+        frags, ["f21", "f7"], [], 15, [], [], []
+    )
 
     maneuver.enhancements = list(map(parse_enhancement, enhancements))
 
@@ -67,4 +73,3 @@ def parse_enhancement(proto_enhancement: DCProtoItem) -> Enhancement:
     enhancement.description = f"{desc} {frags.markup_while(lambda _: True)}".strip()
 
     return enhancement.fixup()
-

@@ -1,5 +1,6 @@
 import re
 
+
 def load_words(files: list[str]) -> list[str]:
     words: list[str] = []
     for file in files:

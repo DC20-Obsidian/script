@@ -4,10 +4,11 @@ from typing import Self
 from dc_types.proto_item import DCProtoItem
 from utils.split import split_items_default
 
+
 class Item(ABC):
     def __init__(self):
         self.name: str = ""
-    
+
     @classmethod
     @abstractmethod
     def get_default_page_range(cls) -> slice[int, int]:
@@ -37,4 +38,3 @@ class Item(ABC):
     def markdown_path(self, prefix: str) -> str:
         _ = prefix
         raise Exception("Abstract method")
-

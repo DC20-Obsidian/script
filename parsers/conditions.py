@@ -19,4 +19,3 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
 
     cond.description = fixup_description(desc)
     return cond
-

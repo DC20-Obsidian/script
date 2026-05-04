@@ -9,9 +9,14 @@ class Args:
         parser.add_argument("page", default=default_page, nargs="?")
         parser.add_argument("last_page", nargs="?")
         parser.add_argument(
-            "-a", "--all", action="store_true", help="use all pages (configured by type)"
+            "-a",
+            "--all",
+            action="store_true",
+            help="use all pages (configured by type)",
         )
-        parser.add_argument("-r", "--raw", action="store_true", help="output raw data (implies --print)")
+        parser.add_argument(
+            "-r", "--raw", action="store_true", help="output raw data (implies --print)"
+        )
         parser.add_argument(
             "-w", "--write", action="store_true", help="write the output to files"
         )
@@ -71,8 +76,11 @@ class Args:
             bail("--markdown is not supported with --raw")
         if self.type not in choices:
             bail(f"Invalid selection of --type. Must be one of {choices}")
-        if (self.page_range.start < 0 or self.page_range.stop < self.page_range.start) and not self.all:
+        if (
+            self.page_range.start < 0 or self.page_range.stop < self.page_range.start
+        ) and not self.all:
             bail("Invalid or missing page range")
+
 
 def bail(msg: str):
     eprint(f"{colors.RED}{msg}{colors.ENDC}")

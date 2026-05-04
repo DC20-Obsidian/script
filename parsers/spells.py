@@ -97,7 +97,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     return spell.fixup()
 
 
-def split_enhancements(frags: FragList) -> list[DCProtoItem]: # TODO use split_items()
+def split_enhancements(frags: FragList) -> list[DCProtoItem]:  # TODO use split_items()
     enhancements: list[DCProtoItem] = []
     current_enhancement = DCProtoItem()
     prev_frag: TextFrag = frags._frags[0]
@@ -151,4 +151,3 @@ def parse_description(frags: FragList) -> str:
     )
     # desc += f'\n\033[38;2;25;25;25mx{colors.ENDC}'
     return desc.strip()
-
