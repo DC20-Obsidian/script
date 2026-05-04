@@ -52,7 +52,7 @@ def main(args: Args):
     if args.write:
         if not args.markdown:
             with open(save_file, "w") as file:
-                file.write(json.dumps(items, cls=DCObjEncoder))
+                file.write(json.dumps(items, cls=DCObjEncoder, indent=2))
         else:
             for item in items:
                 markdown: str = item.markdown()
@@ -76,6 +76,7 @@ def load_saved(args: Args, item_type: Type[Item]) -> list[Item]:
     saved_file = args.file or item_type.get_save_file(
         rf"{prefix}/json", dc20_version
     )
+    eprint(f"Loading saved data from {colors.BLUE}{saved_file}{colors.ENDC}")
     with open(saved_file, "r") as file:
         return json.load(file, object_hook=dc_obj_decoder)
 
@@ -86,12 +87,15 @@ def load_raw(args: Args, item_type: Type[Item]) -> list[DCProtoItem]:
     file_name: str = (
         args.file or rf"{prefix}/json/dc20_{dc20_version}_pdf_filtered.json"
     )
+    eprint(f"Loading raw data from {colors.BLUE}{file_name}{colors.ENDC}")
     with open(file_name, "r") as file:
         pages: list[dict] = json.load(file)
         pages: list[dict] = pages[page_range]  # Filter pages
 
     frags: FragList = flatten_pages(pages)
+    assert not frags.is_empty(), "Unable to load raw items, frags is empty"
     items_raw: list[DCProtoItem] = item_type.split(frags)
+    assert not len(items_raw) == 0, "Unable to load raw items, split into 0 items"
 
     return items_raw
 
