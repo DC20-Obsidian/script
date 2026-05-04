@@ -24,8 +24,10 @@ def fixup(s: str, words: list[str]) -> str:
 
     pattern = r"(" + "|".join(re.escape(w) for w in words) + r")"
     s = re.sub(pattern, replace, s)
+    s = re.sub(" +", " ", s)
+    s = re.sub("’", "'", s)
 
-    return fixup_misc(s)
+    return s.strip()
 
 
 def fixup_misc(s: str) -> str:
@@ -40,15 +42,17 @@ def fixup_misc(s: str) -> str:
 
     misc_fixes = [
         (r"’", r"'"),
+        (r"\u0001+", r" "),
         # (r'([,:\.])', add_space_after), # , . :
         (r" \n", "\n"),
         (r"([\(])", add_space_before),  # (
-        (r"[ \u0001]+", r" "),  # Remove duplicate spaces
         (r" ([\.,:\)])", identity),  # Remove spaces in front
         (r"([\(]) ", identity),  # Remove spaces after
-        (r"([*\)]) :", r"\1:"),  # "Save (5) :" -> "Save (5):"
+        # (r"([*\)]) :", r"\1:"),  # "Save (5) :" -> "Save (5):"
         (r"\*+ \*+", r" "),
         (r"P ?a ?s ?s ?i ?v ?e", r"Passive"),
+        (r" ?\*\*Spell Passive ?", r"\n**Spell Passive"),
+        (r" +", r" "),  # Remove duplicate spaces
     ]
 
     for fix in misc_fixes:
