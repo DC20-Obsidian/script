@@ -1,6 +1,6 @@
 from lib.markup import markup, MarkupStyle
 import re
-from typing import Self, Optional, Union
+from typing import Self, Optional
 from collections.abc import Callable
 from .text_frag import TextFrag
 
