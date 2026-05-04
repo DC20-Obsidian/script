@@ -53,7 +53,7 @@ def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
     maneuver.description = fixup_description(frags.markup_while(lambda frag: frag.font != "f27").strip())
     frags.discard_with_font(["f27"])
 
-    enhancements: list[DCProtoItem] = split_items(frags, ["f21", "f7"], [], 15, [], [])
+    enhancements: list[DCProtoItem] = split_items(frags, ["f21", "f7"], [], 15, [], [], [])
 
     maneuver.enhancements = list(map(parse_enhancement, enhancements))
 
