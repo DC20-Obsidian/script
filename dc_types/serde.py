@@ -1,3 +1,4 @@
+from dc_types.item import Item
 from dc_types.frag_list import FragList
 import json
 from .spell import Spell
@@ -12,9 +13,7 @@ class DCObjEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, FragList):
             return o._frags
-        if isinstance(
-            o, (Spell, Enhancement, TextFrag, DCProtoItem, Condition, Maneuver)
-        ):
+        if isinstance(o, (Item, Enhancement, TextFrag, DCProtoItem)):
             d = o.__dict__
             # if isinstance(o, Spell):
             #     d.pop("_current_enhmt")
@@ -35,4 +34,7 @@ def dc_obj_decoder(d: dict):
             return Condition.from_json(d)
         case "maneuver":
             return Maneuver.from_json(d)
-    return d
+        case _:
+            raise Exception(
+                f"Unable to decode type: {d['type']}. Please add it to dc_obj_decoder"
+            )
