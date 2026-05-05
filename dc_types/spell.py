@@ -2,6 +2,7 @@ from typing import Self
 from dc_types.item import Item
 import re
 from .enhancement import Enhancement
+from lib.utils import list_to_yaml
 
 
 class Spell(Item):
@@ -55,9 +56,9 @@ class Spell(Item):
     def markdown(self) -> str:
         args = {
             "name": self.name,
-            "source": list_to_yaml(self.source),
-            "school": self.school,
-            "tags": list_to_yaml(self.tags),
+            "source": list_to_yaml(self.source, "spells/spell_sources"),
+            "school": self.school.title(),
+            "tags": list_to_yaml(self.tags, "spells/spell_tags"),
             "cost": self.cost,
             "range": self.range,
             "duration": self.duration,
@@ -79,14 +80,14 @@ class Spell(Item):
         return rf"{data_folder}/spells_{version}.json"
 
     def markdown_path(self, prefix: str) -> str:
-        return rf"{prefix}/spells/{self.name}.md"
+        return rf"{prefix}/spells/spells/{self.name}.md"
 
 
 template = """---
 name: {name}
 source:
 {source}
-school: {school}
+school: "[[spells/spell_schools/{school}|{school}]]"
 spell_tags:
 {tags}
 ap: {AP}
@@ -102,12 +103,6 @@ page: {page}
 ## Spell Enhancements
 {enhancements}
 """
-
-
-def list_to_yaml(li: list[str]) -> str:
-    a = " - "
-    a += "\n - ".join(map(lambda s: f'"{s}"', li))
-    return a
 
 
 def enhancements(enhancements: list[Enhancement]) -> str:

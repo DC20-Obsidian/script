@@ -8,6 +8,15 @@ def eprint(*args, **kw):
     print(*args, file=sys.stderr, **kw)
 
 
+def list_to_yaml(li: list[str], link_folder: str = "") -> str:
+    a = " - "
+    if link_folder:
+        a += "\n - ".join(map(lambda s: f'"[[{link_folder}/{s.title()}|{s.title()}]]"', li))
+    else:
+        a += "\n - ".join(map(lambda s: f'"{s}"', li))
+    return a
+
+
 def flatten_pages(pages: list[dict]) -> FragList:
     frags: FragList = FragList()
     for page in pages:

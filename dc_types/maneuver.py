@@ -51,7 +51,7 @@ class Maneuver(Item):
             "enhancements": enhancements(self.enhancements),
             "cost": self.cost,
             "range": self.range,
-            "kind": self.kind,
+            "kind": self.kind.title(),
             "page": self.page,
             "desc": self.description,
         }
@@ -77,7 +77,7 @@ ap: {AP}
 sp: {SP}
 range: {range}
 page: {page}
-kind: {kind}
+kind: "[[maneuver_types/{kind}|{kind}]]"
 ---
 {summary}
 {cost}
@@ -86,12 +86,6 @@ kind: {kind}
 ## Maneuver Enhancements
 {enhancements}
 """
-
-
-def list_to_yaml(li: list[str]) -> str:
-    a = " - "
-    a += "\n - ".join(map(lambda s: f'"{s}"', li))
-    return a
 
 
 def enhancements(enhancements: list[Enhancement]) -> str:
