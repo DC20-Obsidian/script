@@ -1,12 +1,12 @@
+import json
 from dc_types.item import Item
 from dc_types.frag_list import FragList
-import json
-from .spell import Spell
-from .enhancement import Enhancement
-from .condition import Condition
-from .maneuver import Maneuver
-from .text_frag import TextFrag
-from .proto_item import DCProtoItem
+from dc_types.spell import Spell
+from dc_types.enhancement import Enhancement
+from dc_types.condition import Condition
+from dc_types.maneuver import Maneuver
+from dc_types.text_frag import TextFrag
+from dc_types.proto_item import DCProtoItem
 
 
 class DCObjEncoder(json.JSONEncoder):

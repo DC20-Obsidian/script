@@ -1,8 +1,8 @@
 import re
 import enum
 from typing import Optional
-from dc_types.text_frag import TextFrag
 from utils.colors import colors
+from dc_types.text_frag import TextFrag
 
 
 class MarkupStyle(enum.Enum):

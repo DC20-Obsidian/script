@@ -1,21 +1,21 @@
 #!/usr/bin/env python
-from parsers.spells import parse_spell
 import os
-from parsers.maneuvers import parse_maneuver
-from parsers.conditions import parse_condition
-from dc_types.proto_item import DCProtoItem, parse_proto_items
-from lib.utils import flatten_pages, eprint
-from dc_types.frag_list import FragList
-from dc_types.serde import dc_obj_decoder, DCObjEncoder
 import json
-from dc_types.maneuver import Maneuver
-from dc_types.condition import Condition
-from collections.abc import Callable
 from typing import Type
-from dc_types.item import Item
-from dc_types.spell import Spell
+from collections.abc import Callable
 from utils.args import Args
 from utils.colors import colors
+from lib.utils import flatten_pages, eprint
+from dc_types.proto_item import DCProtoItem, parse_proto_items
+from dc_types.frag_list import FragList
+from dc_types.serde import dc_obj_decoder, DCObjEncoder
+from dc_types.item import Item
+from dc_types.spell import Spell
+from parsers.spells import parse_spell
+from dc_types.maneuver import Maneuver
+from parsers.maneuvers import parse_maneuver
+from dc_types.condition import Condition
+from parsers.conditions import parse_condition
 
 dc20_version: str = "0.10.5"
 prefix: str = "./dc-obsidian"

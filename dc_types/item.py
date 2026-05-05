@@ -1,6 +1,6 @@
-from dc_types.frag_list import FragList
 from abc import ABC, abstractmethod
 from typing import Self
+from dc_types.frag_list import FragList
 from dc_types.proto_item import DCProtoItem
 from utils.split import split_items_default
 

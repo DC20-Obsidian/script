@@ -1,6 +1,6 @@
-from dc_types.item import Item
-from typing import Self
 import re
+from typing import Self
+from dc_types.item import Item
 from .enhancement import Enhancement
 
 

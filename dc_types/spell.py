@@ -1,8 +1,8 @@
-from typing import Self
-from dc_types.item import Item
 import re
-from .enhancement import Enhancement
+from typing import Self
 from lib.utils import list_to_yaml
+from dc_types.item import Item
+from .enhancement import Enhancement
 
 
 class Spell(Item):

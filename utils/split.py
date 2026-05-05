@@ -1,8 +1,8 @@
+from collections.abc import Callable
 from lib.fixup_text import fixup_name
 from dc_types.text_frag import TextFrag
 from dc_types.proto_item import DCProtoItem
 from dc_types.frag_list import FragList
-from collections.abc import Callable
 
 
 def split_items_default(frags: FragList) -> list[DCProtoItem]:
