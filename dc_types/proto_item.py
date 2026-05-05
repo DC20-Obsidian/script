@@ -1,4 +1,4 @@
-from typing import TypeVar
+from .item import Item
 from collections.abc import Callable
 from lib.utils import eprint
 from utils.colors import colors
@@ -12,9 +12,6 @@ class DCProtoItem:
         self.frags: FragList = FragList()
         # self.frags: list[TextFrag] = []
         self.section: int = -1
-
-
-Item = TypeVar("Item")
 
 
 def parse_proto_items(
