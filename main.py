@@ -6,7 +6,8 @@ from collections.abc import Callable
 from utils.args import Args
 from utils.colors import colors
 from lib.utils import flatten_pages, eprint
-from dc_types.proto_item import DCProtoItem, parse_proto_items
+from dc_types.proto_item import DCProtoItem
+from utils.parse import parse_proto_items
 from dc_types.frag_list import FragList
 from dc_types.serde import dc_obj_decoder, DCObjEncoder
 from dc_types.item import Item
