@@ -53,6 +53,7 @@ def fixup_misc(s: str) -> str:
         (r"\*+ \*+", r" "),
         (r"P ?a ?s ?s ?i ?v ?e", r"Passive"),
         (r" ?\*\*Spell Passive ?", r"\n**Spell Passive"),
+        (r"Additionaly", r"Additionally"),
         (r" +", r" "),  # Remove duplicate spaces
     ]
 
