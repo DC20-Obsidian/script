@@ -17,6 +17,8 @@ from dc_types.maneuver import Maneuver
 from parsers.maneuvers import parse_maneuver
 from dc_types.condition import Condition
 from parsers.conditions import parse_condition
+from dc_types.ancestry import Ancestry
+from parsers.ancestries import parse_ancestry
 
 dc20_version: str = "0.10.5"
 prefix: str = "./dc-obsidian"
@@ -111,6 +113,8 @@ def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
             return (Condition, parse_condition)
         case "maneuvers":
             return (Maneuver, parse_maneuver)
+        case "ancestries":
+            return (Ancestry, parse_ancestry)
         case _:
             raise Exception(f"type {s} not supported")
 

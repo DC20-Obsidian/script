@@ -5,6 +5,7 @@ from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
 from dc_types.condition import Condition
 from dc_types.maneuver import Maneuver
+from dc_types.ancestry import Ancestry, Trait
 from dc_types.text_frag import TextFrag
 from dc_types.proto_item import DCProtoItem
 
@@ -34,6 +35,10 @@ def dc_obj_decoder(d: dict):
             return Condition.from_json(d)
         case "maneuver":
             return Maneuver.from_json(d)
+        case "ancestry":
+            return Ancestry.from_json(d)
+        case "ancestry_trait":
+            return Trait.from_json(d)
         case _:
             raise Exception(
                 f"Unable to decode type: {d['_type']}. Please add it to dc_obj_decoder"

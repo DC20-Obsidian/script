@@ -23,7 +23,7 @@ class Args:
         parser.add_argument(
             "-p", "--print", action="store_true", help="print the output to stdout"
         )
-        choices: list[str] = ["spells", "conditions", "maneuvers"]
+        choices: list[str] = ["spells", "conditions", "maneuvers", "ancestries"]
         parser.add_argument(
             "-t",
             "--type",
