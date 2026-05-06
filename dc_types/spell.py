@@ -7,7 +7,7 @@ from .enhancement import Enhancement
 
 class Spell(Item):
     def __init__(self):
-        self.type = "spell"
+        self._type = "spell"
         self.name: str = ""
         self.page: int = -1
         self.source: list[str] = []

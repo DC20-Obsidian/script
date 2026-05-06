@@ -7,7 +7,9 @@ from utils.split import split_items_default
 
 class Item(ABC):
     def __init__(self):
+        self._type: str = "<none>"
         self.name: str = ""
+        self.page: int = -1
 
     @classmethod
     @abstractmethod

@@ -5,7 +5,7 @@ class Enhancement:
     def __init__(self):
         from typing import Optional
 
-        self.type = "enhancement"
+        self._type = "enhancement"
         self.name: str = ""
         self.cost: str = ""
         self.repeatable: bool = False

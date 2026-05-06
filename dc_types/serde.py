@@ -23,9 +23,9 @@ class DCObjEncoder(json.JSONEncoder):
 
 
 def dc_obj_decoder(d: dict):
-    if "type" not in d:
+    if "_type" not in d:
         return d
-    match d["type"]:
+    match d["_type"]:
         case "spell":
             return Spell.from_json(d)
         case "enhancement":
@@ -36,5 +36,5 @@ def dc_obj_decoder(d: dict):
             return Maneuver.from_json(d)
         case _:
             raise Exception(
-                f"Unable to decode type: {d['type']}. Please add it to dc_obj_decoder"
+                f"Unable to decode type: {d['_type']}. Please add it to dc_obj_decoder"
             )

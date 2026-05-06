@@ -6,7 +6,7 @@ from .enhancement import Enhancement
 
 class Maneuver(Item):
     def __init__(self):
-        self.type: str = "maneuver"
+        self._type: str = "maneuver"
         self.page: int = -1
         self.name: str = ""
         self.summary: str = ""
