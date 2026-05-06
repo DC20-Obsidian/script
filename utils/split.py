@@ -1,3 +1,6 @@
+from dataclasses import dataclass, field
+from typing import Any, Union
+from lib.utils import eprint
 from collections.abc import Callable
 from lib.fixup_text import fixup_name
 from dc_types.text_frag import TextFrag
@@ -20,29 +23,41 @@ def split_items(
     discard_item_fonts: list[str],
     name_false_positives: list[str],
 ) -> list[DCProtoItem]:
+    prams: SplitPrams = SplitBuilder(
+        is_header=(header_fonts, max_header_font_size),
+        is_section=section_fonts,
+        discard_frag=discard_fonts,
+        discard_from_frag=discard_item_fonts,
+        discard_item=name_false_positives,
+    ).build()
     return split_items_full(
         frags,
-        # Discard
-        lambda frag: frag.font in discard_fonts,
-        lambda frag: frag.font in discard_item_fonts,
-        # Header
-        lambda frag: (
-            frag.font in header_fonts and frag.font_size <= max_header_font_size
-        ),
-        lambda frag: frag.font in section_fonts,
-        # Name
-        lambda name: not any(fp in name.lower() for fp in name_false_positives),
+        prams,
         lambda name: fixup_name(name.lower()).title(),
     )
 
+class SplitPrams:
+    def __init__(self, is_header: Callable[[TextFrag], bool]):
+        # Discard from here to next header
+        self.discard_from_frag: Callable[[TextFrag], bool] = _false
+
+        self.is_header: Callable[[TextFrag], bool] = is_header
+
+        # False positive header, Append it's contents to prev item
+        self.cont_item: Callable[[str], bool] = _false
+
+        # False positive header, Discard
+        self.discard_item: Callable[[str], bool] = _false
+
+        # Ignore frag completely
+        self.discard_frag: Callable[[TextFrag], bool] = _false
+
+        # Increment section counter
+        self.is_section: Callable[[TextFrag], bool] = _false
 
 def split_items_full(
     frags: FragList,
-    discard_predicate: Callable[[TextFrag], bool],
-    discard_item_predicate: Callable[[TextFrag], bool],
-    header_predicate: Callable[[TextFrag], bool],
-    section_predicate: Callable[[TextFrag], bool],
-    name_predicate: Callable[[str], bool],
+    prams: SplitPrams,
     fixup_transform: Callable[[str], str] = lambda s: s,
 ) -> list[DCProtoItem]:
     items: list[DCProtoItem] = []
@@ -54,22 +69,21 @@ def split_items_full(
     discard_item: bool = False
 
     for frag in frags:
-        if section_predicate(frag) and not section_predicate(prev_frag):
+        if prams.is_section(frag) and not prams.is_section(prev_frag):
             current_section += 1
-        if discard_predicate(frag):
-            # Discard Predicate is true discarding
+
+        if prams.discard_frag(frag):
             prev_frag = frag
             continue
-        if discard_item_predicate(frag):
+
+        # Discard fragments from here to next header
+        if prams.discard_from_frag(frag):
             discard_item = True
-        if header_predicate(frag):
+
+        if prams.is_header(frag):
             discard_item = False
             if item_name_done:
-                if current_item.name.strip() != "" and name_predicate(
-                    current_item.name
-                ):
-                    current_item.name = fixup_transform(current_item.name)
-                    items.append(current_item)
+                finish_item(current_item, items, prams, fixup_transform)
                 # Reset current_item
                 current_item = DCProtoItem()
                 current_item.page = frag.page
@@ -83,6 +97,70 @@ def split_items_full(
                 current_item.frags.append(frag)
         prev_frag = frag
 
-    current_item.name = fixup_transform(current_item.name)
-    items.append(current_item)
+    finish_item(current_item, items, prams, fixup_transform)
     return items
+
+def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, fixup: Callable[[str], str]):
+    item.name = item.name.strip().lower()
+    if not item.name:
+        # Discard Items with empty names
+        # This should only happen for the first (blank) item
+        return
+
+    if prams.discard_item(item.name):
+        return
+
+    if prams.cont_item(item.name):
+        prev_item: DCProtoItem = items[-1]
+        prev_item.frags.extend(item.frags)
+        return
+
+    # else Add Item
+    item.name = fixup(item.name)
+    items.append(item)
+
+
+
+def _false(*_args) -> bool:
+    return False
+
+def _empty_list():
+    return field(default_factory=lambda: [])
+
+
+@dataclass(kw_only=True)
+class SplitBuilder:
+    discard_from_frag: Union[Callable[[TextFrag], bool], list[str]] = _empty_list()
+    is_header: Union[Callable[[TextFrag], bool], list[str], tuple[list[str], float]] = _empty_list()
+    cont_item: Union[Callable[[str], bool], list[str]] = _empty_list()
+    discard_item: Union[Callable[[str], bool], list[str]] = _empty_list()
+    discard_frag: Union[Callable[[TextFrag], bool], list[str]] = field(default_factory=lambda: ["f2", "f9", "f1"])
+    is_section: Union[Callable[[TextFrag], bool], list[str]] = _empty_list()
+
+    def build(self) -> SplitPrams:
+        prams: SplitPrams = SplitPrams(_frag_list(self.is_header))
+        prams.discard_from_frag = _frag_list(self.discard_from_frag)
+        prams.cont_item = _name_list(self.cont_item)
+        prams.discard_item = _name_list(self.discard_item)
+        prams.discard_frag = _frag_list(self.discard_frag)
+        prams.is_section = _frag_list(self.is_section)
+        return prams
+
+
+def _frag_list(x: Union[Callable[[TextFrag], bool], list[str], tuple[list[str], float]]) -> Callable[[TextFrag], bool]:
+    def f(frag: TextFrag, li, size) -> bool:
+        return frag.font in li and frag.font_size <= size
+    if isinstance(x, list):
+        return lambda frag: frag.font in x
+    if isinstance(x, tuple):
+        li = x[0]
+        assert isinstance(li, list)
+        size = x[1]
+        assert isinstance(size, float) or isinstance(size, int)
+        return lambda frag: f(frag, li, size)
+    return x
+
+def _name_list(x: Union[Callable[[str], bool], list[str]]) -> Callable[[str], bool]:
+    if isinstance(x, list):
+        return lambda name: name in x
+    return x

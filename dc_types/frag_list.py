@@ -23,6 +23,10 @@ class FragList:
         self._frags.append(frag)
         return self
 
+    def extend(self, frags: Self) -> Self:
+        self._frags.extend(frags._frags)
+        return self
+
     def is_empty(self) -> bool:
         return len(self._frags) == 0
 
