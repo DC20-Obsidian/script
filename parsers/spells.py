@@ -102,7 +102,7 @@ def split_enhancements(frags: FragList) -> list[DCProtoItem]:  # TODO use split_
     current_enhancement = DCProtoItem()
     prev_frag: TextFrag = frags._frags[0]
     has_name = False
-    for frag in frags:
+    for frag in frags: # TODO use split_items
         if (
             frag.font == "f27"
         ):  # This is for Call Famillar and other spells that have multiple sections
