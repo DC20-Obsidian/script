@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AES-GCM Encryptor / Decryptor</title>
+  <style>
+    body {
+      font-family: Roboto, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #0d1117;
+      color: #c9d1d9;
+    }
+    h1 { color: #58a6ff; text-align: center; }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 500;
+      color: #8b949e;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+    }
+    input[type="file"] { padding: 8px; }
+    button {
+      background: #238636;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover { background: #2ea043; }
+    .toggle-container {
+      display: flex;
+      background: #21262d;
+      border-radius: 9999px;
+      padding: 4px;
+      margin: 15px 0;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active {
+      background: #238636;
+      color: white;
+    }
+    .status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.95em;
+    }
+    .success { background: #1f3a2e; color: #7ce38b; }
+    .error { background: #3a1f1f; color: #f85149; }
+  </style>
+</head>
+<body>
+  <h1>AES-GCM File Encryptor / Decryptor</h1>
+
+  <div class="card">
+    <h2>Password or Key File</h2>
+    <div class="toggle-container" id="passwordToggle">
+      <div class="toggle-btn active" data-mode="password">Password</div>
+      <div class="toggle-btn" data-mode="keyfile">Key File</div>
+    </div>
+
+    <div id="passwordInput">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter strong password">
+    </div>
+
+    <div id="keyFileInput" style="display:none;">
+      <label for="keyFile">Key File (SHA-256 → 256-bit key)</label>
+      <input type="file" id="keyFile">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Data File or URL</h2>
+    <div class="toggle-container" id="dataToggle">
+      <div class="toggle-btn active" data-mode="file">Local File</div>
+      <div class="toggle-btn" data-mode="url">URL</div>
+    </div>
+
+    <div id="fileInput">
+      <label for="dataFile">Select File</label>
+      <input type="file" id="dataFile">
+    </div>
+
+    <div id="urlInput" style="display:none;">
+      <label for="dataUrl">File URL</label>
+      <input type="url" id="dataUrl" placeholder="https://example.com/file.zip">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Operation</h2>
+    <div class="toggle-container" id="modeToggle">
+      <div class="toggle-btn active" data-mode="encrypt">Encrypt (AES-GCM)</div>
+      <div class="toggle-btn" data-mode="decrypt">Decrypt (AES-GCM)</div>
+    </div>
+
+    <button onclick="processFile()">Process File</button>
+  </div>
+
+  <div id="status" class="status" style="display:none;"></div>
+
+  <script>
+    // Toggle handlers
+    document.querySelectorAll('.toggle-container').forEach(container => {
+      container.addEventListener('click', e => {
+        if (e.target.classList.contains('toggle-btn')) {
+          // remove the "active" class from all toggle buttons in the container
+          container.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+          // readd the "active" class to the button that was clicked
+          e.target.classList.add('active');
+
+          // show/hide inputs
+          switch(container.id) {
+            case 'passwordToggle':
+              document.getElementById('passwordInput').style.display = (e.target.dataset.mode === 'password') ? 'block' : 'none';
+              document.getElementById('keyFileInput').style.display = (e.target.dataset.mode === 'keyfile') ? 'block' : 'none';
+              break;
+            case 'dataToggle':
+              document.getElementById('fileInput').style.display = (e.target.dataset.mode === 'file') ? 'block' : 'none';
+              document.getElementById('urlInput').style.display = (e.target.dataset.mode === 'url') ? 'block' : 'none';
+              break;
+          }
+        }
+      });
+    });
+
+    async function getKeyMaterial() {
+      // get the "data-mode" property of the <div> under #passwordToggle with the "active" class
+      const mode = document.querySelector('#passwordToggle .active').dataset.mode;
+
+      if (mode === 'password') {
+        const password = document.getElementById('password').value.trim();
+        if (!password) throw new Error("Password is required");
+        return new TextEncoder().encode(password);
+      } else { // mode === 'keyfile'
+        const file = document.getElementById('keyFile').files[0];
+        if (!file) throw new Error("Key file is required");
+        const buf = await file.arrayBuffer();
+        return new Uint8Array(buf);
+      }
+    }
+
+    async function deriveKey(material, salt) {
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw", material, { name: "PBKDF2" }, false, ["deriveBits", "deriveKey"]
+      );
+
+      return crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 600000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    async function getDataFile() {
+      // get the "data-mode" property of the <div> under #passwordToggle with the "active" class
+      const mode = document.querySelector('#dataToggle .active').dataset.mode;
+
+      if (mode === 'file') {
+        const file = document.getElementById('dataFile').files[0];
+        if (!file) throw new Error("Please select a file");
+        return { file, name: file.name };
+      } else { // mode === 'url'
+        const url = document.getElementById('dataUrl').value.trim();
+        if (!url) throw new Error("Please enter a URL");
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to download file");
+        const blob = await res.blob();
+
+        // get file name from basename of the URL
+        const name = url.split('/').pop() || 'downloaded-file';
+        return { file: new File([blob], name), name };
+      }
+    }
+
+    async function processFile() {
+      const status = document.getElementById('status');
+      status.style.display = 'none';
+
+      try {
+        // get the "data-mode" property of the <div> under #modeToggle with the "active" class
+        const mode = document.querySelector('#modeToggle .active').dataset.mode;
+        const keyMaterial = await getKeyMaterial();
+        const { file, name } = await getDataFile();
+
+        status.textContent = (mode === 'encrypt') ? "Encrypting with AES-GCM..." : "Decrypting...";
+        status.className = "status"; // reset #status
+        status.style.display = 'block';
+
+        const data = await file.arrayBuffer();
+
+        if (mode === 'encrypt') {
+          const salt = crypto.getRandomValues(new Uint8Array(16));
+          const iv = crypto.getRandomValues(new Uint8Array(12));
+          const key = await deriveKey(keyMaterial, salt);
+
+          const encrypted = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv: iv },
+            key,
+            data
+          );
+
+          // Combine: salt (16) + iv (12) + ciphertext
+          const result = new Uint8Array(28 + encrypted.byteLength);
+          result.set(salt, 0);
+          result.set(iv, 16);
+          result.set(new Uint8Array(encrypted), 28);
+
+          downloadFile(result, name + '.aesgcm');
+          status.className = "status success";
+          status.innerHTML = `✅ <strong>Encrypted successfully!</strong><br>File: ${name}.aesgcm`;
+
+        } else { // mode === 'decript'
+          // Decrypt
+          if (data.byteLength < 28) throw new Error("File too small to be valid AES-GCM encrypted data");
+
+          const salt = new Uint8Array(data.slice(0, 16));
+          const iv = new Uint8Array(data.slice(16, 28));
+          const ciphertext = new Uint8Array(data.slice(28));
+
+          const key = await deriveKey(keyMaterial, salt);
+
+          const decrypted = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: iv },
+            key,
+            ciphertext
+          );
+
+          downloadFile(new Uint8Array(decrypted), name.replace(/\.aesgcm$/, '') || name + '.decrypted');
+
+          status.className = "status success";
+          status.innerHTML = `✅ <strong>Decrypted successfully!</strong>`;
+        }
+
+      } catch (err) {
+        status.className = "status error";
+        status.textContent = `❌ ${err.message}`;
+        console.error(err);
+      }
+    }
+
+    function downloadFile(uint8Array, filename) {
+      const blob = new Blob([uint8Array]);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+  </script>
+</body>
+</html>
