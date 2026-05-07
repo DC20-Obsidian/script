@@ -19,6 +19,12 @@ class FragList:
             raise StopIteration
         return self._frags[self._current_frag - 1]
 
+    @classmethod
+    def copy(cls, source: Self) -> Self:
+        fl: Self = cls()
+        fl._frags = source._frags.copy()
+        return fl
+
     def append(self, frag: TextFrag) -> Self:
         self._frags.append(frag)
         return self
@@ -43,12 +49,14 @@ class FragList:
         return re.match(regex, self._frags[0].text) is not None
 
     def find_multi_while(
-        self, predicate: Callable[[TextFrag], bool], multi_filter: str
+        self, predicate: Callable[[TextFrag], bool], multi_filter: str,
+        min_one: bool = True
     ) -> list[str]:
         li: list[str] = []
         frag: TextFrag = self.next()
 
-        assert predicate(frag), "predicate is false on the first fragment"
+        if min_one:
+            assert predicate(frag), "predicate is false on the first fragment"
 
         while predicate(frag):
             li.extend(re.findall(multi_filter, frag.text))
@@ -65,11 +73,13 @@ class FragList:
         self,
         predicate: Callable[[TextFrag, str], bool],
         transform: Callable[[str], str] = lambda s: s,
+        min_one: bool = True,
     ) -> str:
         s: str = ""
         frag: TextFrag = self.next()
 
-        assert predicate(frag, s), "predicate is false on the first fragment"
+        if min_one:
+            assert predicate(frag, s), "predicate is false on the first fragment"
 
         while predicate(frag, s):
             s += transform(frag.text)
@@ -81,13 +91,21 @@ class FragList:
         self._frags.insert(0, frag)
         return s
 
-    def markup_while(self, predicate: Callable[[TextFrag], bool]) -> str:
+    def cat_until(
+        self,
+        predicate: Callable[[TextFrag, str], bool],
+        transform: Callable[[str], str] = lambda s: s,
+    ) -> str:
+        return self.cat_while(lambda f, s: not predicate(f, s), transform)
+
+    def markup_while(self, predicate: Callable[[TextFrag], bool], min_one: bool = True) -> str:
         if self.is_empty():
             return ""
         s: str = ""
         frag: Optional[TextFrag] = self.next()
         prev_frag: Optional[TextFrag] = frag
-        assert predicate(frag), "predicate is false on the first fragment"
+        if min_one:
+            assert predicate(frag), "predicate is false on the first fragment"
         while predicate(frag):
             s += markup(frag, prev_frag, MarkupStyle.MARKDOWN)
             prev_frag = frag
@@ -99,6 +117,9 @@ class FragList:
             self._frags.insert(0, frag)
         s += markup(None, prev_frag, MarkupStyle.MARKDOWN)
         return s
+
+    def markup_until(self, predicate: Callable[[TextFrag], bool], min_one: bool = True) -> str:
+        return self.markup_while(lambda f: not predicate(f), min_one)
 
     def assert_frag(self, f: Callable[[TextFrag], bool], msg: Optional[str] = None):
         frag = self.next()
@@ -124,3 +145,6 @@ class FragList:
 
         self._frags.insert(0, frag)
         return count
+
+    def discard_while(self, predicate: Callable[[TextFrag], bool]) -> int:
+        return self.discard_until(lambda f: not predicate(f))
