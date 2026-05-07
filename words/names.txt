@@ -70,3 +70,19 @@ piercing
 strike
 vulnerability
 targets
+
+# Ancestries
+traits
+intimidating
+retractable
+weapon
+extended
+weakness
+movement
+concussive
+cursed
+strikes
+knowledge
+stone
+attribute
+natural
