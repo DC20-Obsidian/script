@@ -1,5 +1,6 @@
 import re
 from typing import Self
+from pathlib import Path
 from lib.utils import list_to_yaml
 from dc_types.item import Item
 from .enhancement import Enhancement
@@ -76,11 +77,11 @@ class Spell(Item):
         return slice(71 - 1, 145)
 
     @classmethod
-    def get_save_file(cls, data_folder: str, version: str) -> str:
-        return rf"{data_folder}/spells_{version}.json"
+    def get_save_file(cls, data_folder: Path, version: str) -> Path:
+        return data_folder / f"spells_{version}.json"
 
-    def markdown_path(self, prefix: str) -> str:
-        return rf"{prefix}/spells/spells/{self.name}.md"
+    def markdown_path(self, prefix: Path) -> Path:
+        return prefix / "spells/spells" / f"{self.name}.md"
 
 
 template = """---

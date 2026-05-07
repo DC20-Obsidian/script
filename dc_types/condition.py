@@ -1,4 +1,5 @@
 from typing import Self
+from pathlib import Path
 from dc_types.item import Item
 
 
@@ -33,11 +34,11 @@ class Condition(Item):
         return slice(173 - 1, 174)
 
     @classmethod
-    def get_save_file(cls, data_folder: str, version: str) -> str:
-        return rf"{data_folder}/conditions_{version}.json"
+    def get_save_file(cls, data_folder: Path, version: str) -> Path:
+        return data_folder / f"conditions_{version}.json"
 
-    def markdown_path(self, prefix) -> str:
-        return rf"{prefix}/conditions/{self.name}.md"
+    def markdown_path(self, prefix: Path) -> Path:
+        return prefix / "conditions" / f"{self.name}.md"
 
 
 template = """---

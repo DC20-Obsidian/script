@@ -1,5 +1,6 @@
 import re
 from functools import reduce
+from pathlib import Path
 from dc_types.proto_item import DCProtoItem
 from dc_types.frag_list import FragList
 from utils.split import split_items_full, SplitPrams, SplitBuilder
@@ -29,11 +30,11 @@ class Ancestry(Item):
         return slice(198 - 1, 206)
 
     @classmethod
-    def get_save_file(cls, data_folder: str, version: str) -> str:
-        return f"{data_folder}/ancestries_{version}.json"
+    def get_save_file(cls, data_folder: Path, version: str) -> Path:
+        return data_folder / f"ancestries_{version}.json"
 
-    def markdown_path(self, prefix: str) -> str:
-        return f"{prefix}/ancestries/ancestires/{self.name}.md"
+    def markdown_path(self, prefix: Path) -> Path:
+        return prefix / "ancestries/ancestires" / f"{self.name}.md"
 
     @classmethod
     def split(cls, frags: FragList) -> list[DCProtoItem]:
@@ -103,11 +104,11 @@ class Trait(Item):
         raise Exception("Not implimented")
 
     @classmethod
-    def get_save_file(cls, data_folder: str, version: str) -> str:
+    def get_save_file(cls, data_folder: Path, version: str) -> Path:
         (_, _) = (data_folder, version)
         raise Exception("Not implimented")
 
-    def markdown_path(self, prefix: str) -> str:
+    def markdown_path(self, prefix: Path) -> Path:
         _ = prefix
         raise Exception("Not implimented")
 

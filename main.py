@@ -3,6 +3,7 @@ import os
 import json
 from typing import Type
 from collections.abc import Callable
+from pathlib import Path
 from utils.args import Args
 from utils.colors import colors
 from lib.utils import flatten_pages, eprint
@@ -21,7 +22,7 @@ from dc_types.ancestry import Ancestry
 from parsers.ancestries import parse_ancestry
 
 dc20_version: str = "0.10.5"
-prefix: str = "./dc-obsidian"
+prefix: Path = Path("./dc-obsidian")
 
 
 def main(args: Args):
@@ -41,7 +42,7 @@ def main(args: Args):
         return
 
     items: list[Item] = load_parsed(args, item_type, parser)
-    save_file: str = item_type.get_save_file(rf"{prefix}/json", dc20_version)
+    save_file: Path = item_type.get_save_file(Path(f"{prefix}/json"), dc20_version)
 
     if args.print:
         if not args.markdown:
@@ -49,9 +50,9 @@ def main(args: Args):
             eprint(save_file)
         else:
             for item in items:
-                (path, _, name) = item.markdown_path(prefix).rpartition("/")
+                path: Path = item.markdown_path(prefix)
                 print(
-                    f"{colors.BLUE}{path}{colors.ENDC}/{colors.GREEN}{name}{colors.ENDC}"
+                    f"{colors.BLUE}{path.parent}{colors.ENDC}/{colors.GREEN}{path.name}{colors.ENDC}"
                 )
                 print(item.markdown())
 
@@ -62,9 +63,8 @@ def main(args: Args):
         else:
             for item in items:
                 markdown: str = item.markdown()
-                path: str = item.markdown_path(prefix)
-                (dir, _, name) = path.rpartition("/")
-                os.makedirs(dir, exist_ok=True)
+                path: Path = item.markdown_path(prefix)
+                os.makedirs(path.parent, exist_ok=True)
                 with open(path, "w") as file:
                     file.write(markdown)
 
@@ -80,7 +80,7 @@ def load_parsed(
 
 
 def load_saved(args: Args, item_type: Type[Item]) -> list[Item]:
-    saved_file = args.file or item_type.get_save_file(rf"{prefix}/json", dc20_version)
+    saved_file = args.file or item_type.get_save_file(Path(f"{prefix}/json"), dc20_version)
     eprint(f"Loading saved data from {colors.BLUE}{saved_file}{colors.ENDC}")
     with open(saved_file, "r") as file:
         return json.load(file, object_hook=dc_obj_decoder)

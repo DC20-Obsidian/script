@@ -1,3 +1,4 @@
+from pathlib import Path
 from abc import ABC, abstractmethod
 from typing import Self
 from dc_types.frag_list import FragList
@@ -18,7 +19,7 @@ class Item(ABC):
 
     @classmethod
     @abstractmethod
-    def get_save_file(cls, data_folder: str, version: str) -> str:
+    def get_save_file(cls, data_folder: Path, version: str) -> Path:
         (_, _) = (data_folder, version)
         raise Exception("Abstract method")
 
@@ -37,6 +38,6 @@ class Item(ABC):
         raise Exception("Abstract method")
 
     @abstractmethod
-    def markdown_path(self, prefix: str) -> str:
+    def markdown_path(self, prefix: Path) -> Path:
         _ = prefix
         raise Exception("Abstract method")

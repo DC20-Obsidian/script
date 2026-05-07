@@ -1,5 +1,6 @@
 import re
 from typing import Self
+from pathlib import Path
 from dc_types.item import Item
 from .enhancement import Enhancement
 
@@ -63,11 +64,11 @@ class Maneuver(Item):
         return slice(52 - 1, 59)
 
     @classmethod
-    def get_save_file(cls, data_folder: str, version: str) -> str:
-        return rf"{data_folder}/maneuvers_{version}.json"
+    def get_save_file(cls, data_folder: Path, version: str) -> Path:
+        return data_folder / f"maneuvers_{version}.json"
 
-    def markdown_path(self, prefix) -> str:
-        return rf"{prefix}/maneuvers/{self.name}.md"
+    def markdown_path(self, prefix: Path) -> Path:
+        return prefix / "maneuvers" / f"{self.name}.md"
 
 
 template = """---
