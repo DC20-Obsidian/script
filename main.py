@@ -67,6 +67,7 @@ def main(args: Args):
                 os.makedirs(path.parent, exist_ok=True)
                 with open(path, "w") as file:
                     file.write(markdown)
+                item.save_subitems(prefix)
 
 
 def load_parsed(

@@ -44,14 +44,20 @@ def markup(
     if frag is None:  # TMP
         return ""
 
-    def bold_italic(s: str):
+    def bold_italic(s: str) -> str:
         return f"{markup['em'][0]}{s}{markup['em'][1]} "
 
-    def bold(s: str):
-        return f"{markup['bold'][0]}{s}{markup['bold'][1]} "
+    def bold(s: str) -> str:
+        return f"{markup['bold'][0]}{s.strip()}{markup['bold'][1]} "
 
-    def normal(s: str):
+    def normal(s: str) -> str:
         return f"{s} "
+
+    def header(s: str) -> str:
+        return f"\n## {s}\n"
+
+    def quote(s: str) -> str:
+        return f"\n> {s} "
 
     def list_mark(s: str):
         if "•" in s:
@@ -66,6 +72,9 @@ def markup(
     t = frag.text
     # prev_font = (prev_item.font if prev_item else None)
 
+    if re.match(r"^[dD][cC] [tT]ip:$", t):
+        return quote(t)
+
     match font:
         case "f11" | "f14":
             return bold(t)
@@ -73,6 +82,8 @@ def markup(
             return bold_italic(t)
         case "f15":
             return list_mark(t)
+        case "f27":
+            return header(t)
         case "f5":
             return normal(t)
         case _:

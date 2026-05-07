@@ -16,7 +16,7 @@ def parse_ancestry(proto: DCProtoItem) -> Ancestry:
     frags: FragList = proto.frags
     ancestry.page = proto.page
 
-    eprint(proto.name)
+    # eprint(proto.name)
 
     def is_header(frag: TextFrag) -> bool:
         return frag.font in ["f3", "<cont item>"]
@@ -25,7 +25,7 @@ def parse_ancestry(proto: DCProtoItem) -> Ancestry:
     frags.discard_while(is_header)
     frags.discard_until(lambda f: f.font in ["f14", "f11", "f3"])
 
-    ancestry.description = desc
+    ancestry.description = fixup_description(desc)
 
     traits = split_traits(frags)
 
@@ -71,6 +71,8 @@ def parse_trait(proto: DCProtoItem, ancestry_name: str) -> Trait:
         depends = depends.group(1) if depends else "<ERROR>"
         trait.description += re.sub(depends_regex, "", frag.text).strip()
         trait.description += " "
+    else:
+        depends = re.sub(r"[rR]equires ", "", depends)
 
     trait.dependent_on = depends.rstrip("):") or None
 
@@ -88,7 +90,7 @@ def parse_trait(proto: DCProtoItem, ancestry_name: str) -> Trait:
     if ancestry_name == "Beastborn":
         trait.kind = sections_beast_born[proto.section]
         if proto.section == 5:
-            trait.dependent_on = "Natral Weapon"
+            trait.dependent_on = "Natural Weapon"
     else:
         trait.kind = sections_normal[proto.section + 1]
         trait.default = proto.section == -1

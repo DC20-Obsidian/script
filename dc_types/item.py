@@ -41,3 +41,6 @@ class Item(ABC):
     def markdown_path(self, prefix: Path) -> Path:
         _ = prefix
         raise Exception("Abstract method")
+
+    def save_subitems(self, prefix: Path):
+        return
