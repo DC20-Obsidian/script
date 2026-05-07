@@ -33,15 +33,14 @@ def split_items(
     return split_items_full(
         frags,
         prams,
-        lambda name: fixup_name(name.lower()).title(),
     )
 
 class SplitPrams:
-    def __init__(self, is_header: Callable[[TextFrag], bool]):
+    def __init__(self, is_header: Callable[[str, TextFrag], bool]):
         # Discard from here to next header
         self.discard_from_frag: Callable[[TextFrag], bool] = _false
 
-        self.is_header: Callable[[TextFrag], bool] = is_header
+        self.is_header: Callable[[str, TextFrag], bool] = is_header
 
         # False positive header, Append it's contents to prev item
         self.cont_item: Callable[[str], bool] = _false
@@ -58,7 +57,7 @@ class SplitPrams:
 def split_items_full(
     frags: FragList,
     prams: SplitPrams,
-    fixup_transform: Callable[[str], str] = lambda s: s,
+    fixup_transform: Callable[[str], str] = lambda name: fixup_name(name.lower()).title(),
 ) -> list[DCProtoItem]:
     items: list[DCProtoItem] = []
     current_item: DCProtoItem = DCProtoItem()
@@ -80,7 +79,8 @@ def split_items_full(
         if prams.discard_from_frag(frag):
             discard_item = True
 
-        if prams.is_header(frag):
+        item_name: str = "" if item_name_done else current_item.name
+        if prams.is_header(item_name.strip().lower(), frag):
             discard_item = False
             if item_name_done:
                 finish_item(current_item, items, prams, fixup_transform)
@@ -112,6 +112,11 @@ def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, 
 
     if prams.cont_item(item.name):
         prev_item: DCProtoItem = items[-1]
+        name_frag: TextFrag = TextFrag.blank()
+        name_frag.text = fixup(item.name)
+        name_frag.page = item.page
+        name_frag.font = "<cont item>"
+        prev_item.frags.append(name_frag)
         prev_item.frags.extend(item.frags)
         return
 
@@ -131,14 +136,14 @@ def _empty_list():
 @dataclass(kw_only=True)
 class SplitBuilder:
     discard_from_frag: Union[Callable[[TextFrag], bool], list[str]] = _empty_list()
-    is_header: Union[Callable[[TextFrag], bool], list[str], tuple[list[str], float]] = _empty_list()
+    is_header: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]] = _empty_list()
     cont_item: Union[Callable[[str], bool], list[str]] = _empty_list()
     discard_item: Union[Callable[[str], bool], list[str]] = _empty_list()
     discard_frag: Union[Callable[[TextFrag], bool], list[str]] = field(default_factory=lambda: ["f2", "f9", "f1"])
     is_section: Union[Callable[[TextFrag], bool], list[str]] = _empty_list()
 
     def build(self) -> SplitPrams:
-        prams: SplitPrams = SplitPrams(_frag_list(self.is_header))
+        prams: SplitPrams = SplitPrams(_is_header(self.is_header))
         prams.discard_from_frag = _frag_list(self.discard_from_frag)
         prams.cont_item = _name_list(self.cont_item)
         prams.discard_item = _name_list(self.discard_item)
@@ -158,6 +163,19 @@ def _frag_list(x: Union[Callable[[TextFrag], bool], list[str], tuple[list[str], 
         size = x[1]
         assert isinstance(size, float) or isinstance(size, int)
         return lambda frag: f(frag, li, size)
+    return x
+
+def _is_header(x: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]]) -> Callable[[str, TextFrag], bool]:
+    def f(frag: TextFrag, li, size) -> bool:
+        return frag.font in li and frag.font_size <= size
+    if isinstance(x, list):
+        return lambda _, frag: frag.font in x
+    if isinstance(x, tuple):
+        li = x[0]
+        assert isinstance(li, list)
+        size = x[1]
+        assert isinstance(size, float) or isinstance(size, int)
+        return lambda _, frag: f(frag, li, size)
     return x
 
 def _name_list(x: Union[Callable[[str], bool], list[str]]) -> Callable[[str], bool]:
