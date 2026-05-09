@@ -57,7 +57,7 @@ def markup(
         return f"\n## {s}\n"
 
     def quote(s: str) -> str:
-        return f"\n> {s} "
+        return f"\n> [!tip] {s} "
 
     def list_mark(s: str):
         if "•" in s:
