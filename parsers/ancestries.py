@@ -42,7 +42,7 @@ def split_traits(frags: FragList) -> list[DCProtoItem]:
         is_section=["f3"],
         discard_from_frag=["f3"],
     ).build()
-    traits: list[DCProtoItem] = split_items_full(frags, prams)
+    traits: list[DCProtoItem] = split_items_full(frags, prams, "ancestry_trait")
     return traits
 
 

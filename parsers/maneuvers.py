@@ -55,7 +55,7 @@ def parse_maneuver(proto_maneuver: DCProtoItem) -> Maneuver:
     frags.discard_with_font(["f27"])
 
     enhancements: list[DCProtoItem] = split_items(
-        frags, ["f21", "f7"], [], 15, [], [], []
+        frags, ["f21", "f7"], [], 15, [], [], [], "enhancement"
     )
 
     maneuver.enhancements = list(map(parse_enhancement, enhancements))

@@ -1,3 +1,4 @@
+from lib.utils import eprint
 import re
 
 
@@ -62,9 +63,10 @@ def fixup_misc(s: str) -> str:
     return s.strip()
 
 
-def fixup_name(s: str) -> str:
-    s = fixup(s.lower(), names).title()
-    return re.sub("'S", "'s", s)
+def fixup_name(name: str, ty: str) -> str:
+    eprint(ty)
+    name = fixup(name.lower(), names).title()
+    return re.sub("'S", "'s", name)
 
 
 def fixup_description(s: str) -> str:

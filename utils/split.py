@@ -8,9 +8,9 @@ from dc_types.proto_item import DCProtoItem
 from dc_types.frag_list import FragList
 
 
-def split_items_default(frags: FragList) -> list[DCProtoItem]:
+def split_items_default(frags: FragList, type: str) -> list[DCProtoItem]:
     return split_items(
-        frags, ["f3"], ["f4"], 15, ["f2", "f9", "f1"], ["f4"], ["summontraits"]
+        frags, ["f3"], ["f4"], 15, ["f2", "f9", "f1"], ["f4"], ["summontraits"], type
     )
 
 
@@ -22,6 +22,7 @@ def split_items(
     discard_fonts: list[str],
     discard_item_fonts: list[str],
     name_false_positives: list[str],
+    type: str,
 ) -> list[DCProtoItem]:
     prams: SplitPrams = SplitBuilder(
         is_header=(header_fonts, max_header_font_size),
@@ -33,6 +34,7 @@ def split_items(
     return split_items_full(
         frags,
         prams,
+        type,
     )
 
 class SplitPrams:
@@ -57,7 +59,8 @@ class SplitPrams:
 def split_items_full(
     frags: FragList,
     prams: SplitPrams,
-    fixup_transform: Callable[[str], str] = lambda name: fixup_name(name.lower()).title(),
+    type: str,
+    fixup_transform: Callable[[str, str], str] = fixup_name,
 ) -> list[DCProtoItem]:
     items: list[DCProtoItem] = []
     current_item: DCProtoItem = DCProtoItem()
@@ -83,7 +86,7 @@ def split_items_full(
         if prams.is_header(item_name.strip().lower(), frag):
             discard_item = False
             if item_name_done:
-                finish_item(current_item, items, prams, fixup_transform)
+                finish_item(current_item, items, prams, type, fixup_transform)
                 # Reset current_item
                 current_item = DCProtoItem()
                 current_item.page = frag.page
@@ -97,10 +100,10 @@ def split_items_full(
                 current_item.frags.append(frag)
         prev_frag = frag
 
-    finish_item(current_item, items, prams, fixup_transform)
+    finish_item(current_item, items, prams, type, fixup_transform)
     return items
 
-def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, fixup: Callable[[str], str]):
+def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, type: str, fixup: Callable[[str, str], str]):
     item.name = item.name.strip().lower()
     if not item.name:
         # Discard Items with empty names
@@ -113,7 +116,7 @@ def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, 
     if prams.cont_item(item.name):
         prev_item: DCProtoItem = items[-1]
         name_frag: TextFrag = TextFrag.blank()
-        name_frag.text = fixup(item.name)
+        name_frag.text = fixup(item.name, type)
         name_frag.page = item.page
         name_frag.font = "<cont item>"
         prev_item.frags.append(name_frag)
@@ -121,7 +124,7 @@ def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, 
         return
 
     # else Add Item
-    item.name = fixup(item.name)
+    item.name = fixup(item.name, type)
     items.append(item)
 
 

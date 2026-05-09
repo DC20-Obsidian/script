@@ -1,10 +1,10 @@
 import re
+from typing import Optional
 
 
 class Enhancement:
+    _type: str = "enhancement"
     def __init__(self):
-        from typing import Optional
-
         self._type = "enhancement"
         self.name: str = ""
         self.cost: str = ""

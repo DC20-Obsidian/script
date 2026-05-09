@@ -7,6 +7,7 @@ from .enhancement import Enhancement
 
 
 class Spell(Item):
+    _type: str = "spell"
     def __init__(self):
         self._type = "spell"
         self.name: str = ""

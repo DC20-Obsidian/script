@@ -11,6 +11,7 @@ from typing import Self, Optional
 
 
 class Ancestry(Item):
+    _type: str = "ancestry"
     def __init__(self):
         self._type = "ancestry"
         self.name: str = ""
@@ -44,7 +45,7 @@ class Ancestry(Item):
             is_header=["f4"],
             cont_item=["beasttraits"],
         ).build()
-        return split_items_full(frags, prams)
+        return split_items_full(frags, prams, "ancestry")
 
     def markdown(self) -> str:
         args = {

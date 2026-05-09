@@ -8,7 +8,7 @@ from dc_types.frag_list import FragList
 
 def parse_condition(proto_cond: DCProtoItem) -> Condition:
     cond = Condition()
-    cond.name = fixup_name(proto_cond.name.replace(" ", ""))
+    cond.name = proto_cond.name.replace(" ", "")
     if cond.name.endswith("X"):
         cond.stacking = True
         cond.name = cond.name.rstrip(" X")

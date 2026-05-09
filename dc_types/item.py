@@ -7,8 +7,9 @@ from utils.split import split_items_default
 
 
 class Item(ABC):
+    _type: str = "<none>"
     def __init__(self):
-        self._type: str = "<none>"
+        self._type: str = Item._type
         self.name: str = ""
         self.page: int = -1
 
@@ -25,7 +26,7 @@ class Item(ABC):
 
     @classmethod
     def split(cls, frags: FragList) -> list[DCProtoItem]:
-        return split_items_default(frags)
+        return split_items_default(frags, cls._type)
 
     @classmethod
     @abstractmethod
@@ -43,4 +44,5 @@ class Item(ABC):
         raise Exception("Abstract method")
 
     def save_subitems(self, prefix: Path):
+        _ = prefix
         return

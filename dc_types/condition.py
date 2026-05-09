@@ -4,6 +4,7 @@ from dc_types.item import Item
 
 
 class Condition(Item):
+    _type: str = "condition"
     def __init__(self):
         self._type: str = "condition"
         self.page: int = -1
