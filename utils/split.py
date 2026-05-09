@@ -78,12 +78,12 @@ def split_items_full(
             prev_frag = frag
             continue
 
+        item_name: str = "" if item_name_done else current_item.name.strip().lower()
         # Discard fragments from here to next header
-        if prams.discard_from_frag(frag):
+        if prams.discard_from_frag(frag) and not prams.is_header(item_name, frag):
             discard_item = True
 
-        item_name: str = "" if item_name_done else current_item.name
-        if prams.is_header(item_name.strip().lower(), frag):
+        if prams.is_header(item_name, frag):
             discard_item = False
             if item_name_done:
                 finish_item(current_item, items, prams, type, fixup_transform)
@@ -139,7 +139,7 @@ def _empty_list():
 @dataclass(kw_only=True)
 class SplitBuilder:
     discard_from_frag: Union[Callable[[TextFrag], bool], list[str]] = _empty_list()
-    is_header: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]] = _empty_list()
+    is_header: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]]
     cont_item: Union[Callable[[str], bool], list[str]] = _empty_list()
     discard_item: Union[Callable[[str], bool], list[str]] = _empty_list()
     discard_frag: Union[Callable[[TextFrag], bool], list[str]] = field(default_factory=lambda: ["f2", "f9", "f1"])

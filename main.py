@@ -20,6 +20,8 @@ from dc_types.condition import Condition
 from parsers.conditions import parse_condition
 from dc_types.ancestry import Ancestry
 from parsers.ancestries import parse_ancestry
+from dc_types.talent import Talent
+from parsers.talents import parse_talent
 
 dc20_version: str = "0.10.5"
 prefix: Path = Path("./dc-obsidian")
@@ -116,6 +118,8 @@ def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
             return (Maneuver, parse_maneuver)
         case "ancestries":
             return (Ancestry, parse_ancestry)
+        case "talents":
+            return (Talent, parse_talent)
         case _:
             raise Exception(f"type {s} not supported")
 

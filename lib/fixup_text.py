@@ -26,6 +26,7 @@ words: dict[str, list[str]] = {
     "enhancement": load_words(["enhancements"]),
     "condition": load_words(["conditions"]),
     "ancestry_trait": load_words(["ancestry_traits"]),
+    "talent": load_words(["talents"]),
 }
 
 acronyms: str = f"(?: |^)({"|".join(re.escape(a) for a in load_words(["acronyms"]))})(?: |$)"
