@@ -1,0 +1,4 @@
+Hp
+Mp
+Ap
+Sp

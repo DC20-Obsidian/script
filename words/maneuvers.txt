@@ -1,0 +1,10 @@
+heroic
+extend
+line
+throw
+side
+piercing
+whirl
+strike
+through
+imrpoved

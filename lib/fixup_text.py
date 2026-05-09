@@ -5,7 +5,7 @@ import re
 def load_words(files: list[str]) -> list[str]:
     words: list[str] = []
     for file in files:
-        with open(file, "r") as file:
+        with open(f"./words/{file}.txt", "r") as file:
             for line in file:
                 line = line.strip()
                 if line.startswith("#") or line == "":
@@ -14,8 +14,23 @@ def load_words(files: list[str]) -> list[str]:
     words.sort(key=str.__len__, reverse=True)
     return words
 
+def cap_acronyms(s: str) -> str:
+    return re.sub(acronyms, lambda m: f" {m.group(1).upper()} ", s)
 
-names = load_words(["./words/names.txt"])
+def lower_articles(s: str) -> str:
+    return re.sub(articles, lambda m: f" {m.group(1).lower()} ", s)
+
+words: dict[str, list[str]] = {
+    "spell": load_words(["spells"]),
+    "maneuver": load_words(["maneuvers"]),
+    "enhancement": load_words(["enhancements"]),
+    "condition": load_words(["conditions"]),
+    "ancestry_trait": load_words(["ancestry_traits"]),
+}
+
+acronyms: str = f"(?: |^)({"|".join(re.escape(a) for a in load_words(["acronyms"]))})(?: |$)"
+articles: str = f"(?: |^)({"|".join(re.escape(a) for a in load_words(["articles"]))})(?: |$)"
+
 
 
 def fixup(s: str, words: list[str]) -> str:
@@ -24,12 +39,11 @@ def fixup(s: str, words: list[str]) -> str:
         # return f' foo{match.group(1)}bar '
         return f" {match.group(1)} "
 
-    pattern = r"(" + "|".join(re.escape(w) for w in words) + r")"
-    s = re.sub(pattern, replace, s)
-    s = re.sub(" +", " ", s)
-    s = re.sub("’", "'", s)
+    if words:
+        pattern = r"(" + "|".join(re.escape(w) for w in words) + r")"
+        s = re.sub(pattern, replace, s)
 
-    return s.strip()
+    return s
 
 
 def fixup_misc(s: str) -> str:
@@ -64,10 +78,17 @@ def fixup_misc(s: str) -> str:
 
 
 def fixup_name(name: str, ty: str) -> str:
-    eprint(ty)
-    name = fixup(name.lower(), names).title()
-    return re.sub("'S", "'s", name)
+    name = re.sub("’", "'", name)
+    if words.get(ty) is not None:
+        name = fixup(name.lower(), words[ty])
+    name = name.title()
+    name = cap_acronyms(name)
+    name = lower_articles(name)
+    name = lower_articles(name) # Run it twice
+    name = re.sub("-([A-Z])", lambda m: f"-{m.group(1).lower()}", name) # Foo-Bar -> Foo-bar
+    name = re.sub(" +", " ", name)
+    return re.sub("'S", "'s", name).strip()
 
 
 def fixup_description(s: str) -> str:
-    return fixup_misc(s)
+    return fixup_misc(s).removesuffix("\n-")

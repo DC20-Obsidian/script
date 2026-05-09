@@ -1,7 +1,7 @@
 # from lib.utils import eprint
 # from utils.colors import colors
 from lib.markup import assert_font
-from lib.fixup_text import fixup_description
+from lib.fixup_text import fixup_description, fixup_name
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from dc_types.spell import Spell
@@ -113,7 +113,7 @@ def split_enhancements(frags: FragList) -> list[DCProtoItem]:  # TODO use split_
                 continue
 
             if has_name and current_enhancement.name != "":
-                current_enhancement.name = current_enhancement.name.strip()
+                current_enhancement.name = fixup_name(current_enhancement.name.strip(), "enhancement")
                 enhancements.append(current_enhancement)
                 current_enhancement = DCProtoItem()
 
@@ -125,7 +125,7 @@ def split_enhancements(frags: FragList) -> list[DCProtoItem]:  # TODO use split_
 
         prev_frag = frag
 
-    current_enhancement.name = current_enhancement.name.strip()
+    current_enhancement.name = fixup_name(current_enhancement.name.strip(), "enhancement")
     enhancements.append(current_enhancement)
     return enhancements
 
