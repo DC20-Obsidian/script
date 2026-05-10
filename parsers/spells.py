@@ -47,8 +47,13 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     # return spell
 
     # Spell Tags
+    tag_fixups: dict[str, str] = {
+        "Plant": "Plants",
+        "Emotion": "Emotions"
+    }
     tags: list[str] = frags.find_words_while_font(["f5"])
     assert 0 < len(tags) < 10
+    tags = list(map(lambda t: tag_fixups.get(t, t), tags))
     spell.tags = tags
     # return spell
 
