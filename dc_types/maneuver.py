@@ -69,7 +69,7 @@ class Maneuver(Item):
         return data_folder / f"maneuvers_{version}.json"
 
     def markdown_path(self, prefix: Path) -> Path:
-        return prefix / "maneuvers" / f"{self.name}.md"
+        return prefix / "maneuvers/maneuvers" / f"{self.name}.md"
 
 
 template = """---
@@ -79,7 +79,7 @@ ap: {AP}
 sp: {SP}
 range: {range}
 page: {page}
-kind: "[[maneuver_types/{kind}|{kind}]]"
+kind: "[[maneuvers/maneuver_types/{kind}|{kind}]]"
 ---
 {summary}
 {cost}
