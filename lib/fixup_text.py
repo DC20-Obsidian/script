@@ -92,4 +92,6 @@ def fixup_name(name: str, ty: str) -> str:
 
 
 def fixup_description(s: str) -> str:
-    return fixup_misc(s).removesuffix("\n-")
+    s = fixup_misc(s).removesuffix("\n-")
+    s = re.sub(r"Wild Magic Table", "[[Wild Magic Table]]", s)
+    return s

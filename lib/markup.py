@@ -56,8 +56,11 @@ def markup(
     def header(s: str) -> str:
         return f"\n## {s}\n"
 
-    def quote(s: str) -> str:
-        return f"\n> [!tip] {s} "
+    def quote(s: str, type: str = "tip") -> str:
+        (title, _, body) = s.partition(":")
+        if body:
+            body += " "
+        return f"\n> [!{type}] {title}:\n> {body}"
 
     def list_mark(s: str):
         if "•" in s:
@@ -72,8 +75,14 @@ def markup(
     t = frag.text
     # prev_font = (prev_item.font if prev_item else None)
 
-    if re.match(r"^[dD][cC] [tT]ip:$", t):
-        return quote(t)
+    if re.match(r"^DC Tip:", t):
+        return quote(t, "tip")
+
+    if re.match(r"^Beta Note:", t):
+        return quote(t, "note")
+
+    if re.match(r"^Example:", t):
+        return quote(t, "example")
 
     match font:
         case "f11" | "f14":
