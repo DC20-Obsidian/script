@@ -12,20 +12,7 @@ from utils.parse import parse_proto_items
 from dc_types.frag_list import FragList
 from dc_types.serde import dc_obj_decoder, DCObjEncoder
 from dc_types.item import Item
-from dc_types.spell import Spell
-from parsers.spells import parse_spell
-from dc_types.maneuver import Maneuver
-from parsers.maneuvers import parse_maneuver
-from dc_types.condition import Condition
-from parsers.conditions import parse_condition
-from dc_types.ancestry import Ancestry
-from parsers.ancestries import parse_ancestry
-from dc_types.talent import Talent
-from parsers.talents import parse_talent
-from dc_types.skill import Skill
-from parsers.skills import parse_skill
-from dc_types.trade import Trade
-from parsers.trades import parse_trade
+from utils.get_type import get_type
 
 dc20_version: str = "0.10.5"
 prefix: Path = Path("./dc-obsidian")
@@ -87,7 +74,9 @@ def load_parsed(
 
 
 def load_saved(args: Args, item_type: Type[Item]) -> list[Item]:
-    saved_file = args.file or item_type.get_save_file(Path(f"{prefix}/json"), dc20_version)
+    saved_file = args.file or item_type.get_save_file(
+        Path(f"{prefix}/json"), dc20_version
+    )
     eprint(f"Loading saved data from {colors.BLUE}{saved_file}{colors.ENDC}")
     with open(saved_file, "r") as file:
         return json.load(file, object_hook=dc_obj_decoder)
@@ -110,26 +99,6 @@ def load_raw(args: Args, item_type: Type[Item]) -> list[DCProtoItem]:
     assert not len(items_raw) == 0, "Unable to load raw items, split into 0 items"
 
     return items_raw
-
-
-def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
-    match s:
-        case "spells":
-            return (Spell, parse_spell)
-        case "conditions":
-            return (Condition, parse_condition)
-        case "maneuvers":
-            return (Maneuver, parse_maneuver)
-        case "ancestries":
-            return (Ancestry, parse_ancestry)
-        case "talents":
-            return (Talent, parse_talent)
-        case "skills":
-            return (Skill, parse_skill)
-        case "trades":
-            return (Trade, parse_trade)
-        case _:
-            raise Exception(f"type {s} not supported")
 
 
 if __name__ == "__main__":
