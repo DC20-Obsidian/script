@@ -9,6 +9,8 @@ from dc_types.ancestry import Ancestry, Trait
 from dc_types.talent import Talent
 from dc_types.text_frag import TextFrag
 from dc_types.proto_item import DCProtoItem
+from dc_types.skill import Skill
+from dc_types.trade import Trade
 
 
 class DCObjEncoder(json.JSONEncoder):
@@ -42,6 +44,10 @@ def dc_obj_decoder(d: dict):
             return Trait.from_json(d)
         case "talent":
             return Talent.from_json(d)
+        case "skill":
+            return Skill.from_json(d)
+        case "Trade":
+            return Trade.from_json(d)
         case _:
             raise Exception(
                 f"Unable to decode type: {d['_type']}. Please add it to dc_obj_decoder"

@@ -29,6 +29,8 @@ class Args:
             "maneuvers",
             "ancestries",
             "talents",
+            "skills",
+            "trades",
         ]
         parser.add_argument(
             "-t",

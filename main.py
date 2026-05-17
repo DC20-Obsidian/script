@@ -22,6 +22,10 @@ from dc_types.ancestry import Ancestry
 from parsers.ancestries import parse_ancestry
 from dc_types.talent import Talent
 from parsers.talents import parse_talent
+from dc_types.skill import Skill
+from parsers.skills import parse_skill
+from dc_types.trade import Trade
+from parsers.trades import parse_trade
 
 dc20_version: str = "0.10.5"
 prefix: Path = Path("./dc-obsidian")
@@ -120,6 +124,10 @@ def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
             return (Ancestry, parse_ancestry)
         case "talents":
             return (Talent, parse_talent)
+        case "skills":
+            return (Skill, parse_skill)
+        case "trades":
+            return (Trade, parse_trade)
         case _:
             raise Exception(f"type {s} not supported")
 
