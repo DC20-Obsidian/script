@@ -40,7 +40,7 @@ class Condition(Item):
         return data_folder / f"conditions_{version}.json"
 
     def markdown_path(self, prefix: Path) -> Path:
-        return prefix / "conditions" / f"{self.name}.md"
+        return prefix / f"Conditions/Conditions/{self.name}.md"
 
 
 template = """---

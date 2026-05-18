@@ -26,7 +26,7 @@ class Skill(Item):
         return skill
 
     def markdown_path(self, prefix: Path) -> Path:
-        return prefix / f"attributes/skills/{self.name}.md"
+        return prefix / f"Attributes/Skills/{self.name}.md"
 
     @classmethod
     def get_save_file(cls, data_folder: Path, version: str) -> Path:
@@ -59,7 +59,7 @@ class Skill(Item):
 template: str = """---
 name: {name}
 page: {page}
-attribute: "[[attributes/attributes/{attribute}|{attribute}]]"
+attribute: "[[Attributes/Attributes/{attribute}|{attribute}]]"
 ---
 {description}
 """

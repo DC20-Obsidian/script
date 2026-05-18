@@ -37,7 +37,7 @@ class Trade(Item):
         return data_folder / f"trades_{version}.json"
 
     def markdown_path(self, prefix: Path) -> Path:
-        return prefix / f"attributes/trades/{self.name}.md"
+        return prefix / f"Attributes/Trades/{self.name}.md"
 
     @classmethod
     def get_default_page_range(cls) -> slice[int, int]:
@@ -59,7 +59,7 @@ class Trade(Item):
         args: dict = {
             "name": self.name,
             "page": self.page,
-            "attributes": list_to_yaml(self.attributes, "attributes/attributes"),
+            "attributes": list_to_yaml(self.attributes, "Attributes/Attributes"),
             "tool": self.tool or "null",
             "type": self.type,
             "categories": self.categories,

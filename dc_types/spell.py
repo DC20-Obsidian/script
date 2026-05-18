@@ -58,9 +58,9 @@ class Spell(Item):
     def markdown(self) -> str:
         args = {
             "name": self.name,
-            "source": list_to_yaml(self.source, "spells/spell_sources"),
+            "source": list_to_yaml(self.source, "Spells/Sources"),
             "school": self.school.title(),
-            "tags": list_to_yaml(self.tags, "spells/spell_tags"),
+            "tags": list_to_yaml(self.tags, "Spells/Tags"),
             "cost": self.cost,
             "range": self.range,
             "duration": self.duration,
@@ -82,14 +82,14 @@ class Spell(Item):
         return data_folder / f"spells_{version}.json"
 
     def markdown_path(self, prefix: Path) -> Path:
-        return prefix / "spells/spells" / f"{self.name}.md"
+        return prefix / "Spells/Spells" / f"{self.name}.md"
 
 
 template = """---
 name: {name}
 source:
 {source}
-school: "[[spells/spell_schools/{school}|{school}]]"
+school: "[[Spells/Schools/{school}|{school}]]"
 spell_tags:
 {tags}
 ap: {AP}

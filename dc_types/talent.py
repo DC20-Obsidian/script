@@ -41,7 +41,7 @@ class Talent(Item):
 
     def markdown_path(self, prefix: Path) -> Path:
         class_name: str = f"{self.class_name}/" if self.class_name else ""
-        return prefix / "talents" / f"{class_name}{self.name}.md"
+        return prefix / f"Talents/{class_name}{self.name}.md"
 
     @classmethod
     def split(cls, frags: FragList) -> list[DCProtoItem]:
