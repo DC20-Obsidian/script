@@ -1,3 +1,4 @@
+from lib.utils import fmt_bool
 from dc_types.text_frag import TextFrag
 from typing import Self, Optional
 from pathlib import Path
@@ -63,7 +64,7 @@ class Talent(Item):
             "page": self.page,
             "level": self.level or "null",
             "requires": self.requires,
-            "repeatable": self.repeatable,
+            "repeatable": fmt_bool(self.repeatable),
             "class_name": self.class_name or "null",
             "description": self.description,
         }

@@ -1,7 +1,7 @@
 import re
 from typing import Self
 from pathlib import Path
-from lib.utils import list_to_yaml
+from lib.utils import list_to_yaml, fmt_bool
 from dc_types.item import Item
 from .enhancement import Enhancement
 
@@ -66,7 +66,7 @@ class Spell(Item):
             "duration": self.duration,
             "AP": self.ap_cost,
             "MP": self.mp_cost,
-            "sustained": self.sustained,
+            "sustained": fmt_bool(self.sustained),
             "page": self.page,
             "description": self.description,
             "enhancements": enhancements(self.enhancements),

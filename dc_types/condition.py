@@ -1,3 +1,4 @@
+from lib.utils import fmt_bool
 from typing import Self
 from pathlib import Path
 from dc_types.item import Item
@@ -25,7 +26,7 @@ class Condition(Item):
         args = {
             "name": self.name,
             "desc": self.description,
-            "stacking": self.stacking,
+            "stacking": fmt_bool(self.stacking),
         }
 
         return template.format(**args)

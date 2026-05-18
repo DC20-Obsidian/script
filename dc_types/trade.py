@@ -60,7 +60,7 @@ class Trade(Item):
             "name": self.name,
             "page": self.page,
             "attributes": list_to_yaml(self.attributes, "attributes/attributes"),
-            "tool": self.tool,
+            "tool": self.tool or "null",
             "type": self.type,
             "categories": self.categories,
             "description": self.description,

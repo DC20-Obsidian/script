@@ -9,12 +9,17 @@ def eprint(*args, **kw):
 
 
 def list_to_yaml(li: list[str], link_folder: str = "") -> str:
-    a = " - "
+    if not li:
+        return "" # Empty
+    a = "  - "
     if link_folder:
-        a += "\n - ".join(map(lambda s: f'"[[{link_folder}/{s.title()}|{s.title()}]]"', li))
+        a += "\n  - ".join(map(lambda s: f'"[[{link_folder}/{s.title()}|{s.title()}]]"', li))
     else:
-        a += "\n - ".join(map(lambda s: f'"{s}"', li))
+        a += "\n  - ".join(map(lambda s: f'"{s}"', li))
     return a
+
+def fmt_bool(b: bool) -> str:
+    return str(b).lower()
 
 
 def flatten_pages(pages: list[dict]) -> FragList:
