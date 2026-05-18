@@ -10,7 +10,7 @@ from .proto_item import DCProtoItem
 
 
 class Trade(Item):
-    _type: str = "_trade"
+    _type: str = "trade"
 
     def __init__(self):
         self._type = "trade"
