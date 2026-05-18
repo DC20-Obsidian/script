@@ -1,3 +1,4 @@
+from dc_types.weapon_property import WeaponProp
 from collections.abc import Callable
 from typing import Type
 
@@ -17,6 +18,7 @@ from parsers.skills import parse_skill
 from parsers.spells import parse_spell
 from parsers.talents import parse_talent
 from parsers.trades import parse_trade
+from parsers.weapon_props import parse_weapon_prop
 
 
 def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
@@ -35,5 +37,7 @@ def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
             return (Skill, parse_skill)
         case "trades":
             return (Trade, parse_trade)
+        case "weapon_prop":
+            return (WeaponProp, parse_weapon_prop)
         case _:
             raise Exception(f"type {s} not supported")

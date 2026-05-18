@@ -37,6 +37,7 @@ def main(args: Args):
         return
 
     items: list[Item] = load_parsed(args, item_type, parser)
+    items.extend(item_type.extra_items())
     save_file: Path = item_type.get_save_file(Path(f"{prefix}/json"), dc20_version)
 
     if args.print:

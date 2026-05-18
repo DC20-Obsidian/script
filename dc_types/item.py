@@ -49,3 +49,7 @@ class Item(ABC):
     def save_subitems(self, prefix: Path):
         _ = prefix
         return
+
+    @classmethod
+    def extra_items(cls) -> list[Self]:
+        return []
