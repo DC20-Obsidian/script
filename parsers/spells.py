@@ -47,10 +47,7 @@ def parse_spell(proto_spell: DCProtoItem) -> Spell:
     # return spell
 
     # Spell Tags
-    tag_fixups: dict[str, str] = {
-        "Plant": "Plants",
-        "Emotion": "Emotions"
-    }
+    tag_fixups: dict[str, str] = {"Plant": "Plants", "Emotion": "Emotions"}
     tags: list[str] = frags.find_words_while_font(["f5"])
     assert 0 < len(tags) < 10
     tags = list(map(lambda t: tag_fixups.get(t, t), tags))
@@ -107,7 +104,7 @@ def split_enhancements(frags: FragList) -> list[DCProtoItem]:  # TODO use split_
     current_enhancement = DCProtoItem()
     prev_frag: TextFrag = frags._frags[0]
     has_name = False
-    for frag in frags: # TODO use split_items
+    for frag in frags:  # TODO use split_items
         if (
             frag.font == "f27"
         ):  # This is for Call Famillar and other spells that have multiple sections
@@ -118,7 +115,9 @@ def split_enhancements(frags: FragList) -> list[DCProtoItem]:  # TODO use split_
                 continue
 
             if has_name and current_enhancement.name != "":
-                current_enhancement.name = fixup_name(current_enhancement.name.strip(), "enhancement")
+                current_enhancement.name = fixup_name(
+                    current_enhancement.name.strip(), "enhancement"
+                )
                 enhancements.append(current_enhancement)
                 current_enhancement = DCProtoItem()
 
@@ -130,7 +129,9 @@ def split_enhancements(frags: FragList) -> list[DCProtoItem]:  # TODO use split_
 
         prev_frag = frag
 
-    current_enhancement.name = fixup_name(current_enhancement.name.strip(), "enhancement")
+    current_enhancement.name = fixup_name(
+        current_enhancement.name.strip(), "enhancement"
+    )
     enhancements.append(current_enhancement)
     return enhancements
 

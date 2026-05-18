@@ -4,6 +4,7 @@ from typing import Optional
 
 class Enhancement:
     _type: str = "enhancement"
+
     def __init__(self):
         self._type = "enhancement"
         self.name: str = ""

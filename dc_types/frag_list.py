@@ -51,8 +51,10 @@ class FragList:
         return re.match(regex, self._frags[0].text) is not None
 
     def find_multi_while(
-        self, predicate: Callable[[TextFrag], bool], multi_filter: str,
-        min_one: bool = True
+        self,
+        predicate: Callable[[TextFrag], bool],
+        multi_filter: str,
+        min_one: bool = True,
     ) -> list[str]:
         li: list[str] = []
         frag: TextFrag = self.next()
@@ -100,7 +102,9 @@ class FragList:
     ) -> str:
         return self.cat_while(lambda f, s: not predicate(f, s), transform)
 
-    def markup_while(self, predicate: Callable[[TextFrag], bool], min_one: bool = True) -> str:
+    def markup_while(
+        self, predicate: Callable[[TextFrag], bool], min_one: bool = True
+    ) -> str:
         if self.is_empty():
             return ""
         s: str = ""
@@ -120,7 +124,9 @@ class FragList:
         s += markup(None, prev_frag, MarkupStyle.MARKDOWN)
         return s
 
-    def markup_until(self, predicate: Callable[[TextFrag], bool], min_one: bool = True) -> str:
+    def markup_until(
+        self, predicate: Callable[[TextFrag], bool], min_one: bool = True
+    ) -> str:
         return self.markup_while(lambda f: not predicate(f), min_one)
 
     def assert_frag(self, f: Callable[[TextFrag], bool], msg: Optional[str] = None):

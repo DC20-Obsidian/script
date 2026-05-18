@@ -10,6 +10,7 @@ from .proto_item import DCProtoItem
 
 class Item(ABC):
     _type: str = "<none>"
+
     def __init__(self):
         self._type: str = Item._type
         self.name: str = ""

@@ -39,6 +39,7 @@ def split_items(
         type,
     )
 
+
 class SplitPrams:
     def __init__(self, is_header: Callable[[str, TextFrag], bool]):
         # Discard from here to next header
@@ -57,6 +58,7 @@ class SplitPrams:
 
         # Increment section counter
         self.is_section: Callable[[TextFrag], bool] = _false
+
 
 def split_items_full(
     frags: FragList,
@@ -105,7 +107,14 @@ def split_items_full(
     finish_item(current_item, items, prams, type, fixup_transform)
     return items
 
-def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, type: str, fixup: Callable[[str, str], str]):
+
+def finish_item(
+    item: DCProtoItem,
+    items: list[DCProtoItem],
+    prams: SplitPrams,
+    type: str,
+    fixup: Callable[[str, str], str],
+):
     item.name = item.name.strip().lower()
     if not item.name:
         # Discard Items with empty names
@@ -130,9 +139,9 @@ def finish_item(item: DCProtoItem, items: list[DCProtoItem], prams: SplitPrams, 
     items.append(item)
 
 
-
 def _false(*_args) -> bool:
     return False
+
 
 def _empty_list():
     return field(default_factory=lambda: [])
@@ -141,10 +150,14 @@ def _empty_list():
 @dataclass(kw_only=True)
 class SplitBuilder:
     discard_from_frag: Union[Callable[[TextFrag], bool], list[str]] = _empty_list()
-    is_header: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]]
+    is_header: Union[
+        Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]
+    ]
     cont_item: Union[Callable[[str], bool], list[str]] = _empty_list()
     discard_item: Union[Callable[[str], bool], list[str]] = _empty_list()
-    discard_frag: Union[Callable[[TextFrag], bool], list[str]] = field(default_factory=lambda: ["f2", "f9", "f1"])
+    discard_frag: Union[Callable[[TextFrag], bool], list[str]] = field(
+        default_factory=lambda: ["f2", "f9", "f1"]
+    )
     is_section: Union[Callable[[TextFrag], bool], list[str]] = _empty_list()
 
     def build(self) -> SplitPrams:
@@ -157,9 +170,12 @@ class SplitBuilder:
         return prams
 
 
-def _frag_list(x: Union[Callable[[TextFrag], bool], list[str], tuple[list[str], float]]) -> Callable[[TextFrag], bool]:
+def _frag_list(
+    x: Union[Callable[[TextFrag], bool], list[str], tuple[list[str], float]],
+) -> Callable[[TextFrag], bool]:
     def f(frag: TextFrag, li, size) -> bool:
         return frag.font in li and frag.font_size <= size
+
     if isinstance(x, list):
         return lambda frag: frag.font in x
     if isinstance(x, tuple):
@@ -170,9 +186,13 @@ def _frag_list(x: Union[Callable[[TextFrag], bool], list[str], tuple[list[str], 
         return lambda frag: f(frag, li, size)
     return x
 
-def _is_header(x: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]]) -> Callable[[str, TextFrag], bool]:
+
+def _is_header(
+    x: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[str], float]],
+) -> Callable[[str, TextFrag], bool]:
     def f(frag: TextFrag, li, size) -> bool:
         return frag.font in li and frag.font_size <= size
+
     if isinstance(x, list):
         return lambda _, frag: frag.font in x
     if isinstance(x, tuple):
@@ -182,6 +202,7 @@ def _is_header(x: Union[Callable[[str, TextFrag], bool], list[str], tuple[list[s
         assert isinstance(size, float) or isinstance(size, int)
         return lambda _, frag: f(frag, li, size)
     return x
+
 
 def _name_list(x: Union[Callable[[str], bool], list[str]]) -> Callable[[str], bool]:
     if isinstance(x, list):

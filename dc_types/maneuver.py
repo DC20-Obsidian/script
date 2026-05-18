@@ -8,6 +8,7 @@ from .item import Item
 
 class Maneuver(Item):
     _type: str = "maneuver"
+
     def __init__(self):
         self._type: str = "maneuver"
         self.page: int = -1

@@ -10,6 +10,7 @@ from .proto_item import DCProtoItem
 
 class Skill(Item):
     _type: str = "skill"
+
     def __init__(self):
         self._type = "skill"
         self.name: str = ""

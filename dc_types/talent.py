@@ -12,6 +12,7 @@ from .text_frag import TextFrag
 
 class Talent(Item):
     _type: str = "talent"
+
     def __init__(self):
         self._type: str = "talent"
         self.name: str = ""
@@ -54,6 +55,7 @@ class Talent(Item):
             if frag.font == "f3":
                 return frag.font_size >= 16
             return False
+
         split_prams: SplitPrams = SplitBuilder(
             is_header=(["f3"], 15),
             is_section=is_section,

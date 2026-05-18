@@ -68,10 +68,11 @@ def parse_metadata(talent: Talent, metadata: str):
             metadata = re.sub(level_regex, "", metadata)
             assert level
             talent.level = int(level.group(1))
-        talent.requires = list(map(lambda s: s.removesuffix("Feature").strip(), metadata.split(",")))
+        talent.requires = list(
+            map(lambda s: s.removesuffix("Feature").strip(), metadata.split(","))
+        )
         if not talent.requires[0]:
             talent.requires.pop()
 
     if talent.name == "Internal Damage":
         talent.requires = []
-

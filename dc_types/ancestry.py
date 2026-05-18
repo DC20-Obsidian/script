@@ -14,6 +14,7 @@ from .proto_item import DCProtoItem
 
 class Ancestry(Item):
     _type: str = "ancestry"
+
     def __init__(self):
         self._type = "ancestry"
         self.name: str = ""
@@ -60,11 +61,12 @@ class Ancestry(Item):
 
     def save_subitems(self, prefix: Path):
         import os
+
         for trait in self.traits:
             file_name: Path = trait.markdown_path(prefix)
             markdown: str = trait.markdown()
             os.makedirs(file_name.parent, exist_ok=True)
-            with open(file_name, 'w') as file:
+            with open(file_name, "w") as file:
                 file.write(markdown)
 
     def fixup(self) -> Self:
@@ -105,7 +107,9 @@ class Trait(Item):
             "page": str(self.page),
             "cost": f"({str(self.cost)})",
             "cost_prop": str(self.cost),
-            "requires": f"\n**Requires:** {self.dependent_on}" if self.dependent_on else "",
+            "requires": f"\n**Requires:** {self.dependent_on}"
+            if self.dependent_on
+            else "",
             "requires_prop": requires_prop(self),
             "description": self.description,
             "default": str(self.default).lower(),
@@ -132,14 +136,16 @@ class Trait(Item):
     def markdown_path(self, prefix: Path) -> Path:
         return prefix / "ancestries/traits" / self.ancestry / f"{self.name}.md"
 
+
 def requires_prop(trait: Trait) -> str:
     requres = trait.dependent_on
     if not requres:
         return "null"
     if requres[0].isupper():
-        return f"\"[[ancestries/traits/{trait.ancestry}/{requres}|{requres}]]\""
+        return f'"[[ancestries/traits/{trait.ancestry}/{requres}|{requres}]]"'
     else:
         return requres
+
 
 template: str = """---
 name: {name}

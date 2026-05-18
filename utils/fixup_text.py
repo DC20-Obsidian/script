@@ -15,11 +15,14 @@ def load_words(files: list[str]) -> list[str]:
     words.sort(key=str.__len__, reverse=True)
     return words
 
+
 def cap_acronyms(s: str) -> str:
     return re.sub(acronyms, lambda m: f" {m.group(1).upper()} ", s)
 
+
 def lower_articles(s: str) -> str:
     return re.sub(articles, lambda m: f" {m.group(1).lower()} ", s)
+
 
 words: dict[str, list[str]] = {
     "spell": load_words(["spells"]),
@@ -30,9 +33,12 @@ words: dict[str, list[str]] = {
     "talent": load_words(["talents"]),
 }
 
-acronyms: str = f"(?: |^)({"|".join(re.escape(a) for a in load_words(["acronyms"]))})(?: |$)"
-articles: str = f"(?: |^)({"|".join(re.escape(a) for a in load_words(["articles"]))})(?: |$)"
-
+acronyms: str = (
+    f"(?: |^)({'|'.join(re.escape(a) for a in load_words(['acronyms']))})(?: |$)"
+)
+articles: str = (
+    f"(?: |^)({'|'.join(re.escape(a) for a in load_words(['articles']))})(?: |$)"
+)
 
 
 def fixup(s: str, words: list[str]) -> str:
@@ -86,8 +92,10 @@ def fixup_name(name: str, ty: str) -> str:
     name = name.title()
     name = cap_acronyms(name)
     name = lower_articles(name)
-    name = lower_articles(name) # Run it twice
-    name = re.sub("-([A-Z])", lambda m: f"-{m.group(1).lower()}", name) # Foo-Bar -> Foo-bar
+    name = lower_articles(name)  # Run it twice
+    name = re.sub(
+        "-([A-Z])", lambda m: f"-{m.group(1).lower()}", name
+    )  # Foo-Bar -> Foo-bar
     name = re.sub(" +", " ", name)
     return re.sub("'S", "'s", name).strip()
 
