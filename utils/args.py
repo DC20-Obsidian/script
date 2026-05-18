@@ -1,5 +1,5 @@
 import argparse
-from lib.utils import eprint
+from utils.debug import eprint
 from utils.colors import colors
 
 

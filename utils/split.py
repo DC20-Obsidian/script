@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any, Union
-from lib.utils import eprint
+from utils.debug import eprint
 from collections.abc import Callable
-from lib.fixup_text import fixup_name
+from utils.fixup_text import fixup_name
 from dc_types.text_frag import TextFrag
 from dc_types.proto_item import DCProtoItem
 from dc_types.frag_list import FragList

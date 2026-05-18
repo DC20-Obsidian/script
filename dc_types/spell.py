@@ -1,7 +1,7 @@
 import re
 from typing import Self
 from pathlib import Path
-from lib.utils import list_to_yaml, fmt_bool
+from utils.frontmatter import list_to_yaml, fmt_bool
 from dc_types.item import Item
 from .enhancement import Enhancement
 

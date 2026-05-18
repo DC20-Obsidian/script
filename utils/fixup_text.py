@@ -1,4 +1,4 @@
-from lib.utils import eprint
+from utils.debug import eprint
 import re
 
 

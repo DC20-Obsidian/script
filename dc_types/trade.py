@@ -4,7 +4,7 @@ from utils.split import split_items_full, SplitBuilder
 from dc_types.proto_item import DCProtoItem
 from dc_types.frag_list import FragList
 from dc_types.item import Item
-from lib.utils import list_to_yaml
+from utils.frontmatter import list_to_yaml
 
 
 class Trade(Item):

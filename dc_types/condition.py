@@ -1,6 +1,6 @@
-from lib.utils import fmt_bool
 from typing import Self
 from pathlib import Path
+from utils.frontmatter import fmt_bool
 from dc_types.item import Item
 
 

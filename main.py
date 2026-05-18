@@ -6,10 +6,11 @@ from collections.abc import Callable
 from pathlib import Path
 from utils.args import Args
 from utils.colors import colors
-from lib.utils import flatten_pages, eprint
+from utils.debug import eprint
 from dc_types.proto_item import DCProtoItem
 from utils.parse import parse_proto_items
 from dc_types.frag_list import FragList
+from dc_types.text_frag import TextFrag
 from dc_types.serde import dc_obj_decoder, DCObjEncoder
 from dc_types.item import Item
 from utils.get_type import get_type
@@ -99,6 +100,16 @@ def load_raw(args: Args, item_type: Type[Item]) -> list[DCProtoItem]:
     assert not len(items_raw) == 0, "Unable to load raw items, split into 0 items"
 
     return items_raw
+
+
+def flatten_pages(pages: list[dict]) -> FragList:
+    frags: FragList = FragList()
+    for page in pages:
+        page_number: int = page["page"]
+        for text_frag in page["textItems"]:
+            frag: TextFrag = TextFrag(text_frag, page_number)
+            frags.append(frag)
+    return frags
 
 
 if __name__ == "__main__":

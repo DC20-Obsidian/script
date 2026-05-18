@@ -1,8 +1,8 @@
 import re
-from lib.utils import eprint
+from utils.debug import eprint
 from utils.colors import colors
-from lib.markup import assert_font
-from lib.fixup_text import fixup_description
+from utils.markup import assert_font
+from utils.fixup_text import fixup_description
 from utils.split import split_items_full, SplitPrams, SplitBuilder
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag

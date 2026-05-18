@@ -1,10 +1,10 @@
 from dc_types.enhancement import Enhancement
-from lib.markup import assert_font
+from utils.markup import assert_font
 
-# from lib.utils import eprint
+# from utils.debug import eprint
 # from utils.colors import colors
 from utils.split import split_items
-from lib.fixup_text import fixup_description
+from utils.fixup_text import fixup_description
 from dc_types.frag_list import FragList
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag

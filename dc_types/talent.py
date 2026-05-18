@@ -1,7 +1,7 @@
-from lib.utils import fmt_bool
-from dc_types.text_frag import TextFrag
 from typing import Self, Optional
 from pathlib import Path
+from dc_types.text_frag import TextFrag
+from utils.frontmatter import fmt_bool
 from dc_types.item import Item
 from dc_types.proto_item import DCProtoItem
 from dc_types.frag_list import FragList

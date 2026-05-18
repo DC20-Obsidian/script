@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from lib.utils import eprint
+from utils.debug import eprint
 from utils.colors import colors
 from dc_types.item import Item
 from dc_types.proto_item import DCProtoItem

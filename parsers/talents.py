@@ -1,7 +1,7 @@
 from typing import Optional
-from lib.fixup_text import fixup_description
+from utils.fixup_text import fixup_description
 import re
-from lib.utils import eprint
+from utils.debug import eprint
 from utils.colors import colors
 from dc_types.proto_item import DCProtoItem
 from dc_types.frag_list import FragList
