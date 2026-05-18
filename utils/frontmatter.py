@@ -1,4 +1,3 @@
-
 def list_to_yaml(li: list[str], link_folder: str = "") -> str:
     if not li:
         return "" # Empty

@@ -1,11 +1,14 @@
-from typing import Self, Optional
 from pathlib import Path
-from dc_types.text_frag import TextFrag
+from typing import Optional, Self
+
 from utils.frontmatter import fmt_bool
-from dc_types.item import Item
-from dc_types.proto_item import DCProtoItem
-from dc_types.frag_list import FragList
 from utils.split import SplitBuilder, SplitPrams, split_items_full
+
+from .frag_list import FragList
+from .item import Item
+from .proto_item import DCProtoItem
+from .text_frag import TextFrag
+
 
 class Talent(Item):
     _type: str = "talent"

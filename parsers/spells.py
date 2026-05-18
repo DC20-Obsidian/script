@@ -1,12 +1,12 @@
 # from utils.debug import eprint
 # from utils.colors import colors
-from utils.markup import assert_font
-from utils.fixup_text import fixup_description, fixup_name
-from dc_types.proto_item import DCProtoItem
-from dc_types.text_frag import TextFrag
-from dc_types.spell import Spell
 from dc_types.enhancement import Enhancement
 from dc_types.frag_list import FragList
+from dc_types.proto_item import DCProtoItem
+from dc_types.spell import Spell
+from dc_types.text_frag import TextFrag
+from utils.fixup_text import fixup_description, fixup_name
+from utils.markup import assert_font
 
 
 def parse_spell(proto_spell: DCProtoItem) -> Spell:

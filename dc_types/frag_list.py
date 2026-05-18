@@ -1,7 +1,9 @@
 import re
-from typing import Self, Optional
 from collections.abc import Callable
-from utils.markup import markup, MarkupStyle
+from typing import Optional, Self
+
+from utils.markup import MarkupStyle, markup
+
 from .text_frag import TextFrag
 
 

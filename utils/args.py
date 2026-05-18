@@ -1,6 +1,7 @@
 import argparse
-from utils.debug import eprint
+
 from utils.colors import colors
+from utils.debug import eprint
 
 
 class Args:

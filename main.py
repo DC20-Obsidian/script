@@ -1,19 +1,20 @@
 #!/usr/bin/env python
-import os
 import json
-from typing import Type
+import os
 from collections.abc import Callable
 from pathlib import Path
+from typing import Type
+
+from dc_types.frag_list import FragList
+from dc_types.item import Item
+from dc_types.proto_item import DCProtoItem
+from dc_types.serde import DCObjEncoder, dc_obj_decoder
+from dc_types.text_frag import TextFrag
 from utils.args import Args
 from utils.colors import colors
 from utils.debug import eprint
-from dc_types.proto_item import DCProtoItem
-from utils.parse import parse_proto_items
-from dc_types.frag_list import FragList
-from dc_types.text_frag import TextFrag
-from dc_types.serde import dc_obj_decoder, DCObjEncoder
-from dc_types.item import Item
 from utils.get_type import get_type
+from utils.parse import parse_proto_items
 
 dc20_version: str = "0.10.5"
 prefix: Path = Path("./dc-obsidian")

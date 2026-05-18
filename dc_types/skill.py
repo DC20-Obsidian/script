@@ -1,9 +1,12 @@
-from typing import Self
 from pathlib import Path
-from utils.split import split_items_full, SplitBuilder
-from dc_types.proto_item import DCProtoItem
-from dc_types.frag_list import FragList
-from dc_types.item import Item
+from typing import Self
+
+from utils.split import SplitBuilder, split_items_full
+
+from .frag_list import FragList
+from .item import Item
+from .proto_item import DCProtoItem
+
 
 class Skill(Item):
     _type: str = "skill"

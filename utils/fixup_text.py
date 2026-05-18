@@ -1,5 +1,6 @@
-from utils.debug import eprint
 import re
+
+# from utils.debug import eprint
 
 
 def load_words(files: list[str]) -> list[str]:

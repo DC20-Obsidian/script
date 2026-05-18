@@ -1,8 +1,9 @@
 from collections.abc import Callable
-from utils.debug import eprint
-from utils.colors import colors
+
 from dc_types.item import Item
 from dc_types.proto_item import DCProtoItem
+from utils.colors import colors
+from utils.debug import eprint
 
 
 def parse_proto_items(

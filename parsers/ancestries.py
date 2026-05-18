@@ -1,13 +1,14 @@
 import re
-from utils.debug import eprint
-from utils.colors import colors
-from utils.markup import assert_font
-from utils.fixup_text import fixup_description
-from utils.split import split_items_full, SplitPrams, SplitBuilder
+
+from dc_types.ancestry import Ancestry, Trait
+from dc_types.frag_list import FragList
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
-from dc_types.frag_list import FragList
-from dc_types.ancestry import Ancestry, Trait
+from utils.colors import colors
+from utils.debug import eprint
+from utils.fixup_text import fixup_description
+from utils.markup import assert_font
+from utils.split import SplitBuilder, SplitPrams, split_items_full
 
 
 def parse_ancestry(proto: DCProtoItem) -> Ancestry:

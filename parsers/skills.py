@@ -1,8 +1,9 @@
 import re
-from utils.fixup_text import fixup_description
-from dc_types.text_frag import TextFrag
-from dc_types.skill import Skill
+
 from dc_types.proto_item import DCProtoItem
+from dc_types.skill import Skill
+from dc_types.text_frag import TextFrag
+from utils.fixup_text import fixup_description
 
 
 def parse_skill(proto: DCProtoItem) -> Skill:

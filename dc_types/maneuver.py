@@ -1,8 +1,9 @@
 import re
-from typing import Self
 from pathlib import Path
-from dc_types.item import Item
+from typing import Self
+
 from .enhancement import Enhancement
+from .item import Item
 
 
 class Maneuver(Item):

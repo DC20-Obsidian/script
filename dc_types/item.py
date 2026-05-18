@@ -1,9 +1,11 @@
-from pathlib import Path
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Self
-from dc_types.frag_list import FragList
-from dc_types.proto_item import DCProtoItem
+
 from utils.split import split_items_default
+
+from .frag_list import FragList
+from .proto_item import DCProtoItem
 
 
 class Item(ABC):

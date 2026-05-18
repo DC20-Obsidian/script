@@ -1,12 +1,14 @@
-from typing import Optional
-from utils.fixup_text import fixup_description
 import re
-from utils.debug import eprint
-from utils.colors import colors
-from dc_types.proto_item import DCProtoItem
+from typing import Optional
+
 from dc_types.frag_list import FragList
-from dc_types.text_frag import TextFrag
+from dc_types.proto_item import DCProtoItem
 from dc_types.talent import Talent
+from utils.fixup_text import fixup_description
+
+# from dc_types.text_frag import TextFrag
+# from utils.colors import colors
+# from utils.debug import eprint
 
 
 def parse_talent(proto: DCProtoItem) -> Talent:

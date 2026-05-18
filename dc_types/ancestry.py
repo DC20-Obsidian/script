@@ -1,13 +1,15 @@
-from utils.debug import eprint
-from utils.colors import colors
 import re
 from functools import reduce
 from pathlib import Path
-from dc_types.proto_item import DCProtoItem
-from dc_types.frag_list import FragList
-from utils.split import split_items_full, SplitPrams, SplitBuilder
+from typing import Optional, Self
+
+from utils.colors import colors
+from utils.debug import eprint
+from utils.split import SplitBuilder, SplitPrams, split_items_full
+
+from .frag_list import FragList
 from .item import Item
-from typing import Self, Optional
+from .proto_item import DCProtoItem
 
 
 class Ancestry(Item):

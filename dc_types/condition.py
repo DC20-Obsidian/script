@@ -1,7 +1,9 @@
-from typing import Self
 from pathlib import Path
+from typing import Self
+
 from utils.frontmatter import fmt_bool
-from dc_types.item import Item
+
+from .item import Item
 
 
 class Condition(Item):

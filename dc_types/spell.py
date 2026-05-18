@@ -1,9 +1,11 @@
 import re
-from typing import Self
 from pathlib import Path
-from utils.frontmatter import list_to_yaml, fmt_bool
-from dc_types.item import Item
+from typing import Self
+
+from utils.frontmatter import fmt_bool, list_to_yaml
+
 from .enhancement import Enhancement
+from .item import Item
 
 
 class Spell(Item):

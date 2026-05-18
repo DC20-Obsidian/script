@@ -1,11 +1,13 @@
-from dataclasses import dataclass, field
-from typing import Any, Union
-from utils.debug import eprint
 from collections.abc import Callable
-from utils.fixup_text import fixup_name
-from dc_types.text_frag import TextFrag
-from dc_types.proto_item import DCProtoItem
+from dataclasses import dataclass, field
+from typing import Union
+
 from dc_types.frag_list import FragList
+from dc_types.proto_item import DCProtoItem
+from dc_types.text_frag import TextFrag
+from utils.fixup_text import fixup_name
+
+# from utils.debug import eprint
 
 
 def split_items_default(frags: FragList, type: str) -> list[DCProtoItem]:
