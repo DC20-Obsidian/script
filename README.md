@@ -15,11 +15,16 @@
 This is a script to convert the DC20 TTRPG PDF into JSON and Obsidian flavored markdown.
 
 ## How do I access the output?
-Use the website to unlock and download the zip archive. [website](https://dc20obsidain.pages.dev/) (TODO include link to website) It requires owning a copy of the PDF to unlock, so if you don't own a copy, go ahead and buy one [here](https://thedungeoncoach.com/products/dc20-core-rules).
+Use the website to unlock and download the zip archive. ([Output](/output) [Unlock Tool](/unlock.html)) It requires owning a copy of the PDF to unlock, so if you don't own a copy, go ahead and buy one [here](https://thedungeoncoach.com/products/dc20-core-rules).
 
 ## Is there a free version?
 Yes, Alan (AKA the Dungeon Coach) has graciously permitted us to share the player options for levels 1-2.
-*(Note: while the code in this repository is open source, DC20, both the source PDF and the output of this script, including the free section, is proprietary. Any questions regarding this should be directed to Alan thedungeoncoach@thedungeoncoach.com, or one of his [discord moderators](https://discord.gg/8yCwh6ZVq7))*
+
+## Are there any restrictions?
+While the code in this repository is open source,
+DC20, both the source PDF and the output of this script, including the free section, is proprietary.
+**This is under the same restrictions as the orginal PDF.**
+Any questions regarding this should be directed to Alan thedungeoncoach@thedungeoncoach.com, or one of his [discord moderators](https://discord.gg/8yCwh6ZVq7))
 
 ## What is the project status/roadmap?
 - [X] spells
@@ -37,10 +42,10 @@ Yes, Alan (AKA the Dungeon Coach) has graciously permitted us to share the playe
 	- [ ] subclasses
 - [ ] actions
 - [ ] damage types
-- [ ] attributes
+- [X] attributes
 	- [ ] saves
-	- [ ] skills
-	- [ ] trades
+	- [X] skills
+	- [X] trades
 	- [ ] languages
 - [ ] equipment
 	- [ ] weapons
@@ -65,13 +70,17 @@ Yes, Alan (AKA the Dungeon Coach) has graciously permitted us to share the playe
 ## What is the difference between the locked and unlocked versions?
 The free/publicly available version is missing the following:
 - **Spells with a base MP cost of 2 or more**
-	-  Banish, Gravity Shift, Increase Gravity, Time Stop, Confusion, Slumber, Revivify, Disintegrating Beam, Disintegrate
+	- Banish, Confusion, Disintegrating Beam, Disintegrate, Gravity Shift, Increase Gravity, Revivify, Slumber, Time Stop
 - **Maneuvers with a base SP cost of 2 or more**
 	- Sunder Strike
 - **Talents with a level requirement of 3 or more**
-	- Unfathomable Strength, Expanded Repertoire, Helping Hands, Champion's Resolve, Disciplined Combatant, Bountiful Blessings, Divine Cleanse, Seize Momentum, Coordinated Command, Wild Form Expansion, Nature's Vortex, Pack Leader, Big Game Hunter, Internal Damage, Steel Fist, Unseen Ambusher, Sinister Shot, Greater Innate Power, Font of Magic, Sling-blade, Adaptive Bond, Pact Bane, Warlock Subcontract, Crowned Sigil, Overly Prepared Spellcaster, Adept Multiclass, Expert Multiclass, Master Multiclass
+	- Adaptive Bond, Adept Multiclass, Big Game Hunter, Bountiful Blessings, Champion's Resolve, Coordinated Command, Crowned Sigil, Disciplined Combatant, Divine Cleanse, Expanded Repertoire, Expert Multiclass, Font of Magic, Greater Innate Power, Helping Hands, Internal Damage, M, Nature's Vortex, Overly Prepared Spellcaster, Pack Leader, Pact Bane, Seize Momentum, Sinister Shot, Sling-blade, Steel Fist, Unfathomable Strength, Unseen Ambusher, Warlock Subcontract, Wild Form Expansionaster Multiclass
+- **Level 3+ Class Features**
+- **Subclasses**
 - **Monsters**
 - **Magazine Content** (This will be locked behind their respective magazines)
+- **Input JSON Data**
+- **Full git history**
 
 # Development
 ## Adding a new Item Type
