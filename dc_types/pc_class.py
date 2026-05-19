@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Self, Optional
+from typing import Optional, Self
 
 from dc_types.frag_list import FragList
 from dc_types.item import Item
@@ -24,6 +24,7 @@ class Class(Item):
 
         self.flavor_feature: Optional[Feature] = None
         self.features: list[Feature] = []
+        self.subclasses: list[Subclass] = []
         self.debug = None
 
     @classmethod
@@ -72,11 +73,27 @@ class Feature(Item):
         raise
 
     @classmethod
-    def get_default_page_range(cls) -> slice:
+    def split(cls, frags: FragList) -> list[DCProtoItem]:
         raise
 
+    def markdown_path(self, prefix: Path) -> Path:
+        raise
+
+    def markdown(self) -> str:
+        raise
+
+
+class Subclass(Item):
+    _type: str = "subcalss"
+    def __init__(self):
+        self._type: str = "subclass"
+        self.name: str = ""
+        self.page: int = -1
+        self.flavor_feature: Optional[Feature] = None
+        self.features: list[Feature] = []
+
     @classmethod
-    def get_save_file(cls, data_folder: Path, version: str) -> Path:
+    def from_json(cls, d: dict) -> Self:
         raise
 
     @classmethod

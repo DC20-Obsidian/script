@@ -1,9 +1,10 @@
+import re
+
+from dc_types.frag_list import FragList
+from dc_types.pc_class import Class, Feature, Subclass
+from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
 from utils.debug import eprint
-import re
-from dc_types.frag_list import FragList
-from dc_types.pc_class import Class, Feature
-from dc_types.proto_item import DCProtoItem
 from utils.fixup_text import fixup_description, fixup_name
 from utils.split import SplitBuilder, split_items_full
 
@@ -24,8 +25,9 @@ def parse_class(proto: DCProtoItem) -> Class:
     # TODO Parse Class Table
     assert frags.match_next_regex(".* Class Table$")
     frags.discard_next()
-    frags.discard_while(lambda frag: frag.font in ["f19"])  # Table Header
-    frags.discard_while(lambda frag: frag.font in ["f22"])
+    # f19: table header; f22: table body
+    class_table: FragList = FragList.slice_while(frags, lambda frag: frag.font in ["f19", "f22"])
+    parse_class_table(class_table, cl)
 
     flavor2: str = fixup_description(  # This part is for Bard flavor text
         frags.markup_until(lambda frag: frag.font in ["f4", "f10"], min_one=False)
@@ -130,8 +132,6 @@ def parse_class_features(frags: FragList, cl: Class):
         is_header=is_level,
     ).build()
     levels = split_items_full(frags, level_split_prams, "<none>")
-    cl.debug = [level.name for level in levels]
-    # cl.debug = [level.frags._frags[0:2] for level in levels]
     for level in levels:
         cl.features.extend(parse_class_level(level, cl))
 
@@ -161,17 +161,57 @@ def parse_class_level(proto: DCProtoItem, cl: Class) -> list[Feature]:
     if level == 1: # Flavor Feature
         flavor_feature: Feature = features.pop(-1)
         flavor_name = re.match(r"([a-zA-Z -]+) \( ?Flavor", flavor_feature.name)
-        eprint(flavor_feature.name)
         assert flavor_name
         flavor_feature.name = flavor_name.group(1)
-        if cl.name == "Druid":
+        if cl.name == "Druid": # Remove Wild Form Templates Sidbar
             flavor_feature.description = re.sub(
                 " WILD FORM TEMPLATES SIDEBAR .*", "", flavor_feature.description
             )
         cl.flavor_feature = flavor_feature
 
+    # Readd "Talent" etc... later since theas are at spisfic levels
     return [f for f in features if f.name not in ["Talent", "Path Progression", "Ancestry Points"]]
 
 
 def parse_subclasses(frags: FragList, cl: Class):
+    prams = SplitBuilder(
+        is_header=["f4"],
+    ).build()
+    subclasses: list[DCProtoItem] = split_items_full(frags, prams, "subclasses")
+    cl.subclasses = [parse_subclass_inner(sc) for sc in subclasses]
+    pass
+
+
+def parse_subclass_inner(proto: DCProtoItem) -> Subclass:
+    subclass = Subclass()
+    subclass.name = proto.name
+    subclass.page = proto.page
+
+    false_positives: list[str] = ["concoctionrecipes", "runenames"]
+    prams = SplitBuilder(
+        is_header=["f3"],
+        cont_item=lambda name: name in false_positives,
+    ).build()
+    proto_features: list[DCProtoItem] = split_items_full(proto.frags, prams, "subclasses")
+
+    def parse_feature(proto: DCProtoItem) -> Feature:
+        feature = Feature()
+        feature.name = proto.name
+        feature.page = proto.page
+        feature.level = 3 # TODO support levels
+        feature.description = fixup_description(proto.frags.markup_rest())
+        return feature
+
+    features = [parse_feature(f) for f in proto_features]
+
+    flavor_feature: Feature = features.pop(-1)
+    flavor_name = re.match(r"([a-zA-Z -]+) \( ?Flavor", flavor_feature.name)
+    assert flavor_name
+    flavor_feature.name = flavor_name.group(1)
+    subclass.flavor_feature = flavor_feature
+
+    subclass.features = features
+    return subclass
+
+def parse_class_table(frags: FragList, cl: Class):
     pass

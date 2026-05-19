@@ -17,12 +17,10 @@ class Item(ABC):
         self.page: int = -1
 
     @classmethod
-    @abstractmethod
     def get_default_page_range(cls) -> slice[int, int]:
         raise Exception("Abstract method")
 
     @classmethod
-    @abstractmethod
     def get_save_file(cls, data_folder: Path, version: str) -> Path:
         (_, _) = (data_folder, version)
         raise Exception("Abstract method")
