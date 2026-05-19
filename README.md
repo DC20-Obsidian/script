@@ -89,7 +89,7 @@ The free/publicly available version is missing the following:
   - implement `__init__`, `from_json`, `markdown`, `get_default_page_range`, `get_save_file`, and `markdown_path`
 - Add to the `dc_obj_decoder` function in `dc_types/serde.py`
 - Add a parser to `parsers/`
-- Add to the `get_type` function in `main.py`
+- Add to the `get_type` function in `utils/get_type.py`
 
 ### Debugging
 - Make sure you have the correct set of pages
