@@ -31,6 +31,8 @@ words: dict[str, list[str]] = {
     "condition": load_words(["conditions"]),
     "ancestry_trait": load_words(["ancestry_traits"]),
     "talent": load_words(["talents"]),
+    "combat training": load_words(["combat_training"]),
+    "features": load_words(["features"])
 }
 
 acronyms: str = (

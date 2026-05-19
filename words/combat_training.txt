@@ -1,0 +1,5 @@
+light
+heavy
+shields
+armor
+focuses

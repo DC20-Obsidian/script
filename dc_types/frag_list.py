@@ -162,3 +162,19 @@ class FragList:
 
     def discard_while(self, predicate: Callable[[TextFrag], bool]) -> int:
         return self.discard_until(lambda f: not predicate(f))
+
+    @classmethod
+    def slice_while(cls, source: Self, predicate: Callable[[TextFrag], bool]) -> Self:
+        sli = cls()
+        frag = source.next()
+
+        while predicate(frag):
+            sli.append(frag)
+            frag = source.next()
+
+        source._frags.insert(0, frag)
+        return sli
+
+    @classmethod
+    def slice_until(cls, source: Self, predicate: Callable[[TextFrag], bool]) -> Self:
+        return cls.slice_while(source, lambda f: not predicate(f))

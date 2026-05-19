@@ -13,6 +13,7 @@ from dc_types.talent import Talent
 from dc_types.text_frag import TextFrag
 from dc_types.trade import Trade
 from dc_types.weapon_property import WeaponProp
+from dc_types.pc_class import Class
 
 
 class DCObjEncoder(json.JSONEncoder):
@@ -52,6 +53,8 @@ def dc_obj_decoder(d: dict):
             return Trade.from_json(d)
         case "weapon_prop":
             return WeaponProp.from_json(d)
+        case "class":
+            return Class.from_json(d)
         case _:
             raise Exception(
                 f"Unable to decode type: {d['_type']}. Please add it to dc_obj_decoder"

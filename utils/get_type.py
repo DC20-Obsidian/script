@@ -1,4 +1,3 @@
-from dc_types.weapon_property import WeaponProp
 from collections.abc import Callable
 from typing import Type
 
@@ -6,12 +5,15 @@ from dc_types.ancestry import Ancestry
 from dc_types.condition import Condition
 from dc_types.item import Item
 from dc_types.maneuver import Maneuver
+from dc_types.pc_class import Class
 from dc_types.proto_item import DCProtoItem
 from dc_types.skill import Skill
 from dc_types.spell import Spell
 from dc_types.talent import Talent
 from dc_types.trade import Trade
+from dc_types.weapon_property import WeaponProp
 from parsers.ancestries import parse_ancestry
+from parsers.classes import parse_class
 from parsers.conditions import parse_condition
 from parsers.maneuvers import parse_maneuver
 from parsers.skills import parse_skill
@@ -39,5 +41,7 @@ def get_type(s: str) -> tuple[Type[Item], Callable[[DCProtoItem], Item]]:
             return (Trade, parse_trade)
         case "weapon_prop":
             return (WeaponProp, parse_weapon_prop)
+        case "classes":
+            return (Class, parse_class)
         case _:
             raise Exception(f"type {s} not supported")

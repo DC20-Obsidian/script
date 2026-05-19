@@ -33,6 +33,7 @@ class Args:
             "skills",
             "trades",
             "weapon_prop",
+            "classes",
         ]
         parser.add_argument(
             "-t",
