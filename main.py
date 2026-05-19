@@ -78,7 +78,7 @@ def load_parsed(
         return load_saved(args, item_type)
     else:
         items_raw: list[DCProtoItem] = load_raw(args, item_type)
-        return list(map(parser, items_raw))
+        return parse_proto_items(items_raw, parser)
 
 
 def load_saved(args: Args, item_type: Type[Item]) -> list[Item]:
