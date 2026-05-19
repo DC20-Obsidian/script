@@ -126,25 +126,25 @@ class Trait(Item):
 
     @classmethod
     def get_default_page_range(cls) -> slice[int, int]:
-        raise Exception("Not implimented")
+        raise Exception("Not implemented")
 
     @classmethod
     def get_save_file(cls, data_folder: Path, version: str) -> Path:
         (_, _) = (data_folder, version)
-        raise Exception("Not implimented")
+        raise Exception("Not implemented")
 
     def markdown_path(self, prefix: Path) -> Path:
         return prefix / "ancestries/traits" / self.ancestry / f"{self.name}.md"
 
 
 def requires_prop(trait: Trait) -> str:
-    requres = trait.dependent_on
-    if not requres:
+    requires = trait.dependent_on
+    if not requires:
         return "null"
-    if requres[0].isupper():
-        return f'"[[ancestries/traits/{trait.ancestry}/{requres}|{requres}]]"'
+    if requires[0].isupper():
+        return f'"[[ancestries/traits/{trait.ancestry}/{requires}|{requires}]]"'
     else:
-        return requres
+        return requires
 
 
 template: str = """---

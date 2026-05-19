@@ -45,7 +45,7 @@ class Args:
             "-u",
             "--unprocessed",
             action="store_true",
-            help="only output unprocessed text fragments (implies --raw) (usefull for debugging)",
+            help="only output unprocessed text fragments (implies --raw) (useful for debugging)",
         )
         parser.add_argument(
             "-f",
@@ -62,7 +62,7 @@ class Args:
             "-m",
             "--markdown",
             action="store_true",
-            help="output markdown insted of JSON",
+            help="output markdown instead of JSON",
         )
         args = parser.parse_args()
 
