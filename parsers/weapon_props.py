@@ -18,7 +18,7 @@ def parse_weapon_prop(proto: DCProtoItem) -> WeaponProp:
 
     prop.description = proto.frags.markup_rest()
 
-    requires_regex: str = r"\(Requires: ([a-zA-Z-]+)(?: Property)\) ?"
+    requires_regex: str = r"\(Requires: ([a-zA-Z -]+)(?: Property)\) ?"
     requires = re.match(requires_regex, prop.description)
     if requires:
         prop.description = re.sub(requires_regex, "", prop.description)
