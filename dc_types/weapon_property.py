@@ -1,9 +1,10 @@
-from dc_types.frag_list import FragList
+import json
 from pathlib import Path
-from typing import Self
+from typing import Self, Optional
 
-from utils.split import split_items_full, SplitBuilder
+from dc_types.frag_list import FragList
 from utils.frontmatter import list_to_yaml
+from utils.split import SplitBuilder, split_items_full
 
 from .item import Item
 from .proto_item import DCProtoItem
@@ -17,7 +18,7 @@ class WeaponProp(Item):
         self._type: str = "weapon_prop"
         self.page: int = -1
         self.name: str = ""
-        self.cost: int = -100
+        self.cost: Optional[int] = None
         self.requires: list[str] = []
         self.description: str = ""
         self.kind: str = ""
@@ -51,20 +52,23 @@ class WeaponProp(Item):
         return split_items_full(frags, prams, "weapon_prop")
 
     @classmethod
-    def extra_items(cls) -> list[Item]:
+    def extra_items(cls, prefix: Path) -> tuple[list[Item], Optional[Path]]:
+        # with open(extra_file, "r") as file:
+        #     return json.load(file, object_hook=dc_obj_decoder)
+
         ammo = cls()
         ammo.name = "Ammo"
         ammo.page = 165
-        ammo.cost = -100
+        ammo.cost = 100
         ammo.description = "This Weapon requires ammunition to make Attacks. You can load a Weapon as part of an Attack made with it."
         ammo.kind = "Ranged"
-        return [ammo]
+        return ([], prefix / "weapon_properties.json")
 
     def markdown(self) -> str:
         args: dict = {
             "page": self.page,
             "name": self.name,
-            "cost": self.cost,
+            "cost": self.cost or "null",
             "requires": list_to_yaml(self.requires),
             "description": self.description,
             "kind": self.kind,

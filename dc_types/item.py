@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Self
+from typing import Self, Optional
 
 from utils.split import split_items_default
 
@@ -51,5 +51,5 @@ class Item(ABC):
         return
 
     @classmethod
-    def extra_items(cls) -> list[Self]:
-        return []
+    def extra_items(cls, prefix: Path) -> tuple[list[Self], Optional[Path]]:
+        return ([], None)
