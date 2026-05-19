@@ -23,7 +23,7 @@ def parse_skill(proto: DCProtoItem) -> Skill:
     uses: list[str] = list(
         map(frag_text, filter(lambda f: f.font in use_fonts, frags._frags))
     )
-    description = fixup_description(frags.markup_while(lambda _: True))
+    description = fixup_description(frags.markup_rest())
 
     # Nest/make lists see "Survival"
     description = re.sub(r"\n- ", "\n  - ", description)

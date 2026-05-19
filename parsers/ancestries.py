@@ -95,6 +95,6 @@ def parse_trait(proto: DCProtoItem, ancestry_name: str) -> Trait:
     else:
         trait.kind = sections_normal[proto.section + 1]
         trait.default = proto.section == -1
-    trait.description += fixup_description(proto.frags.markup_while(lambda _: True))
+    trait.description += fixup_description(proto.frags.markup_rest())
 
     return trait.fixup()

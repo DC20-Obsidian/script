@@ -70,6 +70,6 @@ def parse_enhancement(proto_enhancement: DCProtoItem) -> Enhancement:
 
     (cost, _, desc) = frags.cat_while(lambda _, s: ")" not in s).partition(")")
     enhancement.cost = cost.lstrip(": (")
-    enhancement.description = f"{desc} {frags.markup_while(lambda _: True)}".strip()
+    enhancement.description = f"{desc} {frags.markup_rest()}".strip()
 
     return enhancement.fixup()

@@ -102,6 +102,9 @@ class FragList:
     ) -> str:
         return self.cat_while(lambda f, s: not predicate(f, s), transform)
 
+    def cat_rest(self, transform: Callable[[str], str] = lambda s: s) -> str:
+        return self.cat_while(lambda _, __: True, transform)
+
     def markup_while(
         self, predicate: Callable[[TextFrag], bool], min_one: bool = True
     ) -> str:
@@ -128,6 +131,9 @@ class FragList:
         self, predicate: Callable[[TextFrag], bool], min_one: bool = True
     ) -> str:
         return self.markup_while(lambda f: not predicate(f), min_one)
+
+    def markup_rest(self) -> str:
+        return self.markup_while(lambda _: True)
 
     def assert_frag(self, f: Callable[[TextFrag], bool], msg: Optional[str] = None):
         frag = self.next()

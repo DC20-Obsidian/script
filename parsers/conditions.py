@@ -15,7 +15,7 @@ def parse_condition(proto_cond: DCProtoItem) -> Condition:
     cond.page = proto_cond.frags.next_get_page()
     frags: FragList = proto_cond.frags
 
-    desc: str = frags.markup_while(lambda _: True)
+    desc: str = frags.markup_rest()
 
     cond.description = fixup_description(desc)
     return cond

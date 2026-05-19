@@ -40,7 +40,7 @@ def parse_trade(proto: DCProtoItem) -> Trade:
     )
     trade.categories = categories
 
-    description = fixup_description(frags.markup_while(lambda _: True))
+    description = fixup_description(frags.markup_rest())
     trade.description = re.sub(r" \*\*\*", "\n- ***", description)
 
     return trade

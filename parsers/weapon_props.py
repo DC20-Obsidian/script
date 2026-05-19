@@ -16,7 +16,7 @@ def parse_weapon_prop(proto: DCProtoItem) -> WeaponProp:
     kinds: list[str] = ["Melee", "Ranged"]
     prop.kind = kinds[proto.section - 1]
 
-    prop.description = proto.frags.markup_while(lambda _: True)
+    prop.description = proto.frags.markup_rest()
 
     requires_regex: str = r"\(Requires: ([a-zA-Z-]+)(?: Property)\) ?"
     requires = re.match(requires_regex, prop.description)

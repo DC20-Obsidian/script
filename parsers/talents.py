@@ -40,7 +40,7 @@ def parse_talent(proto: DCProtoItem) -> Talent:
     metadata: str = frags.cat_while(lambda frag, _: frag.font in ["f26"])
     parse_metadata(talent, metadata)
 
-    talent.description = fixup_description(frags.markup_while(lambda _: True).strip())
+    talent.description = fixup_description(frags.markup_rest().strip())
     return talent
 
 
