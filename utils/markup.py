@@ -55,7 +55,7 @@ def markup(
         return f"{s} "
 
     def header(s: str) -> str:
-        return f"\n## {s}\n"
+        return f"\n### {s}\n"
 
     def quote(s: str, type: str = "tip") -> str:
         (title, _, body) = s.partition(":")
