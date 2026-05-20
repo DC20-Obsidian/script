@@ -60,14 +60,8 @@ class Ancestry(Item):
         return template.format(**args)
 
     def save_subitems(self, prefix: Path):
-        import os
-
         for trait in self.traits:
-            file_name: Path = trait.markdown_path(prefix)
-            markdown: str = trait.markdown()
-            os.makedirs(file_name.parent, exist_ok=True)
-            with open(file_name, "w") as file:
-                file.write(markdown)
+            trait.save_self(prefix)
 
     def fixup(self) -> Self:
         return self

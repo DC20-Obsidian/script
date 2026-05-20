@@ -63,11 +63,7 @@ def main(args: Args):
                 file.write(json.dumps(items, cls=DCObjEncoder, indent=2))
         else:
             for item in items:
-                markdown: str = item.markdown()
-                path: Path = item.markdown_path(prefix)
-                os.makedirs(path.parent, exist_ok=True)
-                with open(path, "w") as file:
-                    file.write(markdown)
+                item.save_self(prefix)
                 item.save_subitems(prefix)
 
 

@@ -51,3 +51,14 @@ class Item(ABC):
     @classmethod
     def extra_items(cls, prefix: Path) -> tuple[list[Self], Optional[Path]]:
         return ([], None)
+
+    def fixup(self) -> Self:
+        return self
+
+    def save_self(self, prefix: Path):
+        import os
+        file_name: Path = self.markdown_path(prefix)
+        markdown: str = self.markdown()
+        os.makedirs(file_name.parent, exist_ok=True)
+        with open(file_name, "w") as file:
+            file.write(markdown)
