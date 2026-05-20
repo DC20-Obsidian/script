@@ -79,13 +79,23 @@ def fixup_misc(s: str) -> str:
         (r"\*+ \*+", r" "),
         (r"P ?a ?s ?s ?i ?v ?e", r"Passive"),
         (r" ?\*\*Spell Passive ?", r"\n**Spell Passive"),
-        (r"Additionaly", r"Additionally"),
         (r" +", r" "),  # Remove duplicate spaces
     ]
 
     for fix in misc_fixes:
         s = re.sub(fix[0], fix[1], s)
     return s.strip()
+
+
+def fix_spelling(s: str) -> str:
+    spelling: list[tuple[str, str]] = [
+        (r"Additionaly", r"Additionally"),
+        (r"Otherwordly", r"Otherworldly"),  # for Otherworldly Gift
+        (r"discernable", r"discernible"),  # for Arcane Sigil
+    ]
+    for fix in spelling:
+        s = re.sub(fix[0], fix[1], s)
+    return s
 
 
 def fixup_name(name: str, ty: str) -> str:
@@ -100,7 +110,8 @@ def fixup_name(name: str, ty: str) -> str:
         "-([A-Z])", lambda m: f"-{m.group(1).lower()}", name
     )  # Foo-Bar -> Foo-bar
     name = re.sub(" +", " ", name)
-    return re.sub("'S", "'s", name).strip()
+    name = re.sub("'S", "'s", name).strip()
+    return fix_spelling(name)
 
 
 def fixup_description(s: str) -> str:
