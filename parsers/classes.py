@@ -145,24 +145,26 @@ def parse_class_level(proto: DCProtoItem, cl: Class) -> list[Feature]:
         is_header=["f3"],
     ).build()
 
-    def parse_feature(proto: DCProtoItem, level: int) -> Feature:
+    def parse_feature(proto: DCProtoItem, level: int, class_name: str) -> Feature:
         f = Feature()
         f.name = proto.name
         f.page = proto.page
+        f.class_name = class_name
         f.level = level
         f.description = fixup_description(proto.frags.markup_rest())
-        return f
+        return f.fixup()
 
     features_proto: list[DCProtoItem] = split_items_full(
         proto.frags, split_prams, "features"
     )
-    features: list[Feature] = [parse_feature(f, level) for f in features_proto]
+    features: list[Feature] = [parse_feature(f, level, cl.name) for f in features_proto]
 
     if level == 1: # Flavor Feature
         flavor_feature: Feature = features.pop(-1)
         flavor_name = re.match(r"([a-zA-Z -]+) \( ?Flavor", flavor_feature.name)
         assert flavor_name
         flavor_feature.name = flavor_name.group(1)
+        flavor_feature.is_flavor = True
         if cl.name == "Druid": # Remove Wild Form Templates Sidbar
             flavor_feature.description = re.sub(
                 " WILD FORM TEMPLATES SIDEBAR .*", "", flavor_feature.description
@@ -178,14 +180,15 @@ def parse_subclasses(frags: FragList, cl: Class):
         is_header=["f4"],
     ).build()
     subclasses: list[DCProtoItem] = split_items_full(frags, prams, "subclasses")
-    cl.subclasses = [parse_subclass_inner(sc) for sc in subclasses]
+    cl.subclasses = [parse_subclass_inner(sc, cl) for sc in subclasses]
     pass
 
 
-def parse_subclass_inner(proto: DCProtoItem) -> Subclass:
+def parse_subclass_inner(proto: DCProtoItem, cl: Class) -> Subclass:
     subclass = Subclass()
     subclass.name = proto.name
     subclass.page = proto.page
+    subclass.class_name = cl.name
 
     false_positives: list[str] = ["concoctionrecipes", "runenames"]
     prams = SplitBuilder(
@@ -194,20 +197,23 @@ def parse_subclass_inner(proto: DCProtoItem) -> Subclass:
     ).build()
     proto_features: list[DCProtoItem] = split_items_full(proto.frags, prams, "subclasses")
 
-    def parse_feature(proto: DCProtoItem) -> Feature:
+    def parse_feature(proto: DCProtoItem, subclass: Subclass) -> Feature:
         feature = Feature()
         feature.name = proto.name
         feature.page = proto.page
+        feature.class_name = subclass.class_name
+        feature.subclass = subclass.name
         feature.level = 3 # TODO support levels
         feature.description = fixup_description(proto.frags.markup_rest())
-        return feature
+        return feature.fixup()
 
-    features = [parse_feature(f) for f in proto_features]
+    features = [parse_feature(f, subclass) for f in proto_features]
 
     flavor_feature: Feature = features.pop(-1)
     flavor_name = re.match(r"([a-zA-Z -]+) \( ?Flavor", flavor_feature.name)
     assert flavor_name
     flavor_feature.name = flavor_name.group(1)
+    flavor_feature.is_flavor = True
     subclass.flavor_feature = flavor_feature
 
     subclass.features = features
