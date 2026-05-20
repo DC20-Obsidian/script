@@ -1,4 +1,5 @@
 import re
+from typing import Callable, Union
 
 # from utils.debug import eprint
 
@@ -14,6 +15,16 @@ def load_words(files: list[str]) -> list[str]:
                 words.append(line)
     words.sort(key=str.__len__, reverse=True)
     return words
+
+
+def load_links(files: list[str]) -> list[tuple[re.Pattern, str]]:
+    lines: list[str] = load_words(files)
+    links = [line.partition(":") for line in lines]
+    # return [(re.compile(fr"(?<=[\* \.,]|^){link[0].strip()}(?=[$\* \.,])"), link[2].strip()) for link in links]
+    return [
+        (re.compile(rf"(?<![^\* \.,\n]){link[0].strip()}(?![^\* \.,\n])"), link[2].strip())
+        for link in links
+    ]
 
 
 def cap_acronyms(s: str) -> str:
@@ -36,12 +47,28 @@ words: dict[str, list[str]] = {
     "subclasses": load_words(["subclasses"]),
 }
 
+links = load_links(["links"])
+
 acronyms: str = (
     f"(?: |^)({'|'.join(re.escape(a) for a in load_words(['acronyms']))})(?: |$)"
 )
 articles: str = (
     f"(?: |^)({'|'.join(re.escape(a) for a in load_words(['articles']))})(?: |$)"
 )
+
+
+def fix_links(text: str, links: list[tuple[re.Pattern, str]]) -> str:
+    for link in links:
+        (replace_pat, link) = link
+
+        def replace_link(match: re.Match[str]) -> str:
+            if link:
+                return f"[[{link}/{match.group(0)}|{match.group(0)}]]"
+            else:
+                return f"[[{match.group(0)}]]"
+
+        text = re.sub(replace_pat, replace_link, text)
+    return text
 
 
 def fixup(s: str, words: list[str]) -> str:
@@ -67,7 +94,7 @@ def fixup_misc(s: str) -> str:
     def identity(match: re.Match):
         return match.group(1)
 
-    misc_fixes = [
+    misc_fixes: list[tuple[str, Union[str, Callable]]] = [
         (r"’", r"'"),
         (r"\u0001+", r" "),
         # (r'([,:\.])', add_space_after), # , . :
@@ -116,5 +143,6 @@ def fixup_name(name: str, ty: str) -> str:
 
 def fixup_description(s: str) -> str:
     s = fixup_misc(s).removesuffix("\n-")
-    s = re.sub(r"Wild Magic Table", "[[Wild Magic Table]]", s)
+    s = fix_spelling(s)
+    s = fix_links(s, links)
     return s
