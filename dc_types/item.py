@@ -40,7 +40,7 @@ class Item(ABC):
         raise Exception("Abstract method")
 
     @abstractmethod
-    def markdown_path(self, prefix: Path) -> Path:
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
         _ = prefix
         raise Exception("Abstract method")
 

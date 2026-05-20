@@ -42,8 +42,8 @@ class Class(Item):
     def get_save_file(cls, data_folder: Path, version: str) -> Path:
         return data_folder / f"classes_{version}.json"
 
-    def markdown_path(self, prefix: Path) -> Path:
-        raise
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
+        return prefix / f"Classes/{self.name}/{self.name}.md"
 
     @classmethod
     def split(cls, frags: FragList) -> list[DCProtoItem]:

@@ -43,7 +43,7 @@ class Talent(Item):
     def get_save_file(cls, data_folder: Path, version: str) -> Path:
         return data_folder / f"talents_{version}.json"
 
-    def markdown_path(self, prefix: Path) -> Path:
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
         class_name: str = f"{self.class_name}/" if self.class_name else ""
         return prefix / f"Talents/{class_name}{self.name}.md"
 

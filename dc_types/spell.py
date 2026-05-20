@@ -84,7 +84,7 @@ class Spell(Item):
     def get_save_file(cls, data_folder: Path, version: str) -> Path:
         return data_folder / f"spells_{version}.json"
 
-    def markdown_path(self, prefix: Path) -> Path:
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
         return prefix / "Spells/Spells" / f"{self.name}.md"
 
 

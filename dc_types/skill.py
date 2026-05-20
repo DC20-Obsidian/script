@@ -29,7 +29,7 @@ class Skill(Item):
         skill.uses = d["uses"]
         return skill
 
-    def markdown_path(self, prefix: Path) -> Path:
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
         return prefix / f"Attributes/Skills/{self.name}.md"
 
     @classmethod

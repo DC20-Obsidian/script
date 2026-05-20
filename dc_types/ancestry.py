@@ -39,7 +39,7 @@ class Ancestry(Item):
     def get_save_file(cls, data_folder: Path, version: str) -> Path:
         return data_folder / f"ancestries_{version}.json"
 
-    def markdown_path(self, prefix: Path) -> Path:
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
         return prefix / "ancestries/ancestries" / f"{self.name}.md"
 
     @classmethod
@@ -133,7 +133,7 @@ class Trait(Item):
         (_, _) = (data_folder, version)
         raise Exception("Not implemented")
 
-    def markdown_path(self, prefix: Path) -> Path:
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
         return prefix / "ancestries/traits" / self.ancestry / f"{self.name}.md"
 
 

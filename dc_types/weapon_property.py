@@ -75,7 +75,7 @@ class WeaponProp(Item):
         }
         return template.format(**args)
 
-    def markdown_path(self, prefix: Path) -> Path:
+    def markdown_path(self, prefix: Path = Path("")) -> Path:
         return prefix / f"Equipment/Weapons/Properties/{self.kind}/{self.name}.md"
 
 
