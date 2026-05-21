@@ -6,7 +6,7 @@ from utils.debug import eprint
 
 class Args:
     def __init__(self, default_page: int):
-        parser = argparse.ArgumentParser(prog="parse-spells")
+        parser = argparse.ArgumentParser(prog="parse-dc20-pdf")
         parser.add_argument("page", default=default_page, nargs="?")
         parser.add_argument("last_page", nargs="?")
         parser.add_argument(
