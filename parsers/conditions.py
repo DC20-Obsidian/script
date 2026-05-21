@@ -3,7 +3,7 @@
 from dc_types.condition import Condition
 from dc_types.frag_list import FragList
 from dc_types.proto_item import DCProtoItem
-from utils.fixup_text import fixup_description, fixup_name
+from utils.fixup_text import fixup_description
 
 
 def parse_condition(proto_cond: DCProtoItem) -> Condition:

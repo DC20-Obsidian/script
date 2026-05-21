@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import json
-import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import Type

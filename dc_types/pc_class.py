@@ -6,7 +6,6 @@ from dc_types.frag_list import FragList
 from dc_types.item import Item
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
-from utils.debug import eprint
 from utils.frontmatter import fmt_bool, list_to_yaml
 from utils.split import SplitBuilder, split_items_full
 

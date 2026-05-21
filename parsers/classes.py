@@ -4,7 +4,6 @@ from dc_types.frag_list import FragList
 from dc_types.pc_class import Class, Feature, Subclass
 from dc_types.proto_item import DCProtoItem
 from dc_types.text_frag import TextFrag
-from utils.debug import eprint
 from utils.fixup_text import fixup_description, fixup_name
 from utils.split import SplitBuilder, split_items_full
 

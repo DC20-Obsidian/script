@@ -1,10 +1,7 @@
-import re
 from functools import reduce
 from pathlib import Path
 from typing import Optional, Self
 
-from utils.colors import colors
-from utils.debug import eprint
 from utils.split import SplitBuilder, SplitPrams, split_items_full
 
 from .frag_list import FragList
