@@ -40,7 +40,7 @@ class Ancestry(Item):
         return data_folder / f"ancestries_{version}.json"
 
     def markdown_path(self, prefix: Path = Path("")) -> Path:
-        return prefix / "ancestries/ancestries" / f"{self.name}.md"
+        return prefix / "Ancestries/Ancestries" / f"{self.name}.md"
 
     @classmethod
     def split(cls, frags: FragList) -> list[DCProtoItem]:
@@ -128,7 +128,7 @@ class Trait(Item):
         raise Exception("Not implemented")
 
     def markdown_path(self, prefix: Path = Path("")) -> Path:
-        return prefix / "ancestries/traits" / self.ancestry / f"{self.name}.md"
+        return prefix / "Ancestries/Traits" / self.ancestry / f"{self.name}.md"
 
 
 def requires_prop(trait: Trait) -> str:

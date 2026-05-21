@@ -103,7 +103,8 @@ def fixup_misc(s: str) -> str:
         (r" ([\.,:\)])", identity),  # Remove spaces in front
         (r"([\(]) ", identity),  # Remove spaces after
         # (r"([*\)]) :", r"\1:"),  # "Save (5) :" -> "Save (5):"
-        (r"\*+ \*+", r" "),
+        ("-At-", "-at-"),
+        (r"\*+ +\*+", r" "),
         (r"P ?a ?s ?s ?i ?v ?e", r"Passive"),
         (r" ?\*\*Spell Passive ?", r"\n**Spell Passive"),
         (r" +", r" "),  # Remove duplicate spaces
@@ -126,17 +127,16 @@ def fix_spelling(s: str) -> str:
 
 
 def fixup_name(name: str, ty: str) -> str:
-    name = re.sub("’", "'", name)
     if words.get(ty) is not None:
         name = fixup(name.lower(), words[ty])
     name = name.title()
     name = cap_acronyms(name)
     name = lower_articles(name)
     name = lower_articles(name)  # Run it twice
-    name = re.sub(
-        "-([A-Z])", lambda m: f"-{m.group(1).lower()}", name
-    )  # Foo-Bar -> Foo-bar
-    name = re.sub(" +", " ", name)
+    # name = re.sub(
+    #     "-([A-Z])", lambda m: f"-{m.group(1).lower()}", name
+    # )  # Foo-Bar -> Foo-bar
+    name = fixup_misc(name)
     name = re.sub("'S", "'s", name).strip()
     return fix_spelling(name)
 

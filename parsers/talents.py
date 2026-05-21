@@ -32,7 +32,7 @@ def parse_talent(proto: DCProtoItem) -> Talent:
         "Spellblade",
         "Warlock",
         "Wizard",
-        "multicalss",
+        "multiclass",
     ]
     section: int = max(proto.section - 2, 0)
     talent.class_name = classes[section]

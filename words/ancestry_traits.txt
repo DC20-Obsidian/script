@@ -12,3 +12,4 @@ movement
 weakness
 natural
 weapon
+breathing
