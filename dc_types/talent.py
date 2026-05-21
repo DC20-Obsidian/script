@@ -64,13 +64,19 @@ class Talent(Item):
         return split_items_full(frags, split_prams, "talent")
 
     def markdown(self) -> str:
+        class_name = self.class_name or "null"
+        class_name = (
+            f'"[[Classes/{class_name}/{class_name}|{class_name}]]"'
+            if class_name not in ["general", "multiclass"]
+            else f'"[[Talents/{class_name.title()} Talents|{class_name}]]"'
+        )
         args = {
             "name": self.name,
             "page": self.page,
             "level": self.level or "null",
             "requires": self.requires,
             "repeatable": fmt_bool(self.repeatable),
-            "class_name": self.class_name or "null",
+            "class_name": class_name,
             "description": self.description,
         }
         return template.format(**args)
