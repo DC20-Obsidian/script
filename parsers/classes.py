@@ -26,7 +26,9 @@ def parse_class(proto: DCProtoItem) -> Class:
     assert frags.match_next_regex(".* Class Table$")
     frags.discard_next()
     # f19: table header; f22: table body
-    class_table: FragList = FragList.slice_while(frags, lambda frag: frag.font in ["f19", "f22"])
+    class_table: FragList = FragList.slice_while(
+        frags, lambda frag: frag.font in ["f19", "f22"]
+    )
     parse_class_table(class_table, cl)
 
     flavor2: str = fixup_description(  # This part is for Bard flavor text
@@ -159,20 +161,24 @@ def parse_class_level(proto: DCProtoItem, cl: Class) -> list[Feature]:
     )
     features: list[Feature] = [parse_feature(f, level, cl.name) for f in features_proto]
 
-    if level == 1: # Flavor Feature
+    if level == 1:  # Flavor Feature
         flavor_feature: Feature = features.pop(-1)
         flavor_name = re.match(r"([a-zA-Z -]+) \( ?Flavor", flavor_feature.name)
         assert flavor_name
         flavor_feature.name = flavor_name.group(1)
         flavor_feature.is_flavor = True
-        if cl.name == "Druid": # Remove Wild Form Templates Sidbar
+        if cl.name == "Druid":  # Remove Wild Form Templates Sidbar
             flavor_feature.description = re.sub(
                 " WILD FORM TEMPLATES SIDEBAR .*", "", flavor_feature.description
             )
         cl.flavor_feature = flavor_feature
 
     # Readd "Talent" etc... later since theas are at spisfic levels
-    return [f for f in features if f.name not in ["Talent", "Path Progression", "Ancestry Points"]]
+    return [
+        f
+        for f in features
+        if f.name not in ["Talent", "Path Progression", "Ancestry Points"]
+    ]
 
 
 def parse_subclasses(frags: FragList, cl: Class):
@@ -195,7 +201,9 @@ def parse_subclass_inner(proto: DCProtoItem, cl: Class) -> Subclass:
         is_header=["f3"],
         cont_item=lambda name: name in false_positives,
     ).build()
-    proto_features: list[DCProtoItem] = split_items_full(proto.frags, prams, "subclasses")
+    proto_features: list[DCProtoItem] = split_items_full(
+        proto.frags, prams, "subclasses"
+    )
 
     def parse_feature(proto: DCProtoItem, subclass: Subclass) -> Feature:
         feature = Feature()
@@ -203,7 +211,7 @@ def parse_subclass_inner(proto: DCProtoItem, cl: Class) -> Subclass:
         feature.page = proto.page
         feature.class_name = subclass.class_name
         feature.subclass = subclass.name
-        feature.level = 3 # TODO support levels
+        feature.level = 3  # TODO support levels
         feature.description = fixup_description(proto.frags.markup_rest())
         return feature.fixup()
 
@@ -218,6 +226,7 @@ def parse_subclass_inner(proto: DCProtoItem, cl: Class) -> Subclass:
 
     subclass.features = features
     return subclass
+
 
 def parse_class_table(frags: FragList, cl: Class):
     pass

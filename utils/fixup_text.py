@@ -22,7 +22,10 @@ def load_links(files: list[str]) -> list[tuple[re.Pattern, str]]:
     links = [line.partition(":") for line in lines]
     # return [(re.compile(fr"(?<=[\* \.,]|^){link[0].strip()}(?=[$\* \.,])"), link[2].strip()) for link in links]
     return [
-        (re.compile(rf"(?<![^\* \.,\n]){link[0].strip()}(?![^\* \.,\n])"), link[2].strip())
+        (
+            re.compile(rf"(?<![^\* \.,\n]){link[0].strip()}(?![^\* \.,\n])"),
+            link[2].strip(),
+        )
         for link in links
     ]
 

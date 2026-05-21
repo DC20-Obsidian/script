@@ -3,10 +3,11 @@ from dc_types.weapon_property import WeaponProp
 from dc_types.proto_item import DCProtoItem
 from utils.fixup_text import fixup_description
 
+
 def parse_weapon_prop(proto: DCProtoItem) -> WeaponProp:
     prop = WeaponProp()
     prop.page = proto.page
-    
+
     name = re.match(r"• ?\((?P<cost>-?[0-9]+)\) ?(?P<name>[a-zA-Z-]+):", proto.name)
     assert name, f"Property {proto.name} has an invalid name"
 
