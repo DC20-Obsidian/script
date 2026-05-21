@@ -59,8 +59,9 @@ def main(args: Args):
 
     if args.write:
         if not args.markdown:
-            with open(save_file, "w") as file:
-                file.write(json.dumps(items, cls=DCObjEncoder, indent=2))
+            raise Exception('--write not supported with json output. Pipe output through `jq` instead, like so "./main.py <args...> | jq . > dc-obsidain/json/<filename>.json"')
+            # with open(save_file, "w") as file:
+            #     file.write(json.dumps(items, cls=DCObjEncoder, indent=2))
         else:
             for item in items:
                 item.save_self(prefix)
